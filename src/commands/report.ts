@@ -1,6 +1,8 @@
 import { loadConfig, resolveWorker } from "../config/loader";
 import { getStorageRoot } from "../storage/paths";
 import { loadRun, loadLatestRun, loadGolden } from "../storage/index";
+import { diff } from "../diff/index";
+import { renderDiffTable, renderDetailedDiff } from "../render/table";
 
 export async function cmdReport(
   datasetId: string,
@@ -8,7 +10,7 @@ export async function cmdReport(
   opts: { worker?: string; format?: string },
 ): Promise<void> {
   const config = await loadConfig();
-  const { name: workerName } = resolveWorker(config, opts.worker);
+  const { name: workerName, worker } = resolveWorker(config, opts.worker);
   const storageRoot = getStorageRoot(config);
 
   const run = timestamp
@@ -50,6 +52,9 @@ export async function cmdReport(
 
   console.log(`Golden: blessed ${golden.blessedAt.slice(0, 10)}`);
 
-  // TODO: Implement diff engine + rendering
-  console.log("\n[diff rendering not yet implemented — coming soon]");
+  const result = diff(golden.output, run.output, worker.schema);
+  console.log();
+  console.log(renderDiffTable(result));
+  console.log();
+  console.log(renderDetailedDiff(result));
 }
