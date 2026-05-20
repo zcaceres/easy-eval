@@ -271,8 +271,9 @@ async function mergeOrderedArray(
   if (choice === "g") return [...gArr];
   if (choice === "e") return [...eArr];
   if (choice === "b") {
-    console.log("  (using golden order for 'both')");
-    return [...gArr];
+    const gSet = new Set(gArr.map((x: unknown) => JSON.stringify(x)));
+    const evalOnly = eArr.filter((x: unknown) => !gSet.has(JSON.stringify(x)));
+    return [...gArr, ...evalOnly];
   }
 
   const result: unknown[] = [];
