@@ -1,106 +1,80 @@
+# easy-eval
 
-Default to using Bun instead of Node.js.
+A CLI toolkit (`ee`) for evaluating structured LLM outputs against golden datasets.
 
-- Use `bun <file>` instead of `node <file>` or `ts-node <file>`
-- Use `bun test` instead of `jest` or `vitest`
-- Use `bun build <file.html|file.ts|file.css>` instead of `webpack` or `esbuild`
-- Use `bun install` instead of `npm install` or `yarn install` or `pnpm install`
-- Use `bun run <script>` instead of `npm run <script>` or `yarn run <script>` or `pnpm run <script>`
-- Use `bunx <package> <command>` instead of `npx <package> <command>`
-- Bun automatically loads .env, so don't use dotenv.
+**Kanban:** https://github.com/users/zcaceres/projects/2
+**Repo:** https://github.com/zcaceres/easy-eval
 
-## APIs
+## What this is
 
-- `Bun.serve()` supports WebSockets, HTTPS, and routes. Don't use `express`.
-- `bun:sqlite` for SQLite. Don't use `better-sqlite3`.
-- `Bun.redis` for Redis. Don't use `ioredis`.
-- `Bun.sql` for Postgres. Don't use `pg` or `postgres.js`.
-- `WebSocket` is built-in. Don't use `ws`.
-- Prefer `Bun.file` over `node:fs`'s readFile/writeFile
-- Bun.$`ls` instead of execa.
+Generalized, open-source extraction of the eval framework from `~/storesdata/pipeline`. The core loop — **bless** a golden reference, **eval** by re-running a generator, **diff** against golden, **merge** improvements back — is pipeline-agnostic. Users plug in their own eval function and output schema.
 
-## Testing
+## Architecture decisions
 
-Use `bun test` to run tests.
+- **Bun-only runtime.** No Node/tsx support. Bun handles TS natively, runs `ee.config.ts` directly.
+- **Diff: auto-diff by default, schema optional.** When no `schema` is defined on a worker, the diff engine recursively compares JSON. Users can define explicit `schema.sections` for clean section-by-section diffs (keyed-array, set, scalar, ordered-array).
+- **Config is code, not YAML.** `ee.config.ts` exports via `defineConfig()` for type safety.
+- **Storage is project-local.** `.ee/{worker}/{datasetId}/` — not a global cache. Goldens can be committed to git; runs/reports are ephemeral.
+- **Workers are named eval targets.** Most projects have one (`default`). The `workers` map handles multi-eval projects.
+- **The framework manages outputs only.** It does not manage input data. Users optionally provide an `inputs()` function that loads whatever their eval function needs.
+- **Cost tracking is user-reported.** The user calls `ctx.reportCost()` during their run function. The framework stores and displays it.
 
-```ts#index.test.ts
-import { test, expect } from "bun:test";
+## CLI commands
 
-test("hello world", () => {
-  expect(1).toBe(1);
-});
+```
+ee init                              Scaffold ee.config.ts and .ee/
+ee eval <datasetId>                  Run eval function, compare against golden
+ee bless <datasetId>                 Promote output to golden
+ee runs <datasetId>                  List past eval runs
+ee report <datasetId> [timestamp]    Show diff report from cached run
+ee merge <datasetId> [timestamp]     Interactively merge eval into golden
+ee status                            Overview of all datasets and goldens
 ```
 
-## Frontend
+## Project structure
 
-Use HTML imports with `Bun.serve()`. Don't use `vite`. HTML imports fully support React, CSS, Tailwind.
-
-Server:
-
-```ts#index.ts
-import index from "./index.html"
-
-Bun.serve({
-  routes: {
-    "/": index,
-    "/api/users/:id": {
-      GET: (req) => {
-        return new Response(JSON.stringify({ id: req.params.id }));
-      },
-    },
-  },
-  // optional websocket support
-  websocket: {
-    open: (ws) => {
-      ws.send("Hello, world!");
-    },
-    message: (ws, message) => {
-      ws.send(message);
-    },
-    close: (ws) => {
-      // handle close
-    }
-  },
-  development: {
-    hmr: true,
-    console: true,
-  }
-})
+```
+src/
+  cli.ts              Commander.js entry point (bin: "ee")
+  index.ts            Public API: defineConfig + type re-exports
+  types.ts            All core types
+  config/loader.ts    Find and import ee.config.ts
+  commands/           One file per CLI command
+  storage/            Filesystem ops for golden, runs, reports
+  diff/               Diff engines (auto + schema-driven) [not yet implemented]
+  render/             Table + markdown renderers [not yet implemented]
+templates/basic/      Starter ee.config.ts for `ee init`
 ```
 
-HTML files can import .tsx, .jsx or .js files directly and Bun's bundler will transpile & bundle automatically. `<link>` tags can point to stylesheets and Bun's CSS bundler will bundle.
+## Key types
 
-```html#index.html
-<html>
-  <body>
-    <h1>Hello, world!</h1>
-    <script type="module" src="./frontend.tsx"></script>
-  </body>
-</html>
+- `EvalConfig` — top-level config with `workers` map and optional `storage`
+- `WorkerConfig` — `run` function + optional `schema` + optional `inputs`
+- `EvalContext` — passed to `run`: `datasetId`, `inputs`, `reportCost()`, `reportMeta()`
+- `Golden<T>` — blessed reference: `{ blessedAt, datasetId, worker, output }`
+- `EvalRun<T>` — run snapshot: `{ timestamp, datasetId, worker, durationMs, cost, output }`
+- `DiffResult` — diff output: `{ sections: SectionDiff[], summary }`
+- `SectionConfig` — `scalar | keyed-array | set | ordered-array`
+
+## Development
+
+```bash
+bun run src/cli.ts --help          # Run CLI locally
+bun run typecheck                  # Type check
+bun run src/cli.ts eval <id>       # Test with a local ee.config.ts
 ```
 
-With the following `frontend.tsx`:
+## Runtime
 
-```tsx#frontend.tsx
-import React from "react";
-import { createRoot } from "react-dom/client";
+- Bun only. Use `bun` not `node`.
+- Use `bun test` for tests.
+- Dependencies: `commander` (CLI framework). Keep deps minimal.
 
-// import .css files directly and it works
-import './index.css';
+## Origin
 
-const root = createRoot(document.body);
-
-export default function Frontend() {
-  return <h1>Hello, world!</h1>;
-}
-
-root.render(<Frontend />);
-```
-
-Then, run index.ts
-
-```sh
-bun --hot ./index.ts
-```
-
-For more information, read the Bun API docs in `node_modules/bun-types/docs/**.mdx`.
+Abstracted from `~/storesdata/pipeline/lib/brand-research/eval/`. Key files that informed the design:
+- `eval-cli.ts` — command structure (bless/eval/runs/report/merge)
+- `eval-storage.ts` — golden/run persistence pattern
+- `eval-diff.ts` — section-based diffing with `SectionDiff`/`DetailRow`
+- `eval-merge.ts` — generic `mergeArray<T>` with `keyFn`/`labelFn`/`eqFn`
+- `eval-refine.md` — Claude Code skill for tracing regressions (future `ee:refine`)
