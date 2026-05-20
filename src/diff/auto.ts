@@ -33,6 +33,12 @@ function diffValue(label: string, path: string, golden: unknown, eval_: unknown)
   if (isObject(golden) && isObject(eval_)) {
     return diffObjects(label, path, golden, eval_);
   }
+  if (isObject(eval_) && (golden === undefined || golden === null)) {
+    return diffObjects(label, path, {} as Record<string, unknown>, eval_);
+  }
+  if (isObject(golden) && (eval_ === undefined || eval_ === null)) {
+    return diffObjects(label, path, golden, {} as Record<string, unknown>);
+  }
 
   return [diffScalar(label, path, golden, eval_)];
 }
@@ -109,16 +115,18 @@ function diffArrays(label: string, path: string, golden: unknown[], eval_: unkno
 }
 
 function diffPrimitiveArrays(label: string, path: string, golden: unknown[], eval_: unknown[]): SectionDiff[] {
-  const gSet = new Set(golden.map(displayValue));
-  const eSet = new Set(eval_.map(displayValue));
+  const serialize = (v: unknown) => JSON.stringify(v) ?? "null";
+  const gSet = new Set(golden.map(serialize));
+  const eSet = new Set(eval_.map(serialize));
   const all = [...new Set([...gSet, ...eSet])].sort();
 
-  const rows: DetailRow[] = all.map((v) => {
-    const inG = gSet.has(v);
-    const inE = eSet.has(v);
-    if (inG && inE) return { status: "match" as const, key: v, golden: v, eval: v };
-    if (inG) return { status: "missing" as const, key: v, golden: v, eval: "" };
-    return { status: "new" as const, key: v, golden: "", eval: v };
+  const rows: DetailRow[] = all.map((serialized) => {
+    const inG = gSet.has(serialized);
+    const inE = eSet.has(serialized);
+    const d = displayValue(JSON.parse(serialized));
+    if (inG && inE) return { status: "match" as const, key: d, golden: d, eval: d };
+    if (inG) return { status: "missing" as const, key: d, golden: d, eval: "" };
+    return { status: "new" as const, key: d, golden: "", eval: d };
   });
 
   return [{
