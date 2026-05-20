@@ -1,5 +1,6 @@
 import { createInterface, type Interface as RLInterface } from "readline";
 import type { DiffSchema, SectionConfig } from "../types";
+import { deepEqual } from "../utils";
 
 // ─── Prompt helpers ──────────────────────────────────────────────────
 
@@ -410,9 +411,6 @@ function isObject(val: unknown): val is Record<string, unknown> {
   return val !== null && typeof val === "object" && !Array.isArray(val);
 }
 
-function deepEqual(a: unknown, b: unknown): boolean {
-  return JSON.stringify(a) === JSON.stringify(b);
-}
 
 function defaultDisplay(val: unknown): string {
   if (val === undefined || val === null) return "—";
