@@ -1,3 +1,4 @@
+import { deepEqual } from "../utils";
 import type {
   DiffSchema,
   DiffResult,
@@ -48,8 +49,8 @@ function diffScalar(
 ): SectionDiff {
   const eq = config.eq ?? deepEqual;
   const display = config.display ?? defaultDisplay;
-  const gStr = display(golden);
-  const eStr = display(eval_);
+  const gStr = hasValue(golden) ? display(golden) : "—";
+  const eStr = hasValue(eval_) ? display(eval_) : "—";
   const match = eq(golden, eval_);
 
   let status: RowStatus;
@@ -219,9 +220,6 @@ function hasValue(val: unknown): boolean {
   return val !== undefined && val !== null;
 }
 
-function deepEqual(a: unknown, b: unknown): boolean {
-  return JSON.stringify(a) === JSON.stringify(b);
-}
 
 function defaultDisplay(val: unknown): string {
   if (val === undefined || val === null) return "—";

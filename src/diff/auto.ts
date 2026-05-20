@@ -1,4 +1,5 @@
 import type { DiffResult, SectionDiff, DetailRow, RowStatus } from "../types";
+import { deepEqual } from "../utils";
 
 export function autoDiff(golden: unknown, eval_: unknown): DiffResult {
   const sections: SectionDiff[] = [];
@@ -269,9 +270,6 @@ function compactDisplay(obj: Record<string, unknown>): string {
   return parts.join(", ");
 }
 
-function deepEqual(a: unknown, b: unknown): boolean {
-  return JSON.stringify(a) === JSON.stringify(b);
-}
 
 function deltaStr(g: number, e: number): string {
   if (g === e) return "=";
