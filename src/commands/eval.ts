@@ -1,6 +1,8 @@
 import { loadConfig, resolveWorker } from "../config/loader";
 import { getStorageRoot } from "../storage/paths";
 import { saveRun, loadGolden } from "../storage/index";
+import { diff } from "../diff/index";
+import { renderDiffTable, renderDetailedDiff } from "../render/table";
 import type { EvalContext, EvalRun, CostReport } from "../types";
 
 export async function cmdEval(
@@ -63,8 +65,11 @@ export async function cmdEval(
     return;
   }
 
-  // TODO: Implement diff engine
   console.log(`\nGolden: blessed ${golden.blessedAt.slice(0, 10)}`);
-  console.log("\n[diff engine not yet implemented — coming soon]");
-  console.log("Run `ee bless` to promote this output, or `ee report` to view details.");
+
+  const result = diff(golden.output, output, worker.schema);
+  console.log();
+  console.log(renderDiffTable(result));
+  console.log();
+  console.log(renderDetailedDiff(result));
 }
