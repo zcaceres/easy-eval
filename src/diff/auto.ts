@@ -9,10 +9,10 @@ export function autoDiff(golden: unknown, eval_: unknown): DiffResult {
     for (const key of allKeys) {
       const gVal = golden[key];
       const eVal = eval_[key];
-      sections.push(diffValue(key, key, gVal, eVal));
+      sections.push(...diffValue(key, key, gVal, eVal));
     }
   } else {
-    sections.push(diffValue("root", "root", golden, eval_));
+    sections.push(...diffValue("root", "root", golden, eval_));
   }
 
   const summary = { matches: 0, changed: 0, missing: 0, new: 0 };
@@ -25,7 +25,7 @@ export function autoDiff(golden: unknown, eval_: unknown): DiffResult {
   return { sections, summary };
 }
 
-function diffValue(label: string, path: string, golden: unknown, eval_: unknown): SectionDiff {
+function diffValue(label: string, path: string, golden: unknown, eval_: unknown): SectionDiff[] {
   if (Array.isArray(golden) || Array.isArray(eval_)) {
     return diffArrays(label, path, asArray(golden), asArray(eval_));
   }
@@ -34,32 +34,37 @@ function diffValue(label: string, path: string, golden: unknown, eval_: unknown)
     return diffObjects(label, path, golden, eval_);
   }
 
-  return diffScalar(label, path, golden, eval_);
+  return [diffScalar(label, path, golden, eval_)];
 }
 
 function diffScalar(label: string, path: string, golden: unknown, eval_: unknown): SectionDiff {
   const gStr = displayValue(golden);
   const eStr = displayValue(eval_);
+  const match = deepEqual(golden, eval_);
 
   let status: RowStatus;
-  if (gStr === eStr) status = "match";
-  else if (gStr === "" || gStr === "—") status = "new";
-  else if (eStr === "" || eStr === "—") status = "missing";
+  if (match) status = "match";
+  else if (golden === undefined || golden === null) status = "new";
+  else if (eval_ === undefined || eval_ === null) status = "missing";
   else status = "changed";
+
+  const gPresent = golden !== undefined && golden !== null;
+  const ePresent = eval_ !== undefined && eval_ !== null;
 
   return {
     label,
     path,
-    goldenCount: gStr ? "1" : "0",
-    evalCount: eStr ? "1" : "0",
-    delta: gStr === eStr ? "=" : (eStr && !gStr ? "+1" : (!eStr && gStr ? "-1" : "~")),
+    goldenCount: gPresent ? "1" : "0",
+    evalCount: ePresent ? "1" : "0",
+    delta: match ? "=" : "~",
     rows: [{ status, key: label, golden: gStr, eval: eStr }],
   };
 }
 
-function diffObjects(label: string, path: string, golden: Record<string, unknown>, eval_: Record<string, unknown>): SectionDiff {
+function diffObjects(label: string, path: string, golden: Record<string, unknown>, eval_: Record<string, unknown>): SectionDiff[] {
   const allKeys = [...new Set([...Object.keys(golden), ...Object.keys(eval_)])].sort();
   const rows: DetailRow[] = [];
+  const childSections: SectionDiff[] = [];
 
   for (const key of allKeys) {
     const gVal = golden[key];
@@ -74,22 +79,28 @@ function diffObjects(label: string, path: string, golden: Record<string, unknown
     else status = "changed";
 
     rows.push({ status, key, golden: gStr, eval: eStr });
+
+    const nested = (isObject(gVal) || isObject(eVal) || Array.isArray(gVal) || Array.isArray(eVal));
+    if (nested && status !== "match") {
+      const childPath = path ? `${path}.${key}` : key;
+      childSections.push(...diffValue(key, childPath, gVal, eVal));
+    }
   }
 
   const gCount = Object.keys(golden).length;
   const eCount = Object.keys(eval_).length;
 
-  return {
+  return [{
     label,
     path,
     goldenCount: gCount,
     evalCount: eCount,
     delta: deltaStr(gCount, eCount),
     rows,
-  };
+  }, ...childSections];
 }
 
-function diffArrays(label: string, path: string, golden: unknown[], eval_: unknown[]): SectionDiff {
+function diffArrays(label: string, path: string, golden: unknown[], eval_: unknown[]): SectionDiff[] {
   if (golden.length > 0 && isObject(golden[0]) && eval_.length > 0 && isObject(eval_[0])) {
     return diffObjectArrays(label, path, golden as Record<string, unknown>[], eval_ as Record<string, unknown>[]);
   }
@@ -97,7 +108,7 @@ function diffArrays(label: string, path: string, golden: unknown[], eval_: unkno
   return diffPrimitiveArrays(label, path, golden, eval_);
 }
 
-function diffPrimitiveArrays(label: string, path: string, golden: unknown[], eval_: unknown[]): SectionDiff {
+function diffPrimitiveArrays(label: string, path: string, golden: unknown[], eval_: unknown[]): SectionDiff[] {
   const gSet = new Set(golden.map(displayValue));
   const eSet = new Set(eval_.map(displayValue));
   const all = [...new Set([...gSet, ...eSet])].sort();
@@ -110,17 +121,17 @@ function diffPrimitiveArrays(label: string, path: string, golden: unknown[], eva
     return { status: "new" as const, key: v, golden: "", eval: v };
   });
 
-  return {
+  return [{
     label,
     path,
     goldenCount: golden.length,
     evalCount: eval_.length,
     delta: deltaStr(golden.length, eval_.length),
     rows,
-  };
+  }];
 }
 
-function diffObjectArrays(label: string, path: string, golden: Record<string, unknown>[], eval_: Record<string, unknown>[]): SectionDiff {
+function diffObjectArrays(label: string, path: string, golden: Record<string, unknown>[], eval_: Record<string, unknown>[]): SectionDiff[] {
   const keyField = guessKeyField(golden, eval_);
 
   if (keyField) {
@@ -148,14 +159,14 @@ function diffObjectArrays(label: string, path: string, golden: Record<string, un
     }
   }
 
-  return {
+  return [{
     label,
     path,
     goldenCount: golden.length,
     evalCount: eval_.length,
     delta: deltaStr(golden.length, eval_.length),
     rows,
-  };
+  }];
 }
 
 function diffKeyedObjectArrays(
@@ -164,7 +175,7 @@ function diffKeyedObjectArrays(
   golden: Record<string, unknown>[],
   eval_: Record<string, unknown>[],
   keyField: string,
-): SectionDiff {
+): SectionDiff[] {
   const gByKey = new Map(golden.map((item) => [String(item[keyField]), item]));
   const eByKey = new Map(eval_.map((item) => [String(item[keyField]), item]));
   const allKeys = [...new Set([...gByKey.keys(), ...eByKey.keys()])].sort();
@@ -188,14 +199,14 @@ function diffKeyedObjectArrays(
     }
   }
 
-  return {
+  return [{
     label,
     path,
     goldenCount: golden.length,
     evalCount: eval_.length,
     delta: deltaStr(golden.length, eval_.length),
     rows,
-  };
+  }];
 }
 
 function guessKeyField(golden: Record<string, unknown>[], eval_: Record<string, unknown>[]): string | null {
