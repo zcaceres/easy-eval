@@ -1,6 +1,10 @@
 import { loadConfig, resolveWorker } from "../config/loader";
 import { getStorageRoot } from "../storage/paths";
-import { loadGolden, loadRun, loadLatestRun } from "../storage/index";
+import { loadGolden, loadRun, loadLatestRun, saveGolden } from "../storage/index";
+import { diff } from "../diff/index";
+import { renderDiffTable } from "../render/table";
+import { interactiveMerge } from "../merge/interactive";
+import type { Golden } from "../types";
 
 export async function cmdMerge(
   datasetId: string,
@@ -8,7 +12,7 @@ export async function cmdMerge(
   opts: { worker?: string },
 ): Promise<void> {
   const config = await loadConfig();
-  const { name: workerName } = resolveWorker(config, opts.worker);
+  const { name: workerName, worker } = resolveWorker(config, opts.worker);
   const storageRoot = getStorageRoot(config);
 
   const golden = await loadGolden(storageRoot, workerName, datasetId);
@@ -33,7 +37,20 @@ export async function cmdMerge(
   console.log(`  Golden: blessed ${golden.blessedAt.slice(0, 10)}`);
   console.log(`  Eval:   ${run.timestamp.slice(0, 19)}`);
 
-  // TODO: Implement interactive merge
-  console.log("\n[interactive merge not yet implemented — coming soon]");
-  console.log("For now, use `ee bless` to promote the eval run directly.");
+  const result = diff(golden.output, run.output, worker.schema);
+  console.log();
+  console.log(renderDiffTable(result));
+
+  const merged = await interactiveMerge(golden.output, run.output, worker.schema);
+
+  const newGolden: Golden = {
+    blessedAt: new Date().toISOString(),
+    datasetId,
+    worker: workerName,
+    output: merged,
+    metadata: run.metadata,
+  };
+
+  await saveGolden(storageRoot, workerName, datasetId, newGolden);
+  console.log(`\nNew golden saved for ${datasetId}`);
 }
