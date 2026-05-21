@@ -3,6 +3,7 @@ import { getStorageRoot } from "../storage/paths";
 import { loadRun, loadLatestRun, loadGolden } from "../storage/index";
 import { diff } from "../diff/index";
 import { renderDiffTable, renderDetailedDiff } from "../render/table";
+import { bold, dim, cyan } from "../render/colors";
 
 export async function cmdReport(
   datasetId: string,
@@ -25,19 +26,19 @@ export async function cmdReport(
     process.exit(1);
   }
 
-  console.log(`Eval run: ${run.timestamp.slice(0, 19)} (worker: ${run.worker})`);
-  console.log(`  Duration: ${(run.durationMs / 1000).toFixed(1)}s`);
+  console.log(bold(`Eval run: ${run.timestamp.slice(0, 19)}`) + dim(` (worker: ${run.worker})`));
+  console.log(dim(`  Duration: ${(run.durationMs / 1000).toFixed(1)}s`));
   if (run.cost) {
-    console.log(`  Cost: $${run.cost.total.toFixed(4)}`);
+    console.log(dim(`  Cost: $${run.cost.total.toFixed(4)}`));
     if (run.cost.breakdown) {
       for (const [model, data] of Object.entries(run.cost.breakdown)) {
-        console.log(`    ${model}: $${data.cost.toFixed(4)}`);
+        console.log(dim(`    ${model}: $${data.cost.toFixed(4)}`));
       }
     }
   }
   if (run.metadata && Object.keys(run.metadata).length > 0) {
     for (const [key, value] of Object.entries(run.metadata)) {
-      console.log(`  ${key}: ${JSON.stringify(value)}`);
+      console.log(dim(`  ${key}: ${JSON.stringify(value)}`));
     }
   }
   console.log();
@@ -50,7 +51,7 @@ export async function cmdReport(
     return;
   }
 
-  console.log(`Golden: blessed ${golden.blessedAt.slice(0, 10)}`);
+  console.log(`${dim("Golden:")} blessed ${golden.blessedAt.slice(0, 10)}`);
 
   const result = diff(golden.output, run.output, worker.schema);
   console.log();

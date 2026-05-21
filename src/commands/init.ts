@@ -1,6 +1,7 @@
 import { join } from "path";
 import { existsSync } from "fs";
 import { writeFile, mkdir, readFile } from "fs/promises";
+import { bold, dim, green } from "../render/colors";
 
 export async function cmdInit(cwd: string = process.cwd()): Promise<void> {
   const configPath = join(cwd, "ee.config.ts");
@@ -19,13 +20,13 @@ export async function cmdInit(cwd: string = process.cwd()): Promise<void> {
   }
 
   await writeFile(configPath, template);
-  console.log("Created ee.config.ts");
+  console.log(green("Created ee.config.ts"));
 
   const eeDir = join(cwd, ".ee");
   if (!existsSync(eeDir)) {
     await mkdir(eeDir, { recursive: true });
     await writeFile(join(eeDir, ".gitkeep"), "");
-    console.log("Created .ee/ directory");
+    console.log(green("Created .ee/ directory"));
   }
 
   const gitignorePath = join(cwd, ".gitignore");
@@ -33,13 +34,13 @@ export async function cmdInit(cwd: string = process.cwd()): Promise<void> {
     const content = await readFile(gitignorePath, "utf-8");
     if (!content.includes(".ee/")) {
       await writeFile(gitignorePath, content.trimEnd() + "\n\n# easy-eval runs (goldens can be committed separately)\n.ee/*/runs/\n.ee/*/reports/\n");
-      console.log("Updated .gitignore");
+      console.log(green("Updated .gitignore"));
     }
   }
 
-  console.log("\nReady! Edit ee.config.ts to configure your eval, then run:");
-  console.log("  ee eval <datasetId>    Run an eval");
-  console.log("  ee bless <datasetId>   Bless output as golden");
+  console.log(bold("\nReady!") + " Edit ee.config.ts to configure your eval, then run:");
+  console.log(dim("  ee eval <datasetId>    Run an eval"));
+  console.log(dim("  ee bless <datasetId>   Bless output as golden"));
 }
 
 const DEFAULT_TEMPLATE = `import { defineConfig } from "easy-eval";

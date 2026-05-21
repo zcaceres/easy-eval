@@ -4,6 +4,7 @@ import { loadGolden, loadRun, loadLatestRun, saveGolden } from "../storage/index
 import { diff } from "../diff/index";
 import { renderDiffTable } from "../render/table";
 import { interactiveMerge } from "../merge/interactive";
+import { bold, dim, green, cyan, magenta } from "../render/colors";
 import type { Golden } from "../types";
 
 export async function cmdMerge(
@@ -33,9 +34,9 @@ export async function cmdMerge(
     process.exit(1);
   }
 
-  console.log(`Merge: ${datasetId} (worker: ${workerName})`);
-  console.log(`  Golden: blessed ${golden.blessedAt.slice(0, 10)}`);
-  console.log(`  Eval:   ${run.timestamp.slice(0, 19)}`);
+  console.log(bold(`Merge: ${datasetId}`) + dim(` (worker: ${workerName})`));
+  console.log(`  ${cyan("Golden:")} blessed ${golden.blessedAt.slice(0, 10)}`);
+  console.log(`  ${magenta("Eval:")}   ${run.timestamp.slice(0, 19)}`);
 
   const result = diff(golden.output, run.output, worker.schema);
   console.log();
@@ -52,5 +53,5 @@ export async function cmdMerge(
   };
 
   await saveGolden(storageRoot, workerName, datasetId, newGolden);
-  console.log(`\nNew golden saved for ${datasetId}`);
+  console.log(green(`\nNew golden saved for ${datasetId}`));
 }

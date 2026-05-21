@@ -1,6 +1,7 @@
 import { loadConfig, resolveWorker } from "../config/loader";
 import { getStorageRoot } from "../storage/paths";
 import { saveGolden, loadRun, loadLatestRun } from "../storage/index";
+import { bold, dim, green } from "../render/colors";
 import type { EvalContext, Golden, CostReport } from "../types";
 
 export async function cmdBless(
@@ -26,7 +27,7 @@ export async function cmdBless(
       output: run.output,
       metadata: run.metadata,
     };
-    console.log(`Blessing from eval run ${opts.fromRun}`);
+    console.log(`Blessing from eval run ${dim(opts.fromRun)}`);
   } else {
     const latestRun = await loadLatestRun(storageRoot, workerName, datasetId);
 
@@ -38,7 +39,7 @@ export async function cmdBless(
         output: latestRun.output,
         metadata: latestRun.metadata,
       };
-      console.log(`Blessing from latest eval run (${latestRun.timestamp.slice(0, 19)})`);
+      console.log(`Blessing from latest eval run ${dim(`(${latestRun.timestamp.slice(0, 19)})`)}`);
     } else {
       console.log(`No existing runs. Running eval first...`);
 
@@ -71,6 +72,6 @@ export async function cmdBless(
   }
 
   await saveGolden(storageRoot, workerName, datasetId, golden);
-  console.log(`\nGolden saved for ${datasetId} (worker: ${workerName})`);
-  console.log(`  Location: .ee/${workerName}/${datasetId}/golden.json`);
+  console.log(green(`\nGolden saved for ${datasetId}`) + dim(` (worker: ${workerName})`));
+  console.log(dim(`  Location: .ee/${workerName}/${datasetId}/golden.json`));
 }
