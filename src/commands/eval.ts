@@ -1,12 +1,13 @@
 import { createInterface } from "readline";
 import { loadConfig, resolveEval } from "../config/loader";
 import { getStorageRoot } from "../storage/paths";
-import { saveRun, loadGolden, saveChange } from "../storage/index";
+import { saveRun, loadGolden, saveChange, discoverDatasets } from "../storage/index";
+import type { DatasetInfo } from "../storage/index";
 import { diff } from "../diff/index";
-import { renderDiffTable, renderDetailedDiff, renderOutputTable } from "../render/table";
+import { renderDiffTable, renderDetailedDiff, renderOutputTable, renderSweepTable } from "../render/table";
 import { bold, dim, green, red, yellow } from "../render/colors";
 import { validateEvalDef, validateOutput } from "../validation";
-import type { EvalContext, EvalRun, CostReport, Change, DiffResult } from "../types";
+import type { EvalContext, EvalRun, CostReport, Change, DiffResult, EvalDef, SweepDatasetResult } from "../types";
 
 export async function cmdEval(
   datasetId: string,
@@ -113,7 +114,7 @@ export async function cmdEval(
   console.log();
   console.log(renderDetailedDiff(result));
 
-  await promptCodify(storageRoot, evalName, datasetId, run, inputs, vars, result);
+  await promptCodify(storageRoot, evalName, datasetId, run, inputs, vars, result, evalDef);
 }
 
 async function promptCodify(
@@ -124,15 +125,69 @@ async function promptCodify(
   inputs: unknown,
   vars: Record<string, string>,
   result: DiffResult,
+  evalDef: EvalDef,
 ): Promise<void> {
   const rl = createInterface({ input: process.stdin, output: process.stdout });
+  const ask = (q: string) => new Promise<string>((resolve) => {
+    rl.question(q, (a) => resolve(a.trim().toLowerCase()));
+  });
 
   try {
-    const answer = await new Promise<string>((resolve) => {
-      rl.question(`\nCodify this change? [y/N] `, (a) => resolve(a.trim().toLowerCase()));
-    });
-
+    const answer = await ask(`\nCodify this change? [y/N] `);
     if (answer !== "y" && answer !== "yes") return;
+
+    const allDatasets = await discoverDatasets(storageRoot);
+    const otherGoldens = allDatasets.filter(
+      (ds) => ds.worker === worker && ds.hasGolden && ds.datasetId !== datasetId,
+    );
+
+    if (otherGoldens.length > 0) {
+      const sweepAnswer = await ask(
+        `\n${otherGoldens.length} other golden dataset${otherGoldens.length !== 1 ? "s" : ""} exist. ` +
+        `Run regression check? ${dim(`(runs ${otherGoldens.length} eval${otherGoldens.length !== 1 ? "s" : ""})`)} [y/N] `,
+      );
+
+      if (sweepAnswer === "y" || sweepAnswer === "yes") {
+        console.log();
+        const sweepResults = await runRegressionSweep(otherGoldens, evalDef, storageRoot, worker, vars);
+
+        console.log();
+        console.log(bold("Regression sweep results:"));
+        console.log(renderSweepTable(sweepResults));
+
+        const inspectable = sweepResults.filter((r) => r.diff);
+        if (inspectable.length > 0) {
+          while (true) {
+            const input = await new Promise<string>((resolve) => {
+              rl.question(`\nInspect dataset ${dim("[name / Enter to skip]")}: `, (a) => resolve(a.trim()));
+            });
+            if (input === "") break;
+            const match = inspectable.find((r) => r.datasetId === input);
+            if (!match) {
+              console.log(yellow(`No results for "${input}". Available: ${inspectable.map((r) => r.datasetId).join(", ")}`));
+              continue;
+            }
+            console.log();
+            console.log(renderDiffTable(match.diff!));
+            console.log();
+            console.log(renderDetailedDiff(match.diff!));
+          }
+        }
+
+        const regressionCount = sweepResults.filter((r) => r.status === "regression").length;
+        if (regressionCount > 0) {
+          const proceed = await ask(
+            `\n${red(`${regressionCount} regression${regressionCount !== 1 ? "s" : ""} detected.`)} Still codify? [y/N] `,
+          );
+          if (proceed !== "y" && proceed !== "yes") {
+            console.log(yellow("Aborted. Change was not saved."));
+            return;
+          }
+        } else {
+          console.log(green("\nNo regressions detected."));
+        }
+      }
+    }
 
     const note = await new Promise<string>((resolve) => {
       rl.question(`Note (optional): `, (a) => resolve(a.trim()));
@@ -155,4 +210,74 @@ async function promptCodify(
   } finally {
     rl.close();
   }
+}
+
+async function runRegressionSweep(
+  datasets: DatasetInfo[],
+  evalDef: EvalDef,
+  storageRoot: string,
+  worker: string,
+  vars: Record<string, string>,
+): Promise<SweepDatasetResult[]> {
+  const results: SweepDatasetResult[] = [];
+
+  for (let i = 0; i < datasets.length; i++) {
+    const ds = datasets[i]!;
+    const progress = dim(`[${i + 1}/${datasets.length}]`);
+    process.stdout.write(`  ${progress} ${ds.datasetId}...`);
+
+    try {
+      let inputs: unknown = undefined;
+      if (evalDef.inputs) {
+        inputs = await evalDef.inputs(ds.datasetId);
+      }
+
+      let cost: CostReport | undefined;
+      const metadata: Record<string, unknown> = {};
+      const ctx: EvalContext = {
+        datasetId: ds.datasetId,
+        inputs,
+        vars,
+        reportCost: (c) => { cost = c; },
+        reportMeta: (key, value) => { metadata[key] = value; },
+      };
+
+      const start = Date.now();
+      const output = await evalDef.eval(ctx);
+      const durationMs = Date.now() - start;
+
+      const run: EvalRun = {
+        timestamp: new Date().toISOString(),
+        datasetId: ds.datasetId,
+        worker,
+        durationMs,
+        cost,
+        metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
+        output,
+      };
+      await saveRun(storageRoot, worker, ds.datasetId, run);
+
+      const golden = await loadGolden(storageRoot, worker, ds.datasetId);
+      if (!golden) {
+        console.log(yellow(" skipped (no golden)"));
+        results.push({ datasetId: ds.datasetId, status: "skipped" });
+        continue;
+      }
+
+      const diffResult = diff(golden.output, output, evalDef.diffSchema);
+      const hasRegression = diffResult.summary.changed > 0 || diffResult.summary.missing > 0;
+      const status = hasRegression ? "regression" : "clean";
+      console.log(
+        (hasRegression ? red(" regression") : green(" clean")) + dim(` (${(durationMs / 1000).toFixed(1)}s)`),
+      );
+
+      results.push({ datasetId: ds.datasetId, status, diff: diffResult, durationMs, cost });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.log(yellow(` skipped (${message})`));
+      results.push({ datasetId: ds.datasetId, status: "skipped", error: message });
+    }
+  }
+
+  return results;
 }

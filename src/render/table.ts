@@ -1,4 +1,4 @@
-import type { DiffResult, SectionDiff, DetailRow, RowStatus } from "../types";
+import type { DiffResult, SectionDiff, DetailRow, RowStatus, SweepDatasetResult } from "../types";
 import { bold, cyan, magenta, dim, green, yellow, red } from "./colors";
 
 export function renderDiffTable(diff: DiffResult): string {
@@ -136,4 +136,52 @@ function defaultItemDisplay(item: unknown): string {
   if (typeof item === "string") return item;
   if (typeof item === "number" || typeof item === "boolean") return String(item);
   return JSON.stringify(item);
+}
+
+// ─── Sweep Table ──────────────────────────────────────────────────
+
+export function renderSweepTable(results: SweepDatasetResult[]): string {
+  const lines: string[] = [];
+  const W_DS = 24;
+  const W_NUM = 8;
+  const W_DUR = 10;
+  const W_COST = 10;
+  const W_STATUS = 14;
+  const totalWidth = W_DS + W_NUM * 4 + W_DUR + W_COST + W_STATUS + 7;
+
+  const header = `${bold("Dataset".padEnd(W_DS))} ${"Match".padStart(W_NUM)} ${"Chgd".padStart(W_NUM)} ${"Miss".padStart(W_NUM)} ${"New".padStart(W_NUM)} ${"Duration".padStart(W_DUR)} ${"Cost".padStart(W_COST)} ${"Status".padEnd(W_STATUS)}`;
+  lines.push(header);
+  lines.push(dim("─".repeat(totalWidth)));
+
+  for (const r of results) {
+    if (r.status === "skipped" || r.status === "error") {
+      const statusStr = r.status === "skipped" ? yellow("~ skipped") : red("x error");
+      const dash = dim("—");
+      lines.push(
+        `${trunc(r.datasetId, W_DS - 1).padEnd(W_DS)} ${dash.padStart(W_NUM)} ${dash.padStart(W_NUM)} ${dash.padStart(W_NUM)} ${dash.padStart(W_NUM)} ${dash.padStart(W_DUR)} ${dash.padStart(W_COST)} ${statusStr}`,
+      );
+    } else {
+      const s = r.diff!.summary;
+      const dur = r.durationMs != null ? `${(r.durationMs / 1000).toFixed(1)}s` : "—";
+      const cost = r.cost ? `$${r.cost.total.toFixed(4)}` : "—";
+      const statusStr = r.status === "clean" ? green("ok") : red("x regress");
+
+      lines.push(
+        `${trunc(r.datasetId, W_DS - 1).padEnd(W_DS)} ${dim(String(s.matches).padStart(W_NUM))} ${s.changed > 0 ? yellow(String(s.changed).padStart(W_NUM)) : dim("0".padStart(W_NUM))} ${s.missing > 0 ? red(String(s.missing).padStart(W_NUM)) : dim("0".padStart(W_NUM))} ${s.new > 0 ? green(String(s.new).padStart(W_NUM)) : dim("0".padStart(W_NUM))} ${dim(dur.padStart(W_DUR))} ${dim(cost.padStart(W_COST))} ${statusStr}`,
+      );
+    }
+  }
+
+  lines.push(dim("─".repeat(totalWidth)));
+
+  const cleanCount = results.filter((r) => r.status === "clean").length;
+  const regCount = results.filter((r) => r.status === "regression").length;
+  const skipCount = results.filter((r) => r.status === "skipped" || r.status === "error").length;
+  const parts: string[] = [];
+  if (cleanCount > 0) parts.push(green(`${cleanCount} clean`));
+  if (regCount > 0) parts.push(red(`${regCount} regression${regCount > 1 ? "s" : ""}`));
+  if (skipCount > 0) parts.push(yellow(`${skipCount} skipped`));
+  lines.push(`${results.length} dataset${results.length !== 1 ? "s" : ""}: ${parts.join(", ")}`);
+
+  return lines.join("\n");
 }
