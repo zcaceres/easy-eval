@@ -8,16 +8,7 @@ import { cmdReport } from "./commands/report";
 import { cmdMerge } from "./commands/merge";
 import { cmdStatus } from "./commands/status";
 import { cmdValidate } from "./commands/validate";
-
-function collectVars(value: string, previous: Record<string, string>): Record<string, string> {
-  const eq = value.indexOf("=");
-  if (eq === -1) {
-    console.error(`Invalid --var format: "${value}". Expected key=value.`);
-    process.exit(1);
-  }
-  previous[value.slice(0, eq)] = value.slice(eq + 1);
-  return previous;
-}
+import { collectVars } from "./vars";
 
 const program = new Command();
 

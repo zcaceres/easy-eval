@@ -1,6 +1,6 @@
 import type { ExtractedRestaurant } from "./schema";
 
-export function extractRestaurant(restaurantId: string, _reviews: string[]): ExtractedRestaurant {
+export function extractRestaurant(restaurantId: string, _reviews: string[], _model?: string): ExtractedRestaurant {
   const extractors: Record<string, () => ExtractedRestaurant> = {
     "golden-dragon": () => ({
       name: "Golden Dragon",
