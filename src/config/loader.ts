@@ -21,21 +21,20 @@ export async function loadConfig(cwd: string = process.cwd()): Promise<EvalConfi
 }
 
 function validateConfig(config: unknown): asserts config is EvalConfig {
-  if (!config || typeof config !== "object") {
+  if (config === null || config === undefined || typeof config !== "object") {
     throw new Error("Config must export an object");
   }
 
-  const c = config as Record<string, unknown>;
-  if (!c.workers || typeof c.workers !== "object") {
+  if (!("workers" in config) || config.workers === null || typeof config.workers !== "object") {
     throw new Error("Config must have a `workers` object");
   }
 
-  for (const [name, worker] of Object.entries(c.workers as Record<string, unknown>)) {
-    if (!worker || typeof worker !== "object") {
+  const workers = config.workers;
+  for (const [name, worker] of Object.entries(workers)) {
+    if (worker === null || typeof worker !== "object") {
       throw new Error(`Worker "${name}" must be an object`);
     }
-    const w = worker as Record<string, unknown>;
-    if (typeof w.run !== "function") {
+    if (!("run" in worker) || typeof worker.run !== "function") {
       throw new Error(`Worker "${name}" must have a \`run\` function`);
     }
   }
