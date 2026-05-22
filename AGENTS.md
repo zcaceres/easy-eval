@@ -97,19 +97,54 @@ ee runs user-123 -l 5                        # show last 5 runs only
 
 ### ee report \<datasetId\> [timestamp]
 
-Show diff report comparing an eval run against golden. Uses latest run if no timestamp given.
+Show diff report comparing an eval run against golden (or against another run). Uses latest run if no timestamp given.
 
 ```
 Options:
-  -w, --worker <name>     Named eval target from config (default: "default")
-  -f, --format <format>   Output format: table, md (default: table)
+  -w, --worker <name>        Named eval target from config (default: "default")
+  -f, --format <format>      Output format: table, json, md (default: table)
+  --against <timestamp>      Diff against another run instead of golden
 ```
 
 ```bash
 ee report user-123                             # diff latest run vs golden
 ee report user-123 2025-01-15T10-30-00.000Z    # specific run
+ee report user-123 -f json                     # output as JSON (agent-friendly)
+ee report user-123 <ts1> --against <ts2>       # compare two runs directly
 ee report user-123 -f md                       # output as markdown
 ```
+
+### ee sweep \<datasetId\>
+
+Run regression sweep: re-eval all other golden datasets for the same worker. Non-interactive alternative to the sweep built into `ee eval`'s codify flow.
+
+```
+Options:
+  -w, --worker <name>        Named eval target from config (default: "default")
+  -v, --var <key=value>      Pass variables to eval function (repeatable)
+  -f, --format <format>      Output format: table, json (default: table)
+```
+
+```bash
+ee sweep user-123                              # check all other goldens
+ee sweep user-123 -v model=gpt-4o              # sweep with variables
+ee sweep user-123 -f json                      # output as JSON (agent-friendly)
+```
+
+JSON output shape:
+```json
+{
+  "baseDatasetId": "user-123",
+  "vars": { "model": "gpt-4o" },
+  "results": [
+    { "datasetId": "user-456", "status": "clean", "diff": {...}, "durationMs": 1200 },
+    { "datasetId": "user-789", "status": "regression", "diff": {...}, "durationMs": 1400 }
+  ],
+  "summary": { "total": 2, "clean": 1, "regression": 1, "skipped": 0, "error": 0 }
+}
+```
+
+Each sweep run is saved and visible via `ee runs` / `ee report`.
 
 ### ee merge \<datasetId\> [timestamp]
 
@@ -202,17 +237,52 @@ Run `ee <command> --help` for detailed usage of any command.
 ee validate                          # confirm config is valid
 ee bless <datasetId>                 # establish golden (first time only)
 ee eval <datasetId> --no-diff        # run eval without interactive prompts
-ee report <datasetId>                # view diff as table output
+ee report <datasetId> -f json        # view diff as structured JSON
 ee bless <datasetId>                 # promote if output is better
 ```
+
+### Improvement loop (agent + human collaboration)
+
+The core iteration cycle for improving eval outputs:
+
+```bash
+# 1. Orient — understand the baseline
+ee status -f json                              # see all datasets and goldens
+ee report <datasetId> -f json                  # current diff against golden
+
+# 2. Hypothesize — propose a change (tweak prompt, vars, code in ee.config.ts)
+
+# 3. Test — run eval with proposed changes
+ee eval <datasetId> -v key=value --no-diff -f json
+
+# 4. Assess — read the diff
+ee report <datasetId> <timestamp> -f json      # vs golden
+ee report <datasetId> <ts1> --against <ts2>    # vs a previous iteration
+
+# 5. Verify — check for regressions across other datasets
+ee sweep <datasetId> -v key=value -f json
+
+# 6. Record — codify the improvement
+ee changes add <datasetId> <timestamp> --note "what improved"
+
+# 7. Repeat from step 2
+```
+
+**Key patterns:**
+- Use `-f json` on all read commands for machine-parseable output
+- Use `--no-diff` on `ee eval` to skip interactive prompts
+- Use `--against` on `ee report` to compare two iterations directly
+- Use `ee sweep` to verify a change doesn't regress other datasets
+- Use `-v key=value` to parameterize experiments (model, temperature, prompt variant)
+- Variables flow to both `eval(ctx)` via `ctx.vars` and `inputs(datasetId, vars)`
 
 ### Comparing parameter variations
 
 ```bash
-ee eval my-dataset -v model=claude-sonnet-4-20250514
-ee eval my-dataset -v model=gpt-4o
-ee runs my-dataset                   # see both runs with cost/duration
-ee report my-dataset <timestamp>     # compare specific run to golden
+ee eval my-dataset -v model=claude-sonnet-4-20250514 --no-diff -f json
+ee eval my-dataset -v model=gpt-4o --no-diff -f json
+ee runs my-dataset -f json                   # see both runs with cost/duration
+ee report my-dataset <ts1> --against <ts2>   # compare the two runs directly
 ```
 
 ### Interactive commands to avoid
@@ -222,7 +292,7 @@ ee report my-dataset <timestamp>     # compare specific run to golden
 
 ### Reading eval output programmatically
 
-Use `-f json` with `ee eval` to get structured JSON output instead of a table.
+Use `-f json` with `ee eval`, `ee report`, `ee runs`, `ee status`, `ee sweep`, and `ee changes` to get structured JSON output.
 
 ## Storage Layout
 
@@ -252,7 +322,7 @@ export default defineConfig({
         const model = ctx.vars.model ?? "gpt-4o";
         return await myPipeline(ctx.inputs, { model });
       },
-      inputs: async (datasetId) => loadData(datasetId),
+      inputs: async (datasetId, vars) => loadData(datasetId),
       diffSchema: { sections: [/* ... */] },
     },
   },
@@ -262,7 +332,7 @@ export default defineConfig({
 
 Each eval has:
 - **`eval(ctx)`** (required) — produces structured output
-- **`inputs(datasetId)`** (optional) — loads input data for the eval
+- **`inputs(datasetId, vars)`** (optional) — loads input data for the eval (vars from `-v` flags)
 - **`diffSchema`** (optional) — structured diff configuration
 
 The `ctx` object provides: `datasetId`, `inputs`, `vars`, `reportCost()`, `reportMeta()`.

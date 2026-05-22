@@ -45,7 +45,7 @@ export async function cmdBless(
 
       let inputs: unknown = undefined;
       if (evalDef.inputs) {
-        inputs = await evalDef.inputs(datasetId);
+        inputs = await evalDef.inputs(datasetId, {});
       }
 
       let cost: CostReport | undefined;
