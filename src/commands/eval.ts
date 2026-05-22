@@ -28,18 +28,21 @@ export async function cmdEval(
   }
 
   const storageRoot = getStorageRoot(config);
+  const isJson = opts.format === "json";
 
-  console.log(bold(`Running eval: ${datasetId}`) + dim(` (${evalName})`));
+  if (!isJson) {
+    console.log(bold(`Running eval: ${datasetId}`) + dim(` (${evalName})`));
+  }
+
+  const vars = opts.var ?? {};
 
   let inputs: unknown = undefined;
   if (evalDef.inputs) {
-    inputs = await evalDef.inputs(datasetId);
+    inputs = await evalDef.inputs(datasetId, vars);
   }
 
   let cost: CostReport | undefined;
   const metadata: Record<string, unknown> = {};
-
-  const vars = opts.var ?? {};
 
   const ctx: EvalContext = {
     datasetId,
@@ -78,37 +81,58 @@ export async function cmdEval(
     durationMs,
     cost,
     metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
+    vars: Object.keys(vars).length > 0 ? vars : undefined,
+    inputs,
     output,
   };
 
   await saveRun(storageRoot, evalName, datasetId, run);
 
-  console.log(dim(`  Duration: ${(durationMs / 1000).toFixed(1)}s`));
-  if (cost) {
-    console.log(dim(`  Cost: $${cost.total.toFixed(4)}`));
+  if (!isJson) {
+    console.log(dim(`  Duration: ${(durationMs / 1000).toFixed(1)}s`));
+    if (cost) {
+      console.log(dim(`  Cost: $${cost.total.toFixed(4)}`));
+    }
+    console.log(dim(`  Run saved: .ee/${evalName}/${datasetId}/runs/`));
   }
-  console.log(dim(`  Run saved: .ee/${evalName}/${datasetId}/runs/`));
 
   if (opts.diff === false) {
-    console.log(yellow("\nSkipping diff (--no-diff)."));
+    if (isJson) {
+      console.log(JSON.stringify({ run, diff: null, golden: null }, null, 2));
+    } else {
+      console.log(yellow("\nSkipping diff (--no-diff)."));
+    }
     return;
   }
 
   const golden = await loadGolden(storageRoot, evalName, datasetId);
   if (!golden) {
-    console.log(yellow("\nNo golden to compare against."));
-    console.log(dim("Run `ee bless " + datasetId + "` to promote this output to golden.\n"));
-    if (evalDef.diffSchema) {
-      console.log(renderOutputTable(output, evalDef.diffSchema));
+    if (isJson) {
+      console.log(JSON.stringify({ run, diff: null, golden: null }, null, 2));
     } else {
-      console.log(JSON.stringify(output, null, 2));
+      console.log(yellow("\nNo golden to compare against."));
+      console.log(dim("Run `ee bless " + datasetId + "` to promote this output to golden.\n"));
+      if (evalDef.diffSchema) {
+        console.log(renderOutputTable(output, evalDef.diffSchema));
+      } else {
+        console.log(JSON.stringify(output, null, 2));
+      }
     }
     return;
   }
 
-  console.log(`\n${dim("Golden:")} blessed ${golden.blessedAt.slice(0, 10)}`);
-
   const result = diff(golden.output, output, evalDef.diffSchema);
+
+  if (isJson) {
+    console.log(JSON.stringify({
+      run,
+      diff: result,
+      golden: { blessedAt: golden.blessedAt },
+    }, null, 2));
+    return;
+  }
+
+  console.log(`\n${dim("Golden:")} blessed ${golden.blessedAt.slice(0, 10)}`);
   console.log();
   console.log(renderDiffTable(result));
   console.log();
@@ -229,7 +253,7 @@ async function runRegressionSweep(
     try {
       let inputs: unknown = undefined;
       if (evalDef.inputs) {
-        inputs = await evalDef.inputs(ds.datasetId);
+        inputs = await evalDef.inputs(ds.datasetId, vars);
       }
 
       let cost: CostReport | undefined;
@@ -253,6 +277,8 @@ async function runRegressionSweep(
         durationMs,
         cost,
         metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
+        vars: Object.keys(vars).length > 0 ? vars : undefined,
+        inputs,
         output,
       };
       await saveRun(storageRoot, worker, ds.datasetId, run);

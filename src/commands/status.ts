@@ -3,11 +3,16 @@ import { getStorageRoot } from "../storage/paths";
 import { discoverDatasets } from "../storage/index";
 import { bold, dim, green, yellow } from "../render/colors";
 
-export async function cmdStatus(opts: { config?: string } = {}): Promise<void> {
+export async function cmdStatus(opts: { format?: string; config?: string } = {}): Promise<void> {
   const config = await loadConfig(opts.config);
   const storageRoot = getStorageRoot(config);
 
   const datasets = await discoverDatasets(storageRoot);
+
+  if (opts.format === "json") {
+    console.log(JSON.stringify({ datasets }, null, 2));
+    return;
+  }
 
   if (datasets.length === 0) {
     console.log("No eval data yet.");
