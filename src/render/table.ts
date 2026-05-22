@@ -76,3 +76,64 @@ function statusGlyph(s: RowStatus): string {
 function trunc(s: string, max: number): string {
   return s.length > max ? s.slice(0, max - 1) + "…" : s;
 }
+
+export function renderOutputTable(output: unknown, schema: import("../types").DiffSchema): string {
+  const lines: string[] = [];
+  const W_LABEL = 20;
+  const W_VAL = 50;
+
+  lines.push(`${bold("Section".padEnd(W_LABEL))} ${"Value".padEnd(W_VAL)}`);
+  lines.push(dim("─".repeat(W_LABEL + W_VAL + 1)));
+
+  for (const section of schema.sections) {
+    const value = getPathForRender(output, section.path);
+    const display = formatValue(value, section);
+    lines.push(`${section.label.padEnd(W_LABEL)} ${trunc(display, W_VAL)}`);
+  }
+
+  return lines.join("\n");
+}
+
+function getPathForRender(obj: unknown, path: string): unknown {
+  const parts = path.split(".");
+  let current: unknown = obj;
+  for (const part of parts) {
+    if (current === null || current === undefined) return undefined;
+    if (typeof current !== "object") return undefined;
+    current = (current as Record<string, unknown>)[part];
+  }
+  return current;
+}
+
+function formatValue(value: unknown, section: import("../types").SectionConfig): string {
+  if (value === undefined || value === null) return dim("—");
+
+  switch (section.kind) {
+    case "scalar": {
+      const display = section.display ?? defaultScalarDisplay;
+      return display(value);
+    }
+    case "keyed-array":
+    case "set":
+    case "ordered-array": {
+      if (!Array.isArray(value)) return String(value);
+      const display = section.display ?? defaultItemDisplay;
+      if (value.length <= 3) {
+        return value.map((item) => display(item)).join(", ");
+      }
+      return value.slice(0, 3).map((item) => display(item)).join(", ") + dim(` (+${value.length - 3} more)`);
+    }
+  }
+}
+
+function defaultScalarDisplay(val: unknown): string {
+  if (typeof val === "string") return val;
+  if (typeof val === "number" || typeof val === "boolean") return String(val);
+  return JSON.stringify(val);
+}
+
+function defaultItemDisplay(item: unknown): string {
+  if (typeof item === "string") return item;
+  if (typeof item === "number" || typeof item === "boolean") return String(item);
+  return JSON.stringify(item);
+}
