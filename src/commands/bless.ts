@@ -6,9 +6,9 @@ import type { EvalContext, Golden, CostReport } from "../types";
 
 export async function cmdBless(
   datasetId: string,
-  opts: { worker?: string; fromRun?: string },
+  opts: { worker?: string; fromRun?: string; config?: string },
 ): Promise<void> {
-  const config = await loadConfig();
+  const config = await loadConfig(opts.config);
   const { name: evalName, evalDef } = resolveEval(config, opts.worker);
   const storageRoot = getStorageRoot(config);
 

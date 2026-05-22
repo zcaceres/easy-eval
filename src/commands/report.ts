@@ -8,9 +8,9 @@ import { bold, dim, cyan } from "../render/colors";
 export async function cmdReport(
   datasetId: string,
   timestamp: string | undefined,
-  opts: { worker?: string; format?: string },
+  opts: { worker?: string; format?: string; config?: string },
 ): Promise<void> {
-  const config = await loadConfig();
+  const config = await loadConfig(opts.config);
   const { name: evalName, evalDef } = resolveEval(config, opts.worker);
   const storageRoot = getStorageRoot(config);
 

@@ -10,9 +10,9 @@ import type { Golden } from "../types";
 export async function cmdMerge(
   datasetId: string,
   timestamp: string | undefined,
-  opts: { worker?: string },
+  opts: { worker?: string; config?: string },
 ): Promise<void> {
-  const config = await loadConfig();
+  const config = await loadConfig(opts.config);
   const { name: evalName, evalDef } = resolveEval(config, opts.worker);
   const storageRoot = getStorageRoot(config);
 

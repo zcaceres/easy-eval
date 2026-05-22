@@ -7,10 +7,10 @@ interface TaggedIssue extends ValidationIssue {
   eval: string;
 }
 
-export async function cmdValidate(opts: { worker?: string; probe?: string }): Promise<void> {
+export async function cmdValidate(opts: { worker?: string; probe?: string; config?: string }): Promise<void> {
   let config;
   try {
-    config = await loadConfig();
+    config = await loadConfig(opts.config);
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error(red("Config failed to load:") + " " + msg);

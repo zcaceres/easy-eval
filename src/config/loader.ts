@@ -1,10 +1,23 @@
-import { join } from "path";
+import { join, resolve } from "path";
 import { existsSync } from "fs";
 import type { EvalConfig } from "../types";
 
 const CONFIG_FILENAMES = ["ee.config.ts", "ee.config.js"];
 
-export async function loadConfig(cwd: string = process.cwd()): Promise<EvalConfig> {
+export async function loadConfig(configPath?: string): Promise<EvalConfig> {
+  if (configPath) {
+    const filepath = resolve(configPath);
+    if (!existsSync(filepath)) {
+      console.error(`Config file not found: ${filepath}`);
+      process.exit(1);
+    }
+    const mod = await import(filepath);
+    const config = mod.default ?? mod;
+    validateConfig(config);
+    return config as EvalConfig;
+  }
+
+  const cwd = process.cwd();
   for (const filename of CONFIG_FILENAMES) {
     const filepath = join(cwd, filename);
     if (existsSync(filepath)) {
@@ -16,7 +29,7 @@ export async function loadConfig(cwd: string = process.cwd()): Promise<EvalConfi
   }
 
   console.error("No ee.config.ts found in current directory.");
-  console.error("Run `ee init` to create one.");
+  console.error("Run `ee init` to create one, or pass --config <path>.");
   process.exit(1);
 }
 
