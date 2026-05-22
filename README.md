@@ -76,11 +76,19 @@ Define `diffSchema.sections` on an eval for structured section-by-section diffs.
 
 Section kinds: `scalar`, `keyed-array`, `set`, `ordered-array`.
 
+### Regression Sweep
+
+When you codify a change after `ee eval`, the CLI checks for other golden datasets under the same worker. If any exist, it offers to run a **regression sweep** — re-running your eval with the same variables across all golden datasets to check for regressions before saving the change.
+
+The sweep shows a summary table with match/changed/missing/new counts per dataset. You can drill into any dataset's detailed diff by name. If regressions are found (changed or missing items), you're warned before the change is saved.
+
+This prevents a change that looks good on one dataset from silently breaking others.
+
 ## CLI commands
 
 ```
 ee init                              Scaffold ee.config.ts and .ee/
-ee eval <datasetId> [-v key=value]    Run eval function, compare against golden
+ee eval <datasetId> [-v key=value]   Run eval function, compare against golden
 ee bless <datasetId>                 Promote output to golden
 ee runs <datasetId>                  List past eval runs
 ee report <datasetId> [timestamp]    Show diff report from cached run

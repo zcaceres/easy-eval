@@ -23,7 +23,7 @@ ee bless <datasetId>               # promote output to golden
 
 **Variables** — `-v key=value` flags parameterize eval runs (e.g., model, prompt). Access via `ctx.vars` in your eval function. Repeatable.
 
-**Changes** — Codified improvements from eval runs. After `ee eval` shows a diff, you can record a structured change with context (dataset, worker, variables, inputs, diff, note).
+**Changes** — Codified improvements from eval runs. After `ee eval` shows a diff, you can record a structured change with context (dataset, worker, variables, inputs, diff, note). Before codifying, the CLI offers a regression sweep across all other golden datasets to validate the change doesn't cause regressions.
 
 **diffSchema** (optional) — Define `diffSchema` on a worker for structured section-by-section diffs using section kinds: `scalar`, `keyed-array`, `set`, `ordered-array`. Without it, ee auto-diffs by comparing JSON recursively.
 
@@ -59,6 +59,8 @@ ee eval user-123 -f json                     # output as JSON
 ```
 
 **Note:** Without `--no-diff`, this command prompts "Codify this change? [y/N]" after showing the diff. Use `--no-diff` for non-interactive / agent usage.
+
+**Regression sweep:** When codifying, if other golden datasets exist for the same worker, `ee eval` offers to run a regression sweep — re-running the eval with the same `-v` variables across all golden datasets. Shows a summary table (match/changed/missing/new per dataset), lets you inspect individual diffs by name, and warns if regressions are found. Sweep runs are saved and visible via `ee runs`/`ee report`.
 
 ### ee bless \<datasetId\>
 
@@ -216,7 +218,7 @@ ee report my-dataset <timestamp>     # compare specific run to golden
 ### Interactive commands to avoid
 
 - **`ee merge`** — requires interactive stdin (golden/eval/both/item-by-item prompts per section)
-- **`ee eval` without `--no-diff`** — prompts "Codify this change? [y/N]" after diff
+- **`ee eval` without `--no-diff`** — prompts "Codify this change? [y/N]" after diff, then optionally a regression sweep with per-dataset inspection
 
 ### Reading eval output programmatically
 
