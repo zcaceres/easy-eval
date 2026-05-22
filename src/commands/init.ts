@@ -7,7 +7,14 @@ export async function cmdInit(cwd: string = process.cwd()): Promise<void> {
   const configPath = join(cwd, "ee.config.ts");
 
   if (existsSync(configPath)) {
-    console.error("ee.config.ts already exists in this directory.");
+    console.error("ee.config.ts already exists in this directory.\n");
+    console.error("To configure your eval, edit " + bold("ee.config.ts") + ":");
+    console.error(dim("  - Define your run() function to produce structured output"));
+    console.error(dim("  - Add a schema for section-by-section diffs (optional)"));
+    console.error("");
+    console.error("Then run:");
+    console.error(dim("  ee eval <datasetId>    Run eval and compare against golden"));
+    console.error(dim("  ee bless <datasetId>   Promote output to golden reference"));
     process.exit(1);
   }
 
@@ -38,9 +45,18 @@ export async function cmdInit(cwd: string = process.cwd()): Promise<void> {
     }
   }
 
-  console.log(bold("\nReady!") + " Edit ee.config.ts to configure your eval, then run:");
-  console.log(dim("  ee eval <datasetId>    Run an eval"));
-  console.log(dim("  ee bless <datasetId>   Bless output as golden"));
+  console.log(bold("\nNext steps:"));
+  console.log("");
+  console.log("  1. Open " + bold("ee.config.ts") + " and define your " + bold("run()") + " function");
+  console.log("     This is the eval function that produces structured output for a given dataset.");
+  console.log("");
+  console.log("  2. Optionally add a " + bold("schema") + " to control how diffs are displayed");
+  console.log("     Without a schema, easy-eval auto-diffs JSON recursively.");
+  console.log("     With a schema, you get clean section-by-section diffs (scalar, keyed-array, set).");
+  console.log("");
+  console.log("  3. Run your first eval:");
+  console.log(dim("     ee eval <datasetId>    Run eval and compare against golden"));
+  console.log(dim("     ee bless <datasetId>   Promote output to golden reference"));
 }
 
 const DEFAULT_TEMPLATE = `import { defineConfig } from "easy-eval";
