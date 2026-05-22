@@ -4,7 +4,7 @@ import { extractRestaurant } from "./extractor";
 import { ExtractedRestaurantSchema } from "./schema";
 
 export default defineConfig({
-  workers: {
+  evals: {
     default: {
       inputs: async (datasetId) => {
         const input = REVIEWS[datasetId];
@@ -14,12 +14,13 @@ export default defineConfig({
         return input;
       },
 
-      run: async (ctx) => {
+      eval: async (ctx) => {
         const input = ctx.inputs as { restaurantId: string; reviews: string[] };
-        return extractRestaurant(input.restaurantId, input.reviews);
+        const model = ctx.vars.model ?? "gpt-4o";
+        return extractRestaurant(input.restaurantId, input.reviews, model);
       },
 
-      schema: fromZod(ExtractedRestaurantSchema, {
+      diffSchema: fromZod(ExtractedRestaurantSchema, {
         dishes: { display: (item: any) => `${item.name} (${item.sentiment})` },
         pricePoints: { key: "item", display: (item: any) => `${item.item}: ${item.price}` },
       }),

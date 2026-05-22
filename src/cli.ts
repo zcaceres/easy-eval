@@ -9,6 +9,16 @@ import { cmdMerge } from "./commands/merge";
 import { cmdStatus } from "./commands/status";
 import { cmdValidate } from "./commands/validate";
 
+function collectVars(value: string, previous: Record<string, string>): Record<string, string> {
+  const eq = value.indexOf("=");
+  if (eq === -1) {
+    console.error(`Invalid --var format: "${value}". Expected key=value.`);
+    process.exit(1);
+  }
+  previous[value.slice(0, eq)] = value.slice(eq + 1);
+  return previous;
+}
+
 const program = new Command();
 
 program
@@ -24,7 +34,8 @@ program
 program
   .command("eval <datasetId>")
   .description("Run the eval function for a dataset and compare against golden")
-  .option("-w, --worker <name>", "Which worker to run", "default")
+  .option("-w, --worker <name>", "Which eval to run (from evals map)", "default")
+  .option("-v, --var <key=value>", "Pass variables to the eval function (repeatable)", collectVars, {})
   .option("--no-diff", "Run without comparing to golden")
   .option("-f, --format <format>", "Output format: table, json, md", "table")
   .action(cmdEval);
@@ -32,28 +43,28 @@ program
 program
   .command("bless <datasetId>")
   .description("Promote current output (or a past run) to golden")
-  .option("-w, --worker <name>", "Which worker", "default")
+  .option("-w, --worker <name>", "Which eval to use", "default")
   .option("--from-run <timestamp>", "Promote a specific past eval run")
   .action(cmdBless);
 
 program
   .command("runs <datasetId>")
   .description("List past eval runs for a dataset")
-  .option("-w, --worker <name>", "Which worker", "default")
+  .option("-w, --worker <name>", "Which eval to use", "default")
   .option("-l, --limit <n>", "Max runs to show", "20")
   .action(cmdRuns);
 
 program
   .command("report <datasetId> [timestamp]")
   .description("Show diff report from a cached eval run")
-  .option("-w, --worker <name>", "Which worker", "default")
+  .option("-w, --worker <name>", "Which eval to use", "default")
   .option("-f, --format <format>", "Output format: table, md", "table")
   .action(cmdReport);
 
 program
   .command("merge <datasetId> [timestamp]")
   .description("Interactively merge an eval run into the golden dataset")
-  .option("-w, --worker <name>", "Which worker", "default")
+  .option("-w, --worker <name>", "Which eval to use", "default")
   .action(cmdMerge);
 
 program
@@ -63,8 +74,8 @@ program
 
 program
   .command("validate")
-  .description("Validate ee.config.ts: check schema, worker config, and optionally probe output shape")
-  .option("-w, --worker <name>", "Which worker to validate (default: all)")
+  .description("Validate ee.config.ts: check eval config, diffSchema, and optionally probe output shape")
+  .option("-w, --worker <name>", "Which eval to validate (default: all)")
   .option("--probe <datasetId>", "Run eval once and validate output matches schema")
   .action(cmdValidate);
 

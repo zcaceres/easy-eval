@@ -3,7 +3,7 @@ export { fromZod } from "./schema/index";
 export type { ZodOverrides } from "./schema/index";
 export type {
   EvalConfig,
-  WorkerConfig,
+  EvalDef,
   EvalContext,
   CostReport,
   DiffSchema,

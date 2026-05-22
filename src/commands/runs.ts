@@ -1,4 +1,4 @@
-import { loadConfig, resolveWorker } from "../config/loader";
+import { loadConfig, resolveEval } from "../config/loader";
 import { getStorageRoot } from "../storage/paths";
 import { listRuns, loadGolden } from "../storage/index";
 import { bold, dim, cyan } from "../render/colors";
@@ -8,17 +8,17 @@ export async function cmdRuns(
   opts: { worker?: string; limit?: string },
 ): Promise<void> {
   const config = await loadConfig();
-  const { name: workerName } = resolveWorker(config, opts.worker);
+  const { name: evalName } = resolveEval(config, opts.worker);
   const storageRoot = getStorageRoot(config);
   const limit = opts.limit ? parseInt(opts.limit, 10) : 20;
 
-  const runs = await listRuns(storageRoot, workerName, datasetId);
+  const runs = await listRuns(storageRoot, evalName, datasetId);
   if (runs.length === 0) {
-    console.log(`No eval runs for ${datasetId} (worker: ${workerName})`);
+    console.log(`No eval runs for ${datasetId} (worker: ${evalName})`);
     return;
   }
 
-  const golden = await loadGolden(storageRoot, workerName, datasetId);
+  const golden = await loadGolden(storageRoot, evalName, datasetId);
   if (golden) {
     console.log(`${dim("Golden:")} blessed ${golden.blessedAt.slice(0, 10)}\n`);
   }

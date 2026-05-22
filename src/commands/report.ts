@@ -1,4 +1,4 @@
-import { loadConfig, resolveWorker } from "../config/loader";
+import { loadConfig, resolveEval } from "../config/loader";
 import { getStorageRoot } from "../storage/paths";
 import { loadRun, loadLatestRun, loadGolden } from "../storage/index";
 import { diff } from "../diff/index";
@@ -11,12 +11,12 @@ export async function cmdReport(
   opts: { worker?: string; format?: string },
 ): Promise<void> {
   const config = await loadConfig();
-  const { name: workerName, worker } = resolveWorker(config, opts.worker);
+  const { name: evalName, evalDef } = resolveEval(config, opts.worker);
   const storageRoot = getStorageRoot(config);
 
   const run = timestamp
-    ? await loadRun(storageRoot, workerName, datasetId, timestamp)
-    : await loadLatestRun(storageRoot, workerName, datasetId);
+    ? await loadRun(storageRoot, evalName, datasetId, timestamp)
+    : await loadLatestRun(storageRoot, evalName, datasetId);
 
   if (!run) {
     const msg = timestamp
@@ -43,7 +43,7 @@ export async function cmdReport(
   }
   console.log();
 
-  const golden = await loadGolden(storageRoot, workerName, datasetId);
+  const golden = await loadGolden(storageRoot, evalName, datasetId);
   if (!golden) {
     console.log("No golden to compare against.\n");
     console.log("Output:");
@@ -53,7 +53,7 @@ export async function cmdReport(
 
   console.log(`${dim("Golden:")} blessed ${golden.blessedAt.slice(0, 10)}`);
 
-  const result = diff(golden.output, run.output, worker.schema);
+  const result = diff(golden.output, run.output, evalDef.diffSchema);
   console.log();
   console.log(renderDiffTable(result));
   console.log();

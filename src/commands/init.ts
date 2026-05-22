@@ -9,15 +9,15 @@ export async function cmdInit(cwd: string = process.cwd()): Promise<void> {
   if (existsSync(configPath)) {
     console.error("ee.config.ts already exists in this directory.\n");
     console.error("To configure your eval, edit " + bold("ee.config.ts") + ":");
-    console.error(dim("  - Define your run() function to produce structured output"));
-    console.error(dim("  - Add a schema for section-by-section diffs (optional)"));
+    console.error(dim("  - Define your eval() function to produce structured output"));
+    console.error(dim("  - Add a diffSchema for section-by-section diffs (optional)"));
     console.error("");
     console.error("Then run:");
     console.error(dim("  ee eval <datasetId>    Run eval and compare against golden"));
     console.error(dim("  ee bless <datasetId>   Promote output to golden reference"));
     console.error("");
     console.error("A " + bold("datasetId") + " is a unique string that identifies one input payload");
-    console.error("(e.g. \"user-123\", \"invoice-march\", \"edge-case-empty\"). Your run() function");
+    console.error("(e.g. \"user-123\", \"invoice-march\", \"edge-case-empty\"). Your eval() function");
     console.error("receives it via ctx.datasetId so it can load the right input data.");
     process.exit(1);
   }
@@ -51,30 +51,35 @@ export async function cmdInit(cwd: string = process.cwd()): Promise<void> {
 
   console.log(bold("\nNext steps:"));
   console.log("");
-  console.log("  1. Open " + bold("ee.config.ts") + " and define your " + bold("run()") + " function");
+  console.log("  1. Open " + bold("ee.config.ts") + " and define your " + bold("eval()") + " function");
   console.log("     This is the eval function that produces structured output for a given dataset.");
   console.log("");
-  console.log("  2. Optionally add a " + bold("schema") + " to control how diffs are displayed");
-  console.log("     Without a schema, easy-eval auto-diffs JSON recursively.");
-  console.log("     With a schema, you get clean section-by-section diffs (scalar, keyed-array, set).");
+  console.log("  2. Optionally add a " + bold("diffSchema") + " to control how diffs are displayed");
+  console.log("     Without a diffSchema, easy-eval auto-diffs JSON recursively.");
+  console.log("     With a diffSchema, you get clean section-by-section diffs (scalar, keyed-array, set).");
   console.log("");
   console.log("  3. Run your first eval:");
   console.log(dim("     ee eval <datasetId>    Run eval and compare against golden"));
   console.log(dim("     ee bless <datasetId>   Promote output to golden reference"));
   console.log("");
   console.log("  A " + bold("datasetId") + " is a unique string that identifies one input payload");
-  console.log("  (e.g. \"user-123\", \"invoice-march\", \"edge-case-empty\"). Your run() function");
+  console.log("  (e.g. \"user-123\", \"invoice-march\", \"edge-case-empty\"). Your eval() function");
   console.log("  receives it via ctx.datasetId so it can load the right input data.");
 }
 
 const DEFAULT_TEMPLATE = `import { defineConfig } from "easy-eval";
 
 export default defineConfig({
-  workers: {
+  evals: {
     default: {
       // Your eval function — takes a dataset ID, returns structured output.
       // Replace this with your actual pipeline logic.
-      run: async (ctx) => {
+      //
+      // Use ctx.vars to read CLI variables passed via -v key=value:
+      //   ee eval my-dataset -v model=gpt-4o -v prompt="be concise"
+      eval: async (ctx) => {
+        // const model = ctx.vars.model ?? "gpt-4o";
+        // const prompt = ctx.vars.prompt ?? "default prompt";
         return {
           title: \`Result for \${ctx.datasetId}\`,
           score: 0.95,
@@ -82,10 +87,10 @@ export default defineConfig({
         };
       },
 
-      // Optional: define a schema for structured section-by-section diffs.
+      // Optional: define a diffSchema for structured section-by-section diffs.
       // If omitted, easy-eval will auto-diff by comparing JSON recursively.
       //
-      // schema: {
+      // diffSchema: {
       //   sections: [
       //     { path: "title", label: "Title", kind: "scalar" },
       //     { path: "score", label: "Score", kind: "scalar" },
