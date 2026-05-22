@@ -29,6 +29,9 @@ ee runs <datasetId>                  List past eval runs
 ee report <datasetId> [timestamp]    Show diff report from cached run
 ee merge <datasetId> [timestamp]     Interactively merge eval into golden
 ee status                            Overview of all datasets and goldens
+ee changes list [-d datasetId]       List codified changes (optionally filtered)
+ee changes show <timestamp>          View a codified change in detail
+ee changes export [-d id] [-o path]  Export changes as markdown
 ```
 
 ## Project structure
@@ -56,6 +59,7 @@ templates/basic/      Starter ee.config.ts for `ee init`
 - `EvalRun<T>` — run snapshot: `{ timestamp, datasetId, worker, durationMs, cost, output }`
 - `DiffResult` — diff output: `{ sections: SectionDiff[], summary }`
 - `SectionConfig` — `scalar | keyed-array | set | ordered-array`
+- `Change` — codified improvement: `{ timestamp, datasetId, worker, runTimestamp, inputs, vars, diff, note }`
 
 ## Development
 

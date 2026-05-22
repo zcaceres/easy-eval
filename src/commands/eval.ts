@@ -1,11 +1,12 @@
+import { createInterface } from "readline";
 import { loadConfig, resolveEval } from "../config/loader";
 import { getStorageRoot } from "../storage/paths";
-import { saveRun, loadGolden } from "../storage/index";
+import { saveRun, loadGolden, saveChange } from "../storage/index";
 import { diff } from "../diff/index";
 import { renderDiffTable, renderDetailedDiff, renderOutputTable } from "../render/table";
 import { bold, dim, green, red, yellow } from "../render/colors";
 import { validateEvalDef, validateOutput } from "../validation";
-import type { EvalContext, EvalRun, CostReport } from "../types";
+import type { EvalContext, EvalRun, CostReport, Change, DiffResult } from "../types";
 
 export async function cmdEval(
   datasetId: string,
@@ -111,4 +112,47 @@ export async function cmdEval(
   console.log(renderDiffTable(result));
   console.log();
   console.log(renderDetailedDiff(result));
+
+  await promptCodify(storageRoot, evalName, datasetId, run, inputs, vars, result);
+}
+
+async function promptCodify(
+  storageRoot: string,
+  worker: string,
+  datasetId: string,
+  run: EvalRun,
+  inputs: unknown,
+  vars: Record<string, string>,
+  result: DiffResult,
+): Promise<void> {
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+
+  try {
+    const answer = await new Promise<string>((resolve) => {
+      rl.question(`\nCodify this change? [y/N] `, (a) => resolve(a.trim().toLowerCase()));
+    });
+
+    if (answer !== "y" && answer !== "yes") return;
+
+    const note = await new Promise<string>((resolve) => {
+      rl.question(`Note (optional): `, (a) => resolve(a.trim()));
+    });
+
+    const change: Change = {
+      timestamp: new Date().toISOString(),
+      datasetId,
+      worker,
+      runTimestamp: run.timestamp,
+      inputs,
+      vars,
+      diff: result,
+      note: note || undefined,
+      metadata: run.metadata,
+    };
+
+    await saveChange(storageRoot, change);
+    console.log(green("✓ Change saved") + dim(` to .ee/changes/`));
+  } finally {
+    rl.close();
+  }
 }

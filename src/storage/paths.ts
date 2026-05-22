@@ -25,6 +25,10 @@ export function reportsDir(root: string, worker: string, datasetId: string): str
   return join(datasetDir(root, worker, datasetId), "reports");
 }
 
+export function changesDir(root: string): string {
+  return join(root, "changes");
+}
+
 export function tsToFilename(ts: string): string {
   return ts.replace(/:/g, "-");
 }
