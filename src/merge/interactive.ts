@@ -1,7 +1,7 @@
 import { createInterface, type Interface as RLInterface } from "readline";
 import type { DiffSchema, SectionConfig } from "../types";
 import { deepEqual } from "../utils";
-import { bold, dim, cyan, magenta, green, yellow } from "../render/colors";
+import { bold, dim, cyan, magenta, green, yellow, doubleLine } from "../render/colors";
 
 // ─── Prompt helpers ──────────────────────────────────────────────────
 
@@ -11,9 +11,19 @@ function ask(rl: RLInterface, question: string): Promise<string> {
   });
 }
 
+function coloredSummary(summary: string): string {
+  return summary
+    .replace(/(\d+ match(?:es)?)/, (_, m) => green(m))
+    .replace(/(\d+ golden-only)/, (_, m) => cyan(m))
+    .replace(/(\d+ eval-only)/, (_, m) => magenta(m))
+    .replace(/(\d+ changed)/, (_, m) => yellow(m));
+}
+
 async function askSection(rl: RLInterface, title: string, summary: string): Promise<"g" | "e" | "b" | "i"> {
-  console.log(`\n${dim("──")} ${bold(title)} ${dim("──────────────────────────────────────────────")}`);
-  console.log(dim(`  ${summary}`));
+  console.log(`\n${doubleLine()}`);
+  console.log(`  ${bold(title)}`);
+  console.log(`  ${coloredSummary(summary)}`);
+  console.log(doubleLine());
   let answer = "";
   while (!["g", "e", "b", "i"].includes(answer)) {
     answer = await ask(rl, `  → [${cyan("g")}]olden / [${magenta("e")}]val / [b]oth / [i]tem-by-item? `);

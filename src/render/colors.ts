@@ -6,3 +6,4 @@ export const yellow = (s: string): string => `\x1b[33m${s}\x1b[0m`;
 export const cyan = (s: string): string => `\x1b[36m${s}\x1b[0m`;
 export const magenta = (s: string): string => `\x1b[35m${s}\x1b[0m`;
 export const line = (width = 58): string => dim("─".repeat(width));
+export const doubleLine = (width = 58): string => dim("═".repeat(width));

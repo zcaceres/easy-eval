@@ -11,8 +11,12 @@ export function renderDiffTable(diff: DiffResult): string {
   lines.push(dim("─".repeat(W_LABEL + W_COL * 3 + 3)));
 
   for (const s of diff.sections) {
+    const paddedDelta = s.delta.padStart(W_COL);
+    const coloredDelta = s.delta.startsWith("+") ? green(paddedDelta)
+      : s.delta.startsWith("-") ? red(paddedDelta)
+      : dim(paddedDelta);
     lines.push(
-      `${s.label.padEnd(W_LABEL)} ${String(s.goldenCount).padStart(W_COL)} ${String(s.evalCount).padStart(W_COL)} ${colorDelta(s.delta).padStart(W_COL)}`,
+      `${s.label.padEnd(W_LABEL)} ${String(s.goldenCount).padStart(W_COL)} ${String(s.evalCount).padStart(W_COL)} ${coloredDelta}`,
     );
   }
 
@@ -42,7 +46,7 @@ export function renderDetailedDiff(diff: DiffResult): string {
 
 function renderSection(section: SectionDiff): string {
   const lines: string[] = [];
-  lines.push(`${dim("──")} ${bold(section.label)} ${dim(`(${section.goldenCount} → ${section.evalCount}, ${section.delta})`)} ${dim("─".repeat(Math.max(0, 56 - section.label.length)))}`);
+  lines.push(`${dim("──")} ${bold(section.label)} ${dim("(")}${section.goldenCount} ${dim("→")} ${section.evalCount}${dim(",")} ${colorDelta(section.delta)}${dim(")")} ${dim("─".repeat(Math.max(0, 56 - section.label.length)))}`);
 
   if (section.rows.length === 0) {
     lines.push(dim("  (empty)"));
@@ -58,7 +62,7 @@ function renderSection(section: SectionDiff): string {
     const key = trunc(r.key, W_KEY - 1).padEnd(W_KEY);
     const gv = trunc(r.golden, W_VAL - 1).padEnd(W_VAL);
     const ev = trunc(r.eval, W_VAL - 1).padEnd(W_VAL);
-    lines.push(`${glyph}${key} ${gv} ${ev}`);
+    lines.push(`${glyph}${colorRow(r.status, key)} ${colorRow(r.status, gv)} ${colorRow(r.status, ev)}`);
   }
 
   return lines.join("\n");
@@ -70,6 +74,15 @@ function statusGlyph(s: RowStatus): string {
     case "changed": return yellow("~ ");
     case "missing": return red("- ");
     case "new": return green("+ ");
+  }
+}
+
+function colorRow(status: RowStatus, s: string): string {
+  switch (status) {
+    case "match":   return dim(s);
+    case "changed": return yellow(s);
+    case "missing": return red(s);
+    case "new":     return green(s);
   }
 }
 
