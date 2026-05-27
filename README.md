@@ -74,7 +74,7 @@ eval: async (ctx) => {
 
 A judge determines pass/fail for an eval run. Set `judge` on your eval definition — if omitted, `vibecheck()` is used by default.
 
-**`vibecheck()`** — the built-in judge. Diffs eval output against golden and passes when nothing changed, went missing, or was added. Without a schema it auto-diffs JSON recursively. Pass a schema for structured section-by-section diffs:
+**`vibecheck()`** — the default judge. Diffs eval output against golden and passes when nothing changed, went missing, or was added. Without a schema it auto-diffs JSON recursively. Pass a schema for structured section-by-section diffs:
 
 ```ts
 import { defineConfig, vibecheck } from "easy-eval";
@@ -97,6 +97,45 @@ export default defineConfig({
 ```
 
 Schema section kinds: `scalar`, `keyed-array`, `set`, `ordered-array`.
+
+**`exactMatch()`** — deterministic judge. Deep-equals the run output against golden. Passes only when values are identical. Use `fields` to restrict which top-level keys are checked:
+
+```ts
+import { defineConfig, exactMatch } from "easy-eval";
+
+export default defineConfig({
+  evals: {
+    default: {
+      eval: async (ctx) => { /* ... */ },
+      judge: exactMatch({ fields: ["name", "status"] }),
+    },
+  },
+});
+```
+
+**`fuzzyMatch()`** — flexible judge with normalization. Compares fields with configurable tolerance for strings (case, whitespace, edit distance) and numbers:
+
+```ts
+import { defineConfig, fuzzyMatch } from "easy-eval";
+
+export default defineConfig({
+  evals: {
+    default: {
+      eval: async (ctx) => { /* ... */ },
+      judge: fuzzyMatch({
+        ignoreCase: true,          // default: true
+        ignoreWhitespace: true,    // default: true
+        numericTolerance: 0.1,     // ±10% of golden value
+        maxEditDistance: 3,         // Levenshtein distance threshold
+        minSimilarity: 0.9,        // normalized similarity ratio (0–1)
+        fields: ["name", "score"], // optional: restrict to these keys
+      }),
+    },
+  },
+});
+```
+
+String matching: normalization (case, whitespace) is applied first, then exact comparison. If the strings still differ and `maxEditDistance` or `minSimilarity` is set, Levenshtein distance is checked — passing either threshold is enough. Arrays are compared as sets (order-insensitive).
 
 ### Diff Schema (framework-level)
 
