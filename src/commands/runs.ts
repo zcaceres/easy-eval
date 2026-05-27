@@ -5,9 +5,9 @@ import { bold, dim, cyan } from "../render/colors";
 
 export async function cmdRuns(
   datasetId: string,
-  opts: { worker?: string; limit?: string },
+  opts: { worker?: string; limit?: string; config?: string },
 ): Promise<void> {
-  const config = await loadConfig();
+  const config = await loadConfig(opts.config);
   const { name: evalName } = resolveEval(config, opts.worker);
   const storageRoot = getStorageRoot(config);
   const limit = opts.limit ? parseInt(opts.limit, 10) : 20;

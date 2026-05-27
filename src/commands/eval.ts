@@ -9,9 +9,9 @@ import type { EvalContext, EvalRun, CostReport } from "../types";
 
 export async function cmdEval(
   datasetId: string,
-  opts: { worker?: string; var?: Record<string, string>; diff?: boolean; format?: string },
+  opts: { worker?: string; var?: Record<string, string>; diff?: boolean; format?: string; config?: string },
 ): Promise<void> {
-  const config = await loadConfig();
+  const config = await loadConfig(opts.config);
   const { name: evalName, evalDef } = resolveEval(config, opts.worker);
 
   const configIssues = validateEvalDef(evalDef);

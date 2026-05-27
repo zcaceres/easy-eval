@@ -3,8 +3,8 @@ import { getStorageRoot } from "../storage/paths";
 import { discoverDatasets } from "../storage/index";
 import { bold, dim, green, yellow } from "../render/colors";
 
-export async function cmdStatus(): Promise<void> {
-  const config = await loadConfig();
+export async function cmdStatus(opts: { config?: string } = {}): Promise<void> {
+  const config = await loadConfig(opts.config);
   const storageRoot = getStorageRoot(config);
 
   const datasets = await discoverDatasets(storageRoot);
