@@ -97,6 +97,15 @@ describe("llmJudge", () => {
     expect(verdict.diff).toBeNull();
   });
 
+  test("handles nested braces in LLM response", async () => {
+    const judge = llmJudge({
+      call: async () => '{"pass": false, "summary": "found {weird} braces in output"}',
+    });
+    const verdict = await judge({ run: makeRun({}), golden: makeGolden({}), evalDef });
+    expect(verdict.pass).toBe(false);
+    expect(verdict.summary).toBe("found {weird} braces in output");
+  });
+
   test("handles LLM returning JSON with surrounding text", async () => {
     const judge = llmJudge({
       call: async () => 'Here is my verdict: {"pass": false, "summary": "bad output"} Hope this helps!',
@@ -131,6 +140,15 @@ describe("llmJudge", () => {
     const verdict = await judge({ run: makeRun({}), golden: null, evalDef });
     expect(verdict.pass).toBe(true);
     expect(typeof verdict.summary).toBe("string");
+  });
+
+  test("fails gracefully when call function throws", async () => {
+    const judge = llmJudge({
+      call: async () => { throw new Error("network timeout"); },
+    });
+    const verdict = await judge({ run: makeRun({}), golden: makeGolden({}), evalDef });
+    expect(verdict.pass).toBe(false);
+    expect(verdict.summary).toContain("network timeout");
   });
 
   test("returns valid EvalVerdict shape", async () => {
