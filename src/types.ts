@@ -146,6 +146,17 @@ export interface Change {
   metadata?: Record<string, unknown>;
 }
 
+// ─── Sweep Result ─────────────────────────────────────────────────
+
+export interface SweepDatasetResult {
+  datasetId: string;
+  status: "clean" | "regression" | "skipped" | "error";
+  diff?: DiffResult;
+  durationMs?: number;
+  cost?: CostReport;
+  error?: string;
+}
+
 // ─── defineConfig helper ───────────────────────────────────────────
 
 export function defineConfig(config: EvalConfig): EvalConfig {
