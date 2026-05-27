@@ -1,4 +1,21 @@
 #!/usr/bin/env bun
+import * as easyEvalApi from "./index";
+
+// When this CLI is shipped as a compiled standalone binary, user configs
+// loaded via dynamic import can't resolve `easy-eval` from their own
+// node_modules (the binary has no access to it). Register the embedded
+// API as a virtual `easy-eval` module so `import { defineConfig } from
+// "easy-eval"` resolves inside compiled binaries.
+Bun.plugin({
+  name: "easy-eval-self",
+  setup(build) {
+    build.module("easy-eval", () => ({
+      exports: easyEvalApi,
+      loader: "object",
+    }));
+  },
+});
+
 import { Command } from "commander";
 import { cmdInit } from "./commands/init";
 import { cmdEval } from "./commands/eval";
