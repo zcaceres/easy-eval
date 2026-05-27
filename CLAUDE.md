@@ -12,7 +12,8 @@ Generalized, open-source extraction of the eval framework from `~/storesdata/pip
 ## Architecture decisions
 
 - **Bun-only runtime.** No Node/tsx support. Bun handles TS natively, runs `ee.config.ts` directly.
-- **Diff: auto-diff by default, schema optional.** When no `schema` is defined on a worker, the diff engine recursively compares JSON. Users can define explicit `schema.sections` for clean section-by-section diffs (keyed-array, set, scalar, ordered-array).
+- **Pluggable judges.** `EvalDef.judge` determines pass/fail. Default is `vibecheck()`, which diffs eval output against golden. Judges are `EvalMethod` functions: `(JudgeInput) => Promise<EvalVerdict>`. vibecheck accepts an optional `schema` for structured diffs; without one it auto-diffs JSON recursively.
+- **Framework-level diffSchema.** `EvalDef.diffSchema` controls how `ee report`, `ee merge`, and `ee changes` render diffs. Separate from the judge — judges own their own comparison logic.
 - **Config is code, not YAML.** `ee.config.ts` exports via `defineConfig()` for type safety.
 - **Storage is project-local.** `.ee/{worker}/{datasetId}/` — not a global cache. Goldens can be committed to git; runs/reports are ephemeral.
 - **Workers are named eval targets.** Most projects have one (`default`). The `workers` map handles multi-eval projects.
@@ -49,6 +50,7 @@ src/
   types.ts            All core types
   config/loader.ts    Find and import ee.config.ts
   commands/           One file per CLI command
+  judges/             Eval methods (vibecheck, future: llm-judge)
   storage/            Filesystem ops for golden, runs, reports
   diff/               Diff engines (auto-recursive + schema-driven)
   merge/              Interactive merge UI
@@ -58,9 +60,12 @@ templates/basic/      Starter ee.config.ts for `ee init`
 
 ## Key types
 
-- `EvalConfig` — top-level config with `workers` map and optional `storage`
-- `WorkerConfig` — `run` function + optional `schema` + optional `inputs`
-- `EvalContext` — passed to `run`: `datasetId`, `inputs`, `reportCost()`, `reportMeta()`
+- `EvalConfig` — top-level config with `evals` map and optional `storage`
+- `EvalDef` — `eval` function + optional `judge`, `diffSchema`, `inputs`
+- `EvalMethod` — judge function: `(JudgeInput) => Promise<EvalVerdict>`
+- `EvalVerdict` — judge output: `{ diff, pass, summary, metadata? }`
+- `JudgeInput` — judge input: `{ run, golden, evalDef }`
+- `EvalContext` — passed to `eval`: `datasetId`, `inputs`, `vars`, `reportCost()`, `reportMeta()`
 - `Golden<T>` — blessed reference: `{ blessedAt, datasetId, worker, output }`
 - `EvalRun<T>` — run snapshot: `{ timestamp, datasetId, worker, durationMs, cost, output }`
 - `DiffResult` — diff output: `{ sections: SectionDiff[], summary }`

@@ -2,7 +2,7 @@
 
 A CLI toolkit (`ee`) for evaluating structured LLM outputs against golden datasets.
 
-The core loop: **bless** a golden reference, **eval** by re-running your generator, **diff** against golden, **merge** improvements back.
+The core loop: **bless** a golden reference, **eval** by re-running your generator, **judge** the result (diff against golden by default), **merge** improvements back.
 
 ## Install
 
@@ -70,11 +70,37 @@ eval: async (ctx) => {
 },
 ```
 
-### Diff Schema (optional)
+### Judges
 
-Define `diffSchema.sections` on an eval for structured section-by-section diffs. Without a diffSchema, easy-eval auto-diffs by comparing JSON recursively.
+A judge determines pass/fail for an eval run. Set `judge` on your eval definition — if omitted, `vibecheck()` is used by default.
 
-Section kinds: `scalar`, `keyed-array`, `set`, `ordered-array`.
+**`vibecheck()`** — the built-in judge. Diffs eval output against golden and passes when nothing changed, went missing, or was added. Without a schema it auto-diffs JSON recursively. Pass a schema for structured section-by-section diffs:
+
+```ts
+import { defineConfig, vibecheck } from "easy-eval";
+
+export default defineConfig({
+  evals: {
+    default: {
+      eval: async (ctx) => { /* ... */ },
+      judge: vibecheck({
+        schema: {
+          sections: [
+            { path: "title", label: "Title", kind: "scalar" },
+            { path: "items", label: "Items", kind: "keyed-array", key: "id" },
+          ],
+        },
+      }),
+    },
+  },
+});
+```
+
+Schema section kinds: `scalar`, `keyed-array`, `set`, `ordered-array`.
+
+### Diff Schema (framework-level)
+
+`diffSchema` on an eval definition controls how the framework renders diffs in `ee report`, `ee merge`, and `ee changes`. This is separate from the judge — it's for human-readable display of output comparisons.
 
 ### Regression Sweep
 

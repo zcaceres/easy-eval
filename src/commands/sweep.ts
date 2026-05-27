@@ -1,9 +1,9 @@
 import { loadConfig, resolveEval } from "../config/loader";
 import { getStorageRoot } from "../storage/paths";
 import { saveRun, loadGolden, discoverDatasets } from "../storage/index";
-import { diff } from "../diff/index";
 import { renderSweepTable, renderDiffTable, renderDetailedDiff } from "../render/table";
 import { bold, dim, green, red, yellow } from "../render/colors";
+import { vibecheck } from "../judges/vibecheck";
 import type { EvalContext, EvalRun, CostReport, EvalDef, SweepDatasetResult } from "../types";
 
 export async function cmdSweep(
@@ -122,17 +122,17 @@ async function runSweep(
         continue;
       }
 
-      const diffResult = diff(golden.output, output, evalDef.diffSchema);
-      const hasRegression = diffResult.summary.changed > 0 || diffResult.summary.missing > 0;
-      const status = hasRegression ? "regression" : "clean";
+      const judge = evalDef.judge ?? vibecheck();
+      const verdict = await judge({ run, golden, evalDef });
+      const status = verdict.pass ? "clean" : "regression";
 
       if (!silent) {
         console.log(
-          (hasRegression ? red(" regression") : green(" clean")) + dim(` (${(durationMs / 1000).toFixed(1)}s)`),
+          (verdict.pass ? green(" clean") : red(" regression")) + dim(` (${(durationMs / 1000).toFixed(1)}s)`),
         );
       }
 
-      results.push({ datasetId: dsId, status, diff: diffResult, durationMs, cost });
+      results.push({ datasetId: dsId, status, diff: verdict.diff ?? undefined, durationMs, cost });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       if (!silent) console.log(yellow(` error (${message})`));
