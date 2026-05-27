@@ -11,7 +11,7 @@ export interface StorageConfig {
 
 export interface EvalDef {
   eval: (ctx: EvalContext) => Promise<unknown>;
-  inputs?: (datasetId: string) => Promise<unknown>;
+  inputs?: (datasetId: string, vars: Record<string, string>) => Promise<unknown>;
   diffSchema?: DiffSchema;
 }
 
@@ -99,6 +99,8 @@ export interface EvalRun<TOutput = unknown> {
   durationMs: number;
   cost?: CostReport;
   metadata?: Record<string, unknown>;
+  vars?: Record<string, string>;
+  inputs?: unknown;
   output: TOutput;
 }
 

@@ -1,17 +1,24 @@
 import { writeFile } from "fs/promises";
-import { loadConfig } from "../config/loader";
+import { loadConfig, resolveEval } from "../config/loader";
 import { getStorageRoot } from "../storage/paths";
-import { listChanges, loadChange } from "../storage/index";
+import { listChanges, loadChange, loadLatestRun, loadRun, loadGolden, saveChange } from "../storage/index";
+import { diff } from "../diff/index";
 import { renderDiffTable } from "../render/table";
-import { bold, dim, cyan } from "../render/colors";
+import { bold, dim, cyan, green, red } from "../render/colors";
+import type { Change } from "../types";
 
 export async function cmdChanges(
-  opts: { dataset?: string; config?: string },
+  opts: { dataset?: string; format?: string; config?: string },
 ): Promise<void> {
   const config = await loadConfig(opts.config);
   const storageRoot = getStorageRoot(config);
 
   const changes = await listChanges(storageRoot, opts.dataset);
+
+  if (opts.format === "json") {
+    console.log(JSON.stringify({ changes }, null, 2));
+    return;
+  }
 
   if (changes.length === 0) {
     if (opts.dataset) {
@@ -50,7 +57,7 @@ export async function cmdChanges(
 
 export async function cmdChange(
   timestamp: string,
-  opts: { config?: string },
+  opts: { format?: string; config?: string },
 ): Promise<void> {
   const config = await loadConfig(opts.config);
   const storageRoot = getStorageRoot(config);
@@ -59,6 +66,11 @@ export async function cmdChange(
   if (!change) {
     console.error(`No change found at ${timestamp}`);
     process.exit(1);
+  }
+
+  if (opts.format === "json") {
+    console.log(JSON.stringify(change, null, 2));
+    return;
   }
 
   console.log(bold("Change") + dim(` ${change.timestamp}`));
@@ -93,6 +105,46 @@ export async function cmdChange(
     console.log(`\n${bold("Diff:")}`);
     console.log(renderDiffTable(change.diff));
   }
+}
+
+export async function cmdAddChange(
+  datasetId: string,
+  runTimestamp: string | undefined,
+  opts: { worker?: string; note?: string; config?: string },
+): Promise<void> {
+  const config = await loadConfig(opts.config);
+  const { name: evalName, evalDef } = resolveEval(config, opts.worker);
+  const storageRoot = getStorageRoot(config);
+
+  const run = runTimestamp
+    ? await loadRun(storageRoot, evalName, datasetId, runTimestamp)
+    : await loadLatestRun(storageRoot, evalName, datasetId);
+
+  if (!run) {
+    const msg = runTimestamp
+      ? `No eval run for ${datasetId} at ${runTimestamp}`
+      : `No eval runs for ${datasetId}`;
+    console.error(red(msg));
+    process.exit(1);
+  }
+
+  const golden = await loadGolden(storageRoot, evalName, datasetId);
+  const result = golden ? diff(golden.output, run.output, evalDef.diffSchema) : undefined;
+
+  const change: Change = {
+    timestamp: new Date().toISOString(),
+    datasetId,
+    worker: evalName,
+    runTimestamp: run.timestamp,
+    inputs: run.inputs,
+    vars: run.vars ?? {},
+    diff: result,
+    note: opts.note || undefined,
+    metadata: run.metadata,
+  };
+
+  await saveChange(storageRoot, change);
+  console.log(green("✓ Change saved") + dim(` to .ee/changes/`));
 }
 
 export async function cmdExportChanges(

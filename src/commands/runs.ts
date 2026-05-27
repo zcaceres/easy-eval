@@ -5,7 +5,7 @@ import { bold, dim, cyan } from "../render/colors";
 
 export async function cmdRuns(
   datasetId: string,
-  opts: { worker?: string; limit?: string; config?: string },
+  opts: { worker?: string; limit?: string; format?: string; config?: string },
 ): Promise<void> {
   const config = await loadConfig(opts.config);
   const { name: evalName } = resolveEval(config, opts.worker);
@@ -13,6 +13,12 @@ export async function cmdRuns(
   const limit = opts.limit ? parseInt(opts.limit, 10) : 20;
 
   const runs = await listRuns(storageRoot, evalName, datasetId);
+
+  if (opts.format === "json") {
+    console.log(JSON.stringify({ datasetId, worker: evalName, runs }, null, 2));
+    return;
+  }
+
   if (runs.length === 0) {
     console.log(`No eval runs for ${datasetId} (worker: ${evalName})`);
     return;

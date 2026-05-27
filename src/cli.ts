@@ -8,7 +8,8 @@ import { cmdReport } from "./commands/report";
 import { cmdMerge } from "./commands/merge";
 import { cmdStatus } from "./commands/status";
 import { cmdValidate } from "./commands/validate";
-import { cmdChanges, cmdChange, cmdExportChanges } from "./commands/changes";
+import { cmdChanges, cmdChange, cmdExportChanges, cmdAddChange } from "./commands/changes";
+import { cmdSweep } from "./commands/sweep";
 import { collectVars } from "./vars";
 
 const program = new Command();
@@ -84,21 +85,26 @@ program
   .description("List past eval runs for a dataset, showing timestamp, duration, and cost")
   .option("-w, --worker <name>", "Named eval target from config (default: \"default\")")
   .option("-l, --limit <n>", "Max runs to show (default: 20)")
+  .option("-f, --format <format>", "Output format: table, json (default: table)")
   .addHelpText('after', `
 Examples:
   $ ee runs user-123
-  $ ee runs user-123 -l 5                      Show last 5 runs only`)
+  $ ee runs user-123 -l 5                      Show last 5 runs only
+  $ ee runs user-123 -f json                   Output as JSON`)
   .action((datasetId, opts) => cmdRuns(datasetId, { ...opts, ...globalOpts() }));
 
 program
   .command("report <datasetId> [timestamp]")
   .description("Show diff report comparing an eval run against golden (latest run if no timestamp)")
   .option("-w, --worker <name>", "Named eval target from config (default: \"default\")")
-  .option("-f, --format <format>", "Output format: table, md (default: table)")
+  .option("-f, --format <format>", "Output format: table, json, md (default: table)")
+  .option("--against <timestamp>", "Diff against another run instead of golden (run-vs-run comparison)")
   .addHelpText('after', `
 Examples:
   $ ee report user-123                         Diff latest run vs golden
   $ ee report user-123 2025-01-15T10-30-00.000Z
+  $ ee report user-123 -f json                 Output as JSON (agent-friendly)
+  $ ee report user-123 <ts1> --against <ts2>   Compare two runs directly
   $ ee report user-123 -f md                   Output as markdown`)
   .action((datasetId, timestamp, opts) => cmdReport(datasetId, timestamp, { ...opts, ...globalOpts() }));
 
@@ -116,13 +122,31 @@ Not suitable for non-interactive / agent usage — use "ee bless" instead.`)
   .action((datasetId, timestamp, opts) => cmdMerge(datasetId, timestamp, { ...opts, ...globalOpts() }));
 
 program
+  .command("sweep <datasetId>")
+  .description("Run regression sweep: re-eval all other golden datasets for the same worker")
+  .option("-w, --worker <name>", "Named eval target from config (default: \"default\")")
+  .option("-v, --var <key=value>", "Pass variables to eval function, repeatable (access via ctx.vars)", collectVars, {})
+  .option("-f, --format <format>", "Output format: table, json (default: table)")
+  .addHelpText('after', `
+Examples:
+  $ ee sweep user-123                            Check all other goldens
+  $ ee sweep user-123 -v model=gpt-4o            Sweep with variables
+  $ ee sweep user-123 -f json                    Output as JSON (agent-friendly)
+  $ ee sweep user-123 -w my-worker
+
+Runs the eval function against every golden dataset (except the given one)
+for the same worker. Reports which datasets match and which regressed.
+Each sweep run is saved and visible in "ee runs" / "ee report".`)
+  .action((datasetId, opts) => cmdSweep(datasetId, { ...opts, ...globalOpts() }));
+
+program
   .command("status")
   .description("Show overview of all datasets, goldens, and run counts across workers")
+  .option("-f, --format <format>", "Output format: table, json (default: table)")
   .addHelpText('after', `
-Example:
+Examples:
   $ ee status
-  Dataset        Worker    Golden          Runs  Latest Run
-  user-123       default   2025-01-15         3  2025-01-15T14:22:01`)
+  $ ee status -f json                          Output as JSON`)
   .action((opts) => cmdStatus({ ...opts, ...globalOpts() }));
 
 program
@@ -141,31 +165,49 @@ const changes = program
   .command("changes")
   .description("Manage codified changes — structured records of eval improvements with context and diffs")
   .addHelpText('after', `
-Changes are created during "ee eval" when you answer "Codify this change? [y]".
+Changes are created during "ee eval" when you answer "Codify this change? [y]",
+or programmatically via "ee changes add".
 Each change records: the dataset, worker, variables used, inputs, diff, and an optional note.
 
 Subcommands:
   list       List all codified changes
   show       View a single change in detail
+  add        Create a change from an existing run (non-interactive)
   export     Export changes as markdown`);
 
 changes
   .command("list")
   .description("List codified changes, showing timestamp, dataset, note, and variables")
   .option("-d, --dataset <datasetId>", "Filter to changes from a specific dataset")
+  .option("-f, --format <format>", "Output format: table, json (default: table)")
   .addHelpText('after', `
 Examples:
   $ ee changes list
-  $ ee changes list -d user-123`)
+  $ ee changes list -d user-123
+  $ ee changes list -f json`)
   .action((opts) => cmdChanges({ ...opts, ...globalOpts() }));
 
 changes
   .command("show <timestamp>")
   .description("View a codified change in detail: dataset, worker, variables, inputs, and diff")
+  .option("-f, --format <format>", "Output format: table, json (default: table)")
   .addHelpText('after', `
-Example:
-  $ ee changes show 2025-01-15T10-30-00.000Z`)
+Examples:
+  $ ee changes show 2025-01-15T10-30-00.000Z
+  $ ee changes show 2025-01-15T10-30-00.000Z -f json`)
   .action((timestamp, opts) => cmdChange(timestamp, { ...opts, ...globalOpts() }));
+
+changes
+  .command("add <datasetId> [runTimestamp]")
+  .description("Create a change from an existing eval run (non-interactive)")
+  .option("-w, --worker <name>", "Named eval target from config (default: \"default\")")
+  .option("--note <text>", "Note describing the change")
+  .addHelpText('after', `
+Examples:
+  $ ee changes add user-123                    Codify from latest run
+  $ ee changes add user-123 2025-01-15T10-30-00.000Z --note "improved extraction"
+  $ ee changes add user-123 -w my-worker`)
+  .action((datasetId, runTimestamp, opts) => cmdAddChange(datasetId, runTimestamp, { ...opts, ...globalOpts() }));
 
 changes
   .command("export")
