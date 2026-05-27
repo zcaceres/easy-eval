@@ -41,8 +41,9 @@ src/
   config/loader.ts    Find and import ee.config.ts
   commands/           One file per CLI command
   storage/            Filesystem ops for golden, runs, reports
-  diff/               Diff engines (auto + schema-driven) [not yet implemented]
-  render/             Table + markdown renderers [not yet implemented]
+  diff/               Diff engines (auto-recursive + schema-driven)
+  merge/              Interactive merge UI
+  render/             Table + ANSI color renderers
 templates/basic/      Starter ee.config.ts for `ee init`
 ```
 
