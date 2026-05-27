@@ -13,7 +13,9 @@ interface SectionOverride {
   identity?: (item: unknown) => string;
 }
 
-export type ZodOverrides = Record<string, SectionOverride | false>;
+export type ZodOverrides<TShape extends Record<string, unknown> = Record<string, unknown>> = {
+  [K in keyof TShape]?: SectionOverride | false;
+};
 
 const KEY_CANDIDATES = ["id", "key", "name", "slug", "code"];
 
@@ -61,7 +63,7 @@ function guessKey(objectDef: any): string | undefined {
   return undefined;
 }
 
-function inferSection(path: string, zodType: ZodType, overrides: ZodOverrides): SectionConfig | null {
+function inferSection(path: string, zodType: ZodType, overrides: ZodOverrides<Record<string, unknown>>): SectionConfig | null {
   const override = overrides[path];
   if (override === false) return null;
 
@@ -133,14 +135,14 @@ function pick(
   return result;
 }
 
-export function fromZod(schema: ZodObject, overrides: ZodOverrides = {}): DiffSchema {
+export function fromZod<T extends ZodObject>(schema: T, overrides: ZodOverrides<T["shape"]> = {}): DiffSchema {
   if (!schema || !schema.shape) {
     throw new Error("fromZod expects a Zod object schema (z.object({...}))");
   }
 
   const sections: SectionConfig[] = [];
   for (const [path, zodType] of Object.entries(schema.shape)) {
-    const section = inferSection(path, zodType, overrides);
+    const section = inferSection(path, zodType, overrides as ZodOverrides);
     if (section) sections.push(section);
   }
   return { sections };

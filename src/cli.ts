@@ -7,6 +7,7 @@ import { cmdRuns } from "./commands/runs";
 import { cmdReport } from "./commands/report";
 import { cmdMerge } from "./commands/merge";
 import { cmdStatus } from "./commands/status";
+import { cmdValidate } from "./commands/validate";
 
 const program = new Command();
 
@@ -59,5 +60,12 @@ program
   .command("status")
   .description("Show overview of all datasets, goldens, and runs")
   .action(cmdStatus);
+
+program
+  .command("validate")
+  .description("Validate ee.config.ts: check schema, worker config, and optionally probe output shape")
+  .option("-w, --worker <name>", "Which worker to validate (default: all)")
+  .option("--probe <datasetId>", "Run eval once and validate output matches schema")
+  .action(cmdValidate);
 
 program.parse();
