@@ -1,9 +1,12 @@
-import type { ExtractedRestaurant } from "./schema";
+// Fake extraction pipeline that simulates an LLM extracting structured
+// restaurant data from reviews. Returns an ExtractedRestaurant with
+// intentional random variation (jittered ratings, dropped/added items,
+// flipped sentiments) so each eval run produces slightly different output.
+// This makes it useful for exercising ee's diff, merge, and sweep features.
+//
+// In a real project, this file would call an actual LLM API.
 
-// ─── Randomness helpers for test variability ─────────────────────
-// These simulate LLM non-determinism so each eval run produces
-// slightly different outputs — useful for stress-testing diffs,
-// the changelog, and other features that depend on run-to-run variation.
+import type { ExtractedRestaurant } from "./schema";
 
 function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]!;
