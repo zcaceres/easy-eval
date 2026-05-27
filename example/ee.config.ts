@@ -1,6 +1,7 @@
-import { defineConfig } from "../src/index";
+import { defineConfig, fromZod } from "../src/index";
 import { REVIEWS } from "./reviews";
 import { extractRestaurant } from "./extractor";
+import { ExtractedRestaurantSchema } from "./schema";
 
 export default defineConfig({
   workers: {
@@ -18,43 +19,10 @@ export default defineConfig({
         return extractRestaurant(input.restaurantId, input.reviews);
       },
 
-      schema: {
-        sections: [
-          { path: "name", label: "Name", kind: "scalar" },
-          { path: "cuisineType", label: "Cuisine", kind: "scalar" },
-          { path: "priceRange", label: "Price Range", kind: "scalar" },
-          { path: "overallRating", label: "Rating", kind: "scalar" },
-          {
-            path: "dishes",
-            label: "Dishes",
-            kind: "keyed-array",
-            key: "name",
-            display: (item: any) => `${item.name} (${item.sentiment})`,
-          },
-          {
-            path: "attributes",
-            label: "Attributes",
-            kind: "set",
-          },
-          {
-            path: "pricePoints",
-            label: "Price Points",
-            kind: "keyed-array",
-            key: "item",
-            display: (item: any) => `${item.item}: ${item.price}`,
-          },
-          {
-            path: "highlights",
-            label: "Highlights",
-            kind: "set",
-          },
-          {
-            path: "warnings",
-            label: "Warnings",
-            kind: "set",
-          },
-        ],
-      },
+      schema: fromZod(ExtractedRestaurantSchema, {
+        dishes: { display: (item: any) => `${item.name} (${item.sentiment})` },
+        pricePoints: { key: "item", display: (item: any) => `${item.item}: ${item.price}` },
+      }),
     },
   },
 

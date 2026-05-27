@@ -1,146 +1,132 @@
-export interface ExtractedRestaurant {
-  name: string;
-  cuisineType: string;
-  priceRange: "budget" | "moderate" | "upscale" | "fine-dining";
-  overallRating: number;
-  dishes: Array<{
-    name: string;
-    sentiment: "positive" | "neutral" | "negative";
-  }>;
-  attributes: string[];
-  pricePoints: Array<{
-    item: string;
-    price: string;
-  }>;
-  sentiment: {
-    positive: number;
-    negative: number;
-    neutral: number;
-  };
-  highlights: string[];
-  warnings: string[];
-}
+import type { ExtractedRestaurant } from "./schema";
 
-export function extractRestaurant(restaurantId: string, reviews: string[]): ExtractedRestaurant {
+export function extractRestaurant(restaurantId: string, _reviews: string[]): ExtractedRestaurant {
   const extractors: Record<string, () => ExtractedRestaurant> = {
-    "joes-pizza": () => ({
-      name: "Joe's Pizza",
-      cuisineType: "Italian / Pizza",
+    "golden-dragon": () => ({
+      name: "Golden Dragon",
+      cuisineType: "Chinese / Sichuan",
       priceRange: "budget",
-      overallRating: 4.1,
+      overallRating: 4.4,
       dishes: [
-        { name: "Plain Slice", sentiment: "positive" },
-        { name: "Pepperoni Slice", sentiment: "positive" },
-        { name: "Margherita", sentiment: "neutral" },
-        { name: "Cannoli", sentiment: "positive" },
-        { name: "Garlic Knots", sentiment: "positive" },
+        { name: "Dan Dan Noodles", sentiment: "positive" },
+        { name: "Mapo Tofu", sentiment: "positive" },
+        { name: "Cumin Lamb", sentiment: "positive" },
+        { name: "Kung Pao Chicken", sentiment: "positive" },
+        { name: "Tea-Smoked Duck", sentiment: "negative" },
+        { name: "Soup Dumplings (XLB)", sentiment: "positive" },
+        { name: "Turnip Cake", sentiment: "positive" },
+        { name: "Hot Pot", sentiment: "positive" },
       ],
       attributes: [
         "cash-only",
-        "no-frills",
-        "coal-oven",
-        "family-owned",
-        "nyc-institution",
-      ],
-      pricePoints: [
-        { item: "Plain Slice", price: "$3.50-$5.00" },
-      ],
-      sentiment: { positive: 3, negative: 0, neutral: 1 },
-      highlights: [
-        "Thin crispy crust with perfect fold",
-        "Coal oven char",
-        "Fresh mozzarella and San Marzano tomatoes",
-        "Family-owned for three generations",
-      ],
-      warnings: [
-        "Long wait times",
-        "Cash only",
-        "Prices increasing",
-      ],
-    }),
-
-    "sakura-sushi": () => ({
-      name: "Sakura Sushi",
-      cuisineType: "Japanese / Sushi",
-      priceRange: "fine-dining",
-      overallRating: 4.3,
-      dishes: [
-        { name: "Omakase", sentiment: "positive" },
-        { name: "Uni", sentiment: "positive" },
-        { name: "Otoro", sentiment: "positive" },
-        { name: "A5 Wagyu Nigiri", sentiment: "positive" },
-        { name: "Hamachi", sentiment: "positive" },
-        { name: "Yuzu Sorbet", sentiment: "positive" },
-      ],
-      attributes: [
-        "omakase",
-        "bar-seating",
-        "reservation-required",
-        "intimate-setting",
-        "daily-fish-sourcing",
-      ],
-      pricePoints: [
-        { item: "Omakase", price: "$185" },
-        { item: "Prix Fixe", price: "$150" },
-      ],
-      sentiment: { positive: 3, negative: 0, neutral: 1 },
-      highlights: [
-        "Chef Tanaka sources fish daily from Tsukiji",
-        "Perfectly seasoned rice",
-        "Michelin-worthy quality",
-        "Beautiful presentation",
-      ],
-      warnings: [
-        "Very expensive",
-        "Small portions for price",
-        "3-week wait for reservations",
-        "Overpriced wine list",
-      ],
-    }),
-
-    "marias-cantina": () => ({
-      name: "Maria's Cantina",
-      cuisineType: "Mexican",
-      priceRange: "moderate",
-      overallRating: 4.0,
-      dishes: [
-        { name: "Tacos al Pastor", sentiment: "positive" },
-        { name: "Mole", sentiment: "positive" },
-        { name: "Churros", sentiment: "positive" },
-        { name: "Elote", sentiment: "positive" },
-        { name: "Queso Fundido", sentiment: "positive" },
-        { name: "Chilaquiles", sentiment: "positive" },
-        { name: "Breakfast Burrito", sentiment: "positive" },
-        { name: "Guacamole", sentiment: "positive" },
-      ],
-      attributes: [
+        "byob",
+        "no-reservations",
         "family-run",
-        "patio",
-        "happy-hour",
-        "brunch",
-        "vegan-options",
-        "tableside-guac",
+        "open-late",
+        "hand-pulled-noodles",
       ],
       pricePoints: [
-        { item: "Margarita (Happy Hour)", price: "$8" },
-        { item: "Breakfast Burrito", price: "$12" },
+        { item: "Dan Dan Noodles", price: "$14" },
       ],
       sentiment: { positive: 3, negative: 0, neutral: 1 },
       highlights: [
-        "Fresh pineapple salsa made every hour",
-        "Rich complex mole with chocolate finish",
-        "Life-changing chilaquiles",
-        "Housemade horchata",
+        "Hand-pulled noodles made fresh to order",
+        "Grandma still makes dumpling wrappers by hand",
+        "15 years of consistent quality",
+        "Perfect Sichuan peppercorn balance",
       ],
       warnings: [
-        "Very loud on weekends",
+        "Cash only",
+        "Service is efficient but impersonal",
+        "Tea-smoked duck was dry",
+      ],
+    }),
+
+    "the-rustic-oven": () => ({
+      name: "The Rustic Oven",
+      cuisineType: "Italian / Neapolitan Pizza",
+      priceRange: "upscale",
+      overallRating: 3.9,
+      dishes: [
+        { name: "Margherita Pizza", sentiment: "positive" },
+        { name: "Burrata Appetizer", sentiment: "positive" },
+        { name: "Diavola Pizza", sentiment: "positive" },
+        { name: "Tiramisu", sentiment: "positive" },
+        { name: "Truffle Pizza", sentiment: "positive" },
+        { name: "Arugula Salad", sentiment: "negative" },
+      ],
+      attributes: [
+        "wood-fired-oven",
+        "no-reservations",
+        "intimate-setting",
+        "date-spot",
+        "neapolitan-owner",
+        "seasonal-menu",
+      ],
+      pricePoints: [
+        { item: "Margherita Pizza", price: "$18" },
+        { item: "Truffle Pizza", price: "$22" },
+      ],
+      sentiment: { positive: 3, negative: 1, neutral: 0 },
+      highlights: [
+        "Leopard-spotted crust from wood-fired oven",
+        "Fresh black truffle shaved tableside",
+        "Owner is from Naples",
+        "Excellent house Montepulciano",
+      ],
+      warnings: [
+        "Long waits even with reservation",
+        "Expensive for pizza",
+        "Inconsistent service",
+      ],
+    }),
+
+    "cafe-lumiere": () => ({
+      name: "Café Lumière",
+      cuisineType: "French Bistro",
+      priceRange: "moderate",
+      overallRating: 3.5,
+      dishes: [
+        { name: "Croque Monsieur", sentiment: "positive" },
+        { name: "French Onion Soup", sentiment: "positive" },
+        { name: "Duck Confit", sentiment: "positive" },
+        { name: "Frisée Salad", sentiment: "positive" },
+        { name: "Crème Brûlée", sentiment: "neutral" },
+        { name: "Eggs Benedict", sentiment: "positive" },
+        { name: "French Toast", sentiment: "positive" },
+        { name: "Steak Frites", sentiment: "negative" },
+        { name: "Profiteroles", sentiment: "positive" },
+      ],
+      attributes: [
+        "patio-seating",
+        "brunch",
+        "prix-fixe-lunch",
+        "well-curated-wine-list",
+        "bottomless-mimosas",
+      ],
+      pricePoints: [
+        { item: "Prix Fixe Lunch", price: "$16" },
+        { item: "Bottomless Mimosas", price: "$25" },
+        { item: "Steak Frites", price: "$34" },
+      ],
+      sentiment: { positive: 2, negative: 2, neutral: 0 },
+      highlights: [
+        "Textbook croque monsieur",
+        "Duck confit fall-off-the-bone tender",
+        "Silky hollandaise on eggs Benedict",
+        "Charming patio seating",
+      ],
+      warnings: [
+        "Steak often overcooked",
+        "Slow service on off-peak nights",
+        "Gets packed by 11am for brunch",
       ],
     }),
   };
 
   const extract = extractors[restaurantId];
   if (!extract) {
-    throw new Error(`Unknown restaurant: ${restaurantId}`);
+    throw new Error(`Unknown restaurant: ${restaurantId}. Available: ${Object.keys(extractors).join(", ")}`);
   }
   return extract();
 }
