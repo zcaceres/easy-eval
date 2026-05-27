@@ -132,6 +132,20 @@ export interface DiffResult {
   };
 }
 
+// ─── Change (codified improvement) ────────────────────────────────
+
+export interface Change {
+  timestamp: string;
+  datasetId: string;
+  worker: string;
+  runTimestamp: string;
+  inputs: unknown;
+  vars: Record<string, string>;
+  diff?: DiffResult;
+  note?: string;
+  metadata?: Record<string, unknown>;
+}
+
 // ─── defineConfig helper ───────────────────────────────────────────
 
 export function defineConfig(config: EvalConfig): EvalConfig {

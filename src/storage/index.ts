@@ -1,10 +1,11 @@
 import { join } from "path";
 import { readdir, readFile, writeFile, mkdir } from "fs/promises";
-import type { Golden, EvalRun } from "../types";
+import type { Golden, EvalRun, Change } from "../types";
 import {
   goldenPath,
   runsDir,
   reportsDir,
+  changesDir,
   tsToFilename,
   filenameToTs,
 } from "./paths";
@@ -130,6 +131,71 @@ export async function saveReport(
   const filepath = join(dir, filename);
   await writeFile(filepath, markdown);
   return filepath;
+}
+
+// ─── Changes ──────────────────────────────────────────────────────
+
+export async function saveChange(
+  storageRoot: string,
+  change: Change,
+): Promise<void> {
+  const dir = changesDir(storageRoot);
+  await ensureDir(dir);
+  const filename = `${tsToFilename(change.timestamp)}.json`;
+  await writeFile(join(dir, filename), JSON.stringify(change, null, 2));
+}
+
+export async function loadChange(
+  storageRoot: string,
+  timestamp: string,
+): Promise<Change | null> {
+  try {
+    const filename = `${tsToFilename(timestamp)}.json`;
+    const raw = await readFile(join(changesDir(storageRoot), filename), "utf-8");
+    return JSON.parse(raw) as Change;
+  } catch {
+    return null;
+  }
+}
+
+export interface ChangeSummary {
+  timestamp: string;
+  datasetId: string;
+  worker: string;
+  note?: string;
+  vars: Record<string, string>;
+}
+
+export async function listChanges(
+  storageRoot: string,
+  datasetId?: string,
+): Promise<ChangeSummary[]> {
+  const dir = changesDir(storageRoot);
+  let files: string[];
+  try {
+    files = await readdir(dir);
+  } catch {
+    return [];
+  }
+
+  const summaries: ChangeSummary[] = [];
+  for (const file of files.filter((f) => f.endsWith(".json")).sort()) {
+    try {
+      const raw = await readFile(join(dir, file), "utf-8");
+      const change = JSON.parse(raw) as Change;
+      if (datasetId && change.datasetId !== datasetId) continue;
+      summaries.push({
+        timestamp: change.timestamp,
+        datasetId: change.datasetId,
+        worker: change.worker,
+        note: change.note,
+        vars: change.vars,
+      });
+    } catch {
+      // skip corrupt files
+    }
+  }
+  return summaries;
 }
 
 // ─── Discovery ─────────────────────────────────────────────────────

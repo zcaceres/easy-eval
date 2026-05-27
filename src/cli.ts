@@ -8,6 +8,7 @@ import { cmdReport } from "./commands/report";
 import { cmdMerge } from "./commands/merge";
 import { cmdStatus } from "./commands/status";
 import { cmdValidate } from "./commands/validate";
+import { cmdChanges, cmdChange, cmdExportChanges } from "./commands/changes";
 import { collectVars } from "./vars";
 
 const program = new Command();
@@ -74,5 +75,27 @@ program
   .option("-w, --worker <name>", "Which eval to validate (default: all)")
   .option("--probe <datasetId>", "Run eval once and validate output matches schema")
   .action((opts) => cmdValidate({ ...opts, ...globalOpts() }));
+
+const changes = program
+  .command("changes")
+  .description("Manage codified changes");
+
+changes
+  .command("list")
+  .description("List codified changes across the project")
+  .option("-d, --dataset <datasetId>", "Filter to changes from a specific dataset")
+  .action((opts) => cmdChanges({ ...opts, ...globalOpts() }));
+
+changes
+  .command("show <timestamp>")
+  .description("View a codified change in detail")
+  .action((timestamp, opts) => cmdChange(timestamp, { ...opts, ...globalOpts() }));
+
+changes
+  .command("export")
+  .description("Export codified changes as markdown")
+  .option("-d, --dataset <datasetId>", "Filter to changes from a specific dataset")
+  .option("-o, --out <path>", "Write to file instead of stdout")
+  .action((opts) => cmdExportChanges({ ...opts, ...globalOpts() }));
 
 program.parse();
