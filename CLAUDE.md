@@ -12,7 +12,7 @@ Generalized, open-source extraction of the eval framework from `~/storesdata/pip
 ## Architecture decisions
 
 - **Bun-only runtime.** No Node/tsx support. Bun handles TS natively, runs `ee.config.ts` directly.
-- **Pluggable judges.** `EvalDef.judge` determines pass/fail. Default is `vibecheck()`, which diffs eval output against golden. Built-in judges: `vibecheck()` (structured diff), `exactMatch()` (deep equality), `fuzzyMatch()` (normalized comparison with Levenshtein support). Judges are `EvalMethod` functions: `(JudgeInput) => Promise<EvalVerdict>`.
+- **Pluggable judges.** `EvalDef.judge` determines pass/fail. Default is `vibecheck()`, which diffs eval output against golden. Built-in judges: `vibecheck()` (structured diff), `exactMatch()` (deep equality), `fuzzyMatch()` (normalized comparison with Levenshtein support), `llmJudge()` (LLM-as-judge with user-provided call function). Judges are `EvalMethod` functions: `(JudgeInput) => Promise<EvalVerdict>`.
 - **Framework-level diffSchema.** `EvalDef.diffSchema` controls how `ee report`, `ee merge`, and `ee changes` render diffs. Separate from the judge — judges own their own comparison logic.
 - **Config is code, not YAML.** `ee.config.ts` exports via `defineConfig()` for type safety.
 - **Storage is project-local.** `.ee/{worker}/{datasetId}/` — not a global cache. Goldens can be committed to git; runs/reports are ephemeral.

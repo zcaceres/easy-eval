@@ -137,6 +137,29 @@ export default defineConfig({
 
 String matching: normalization (case, whitespace) is applied first, then exact comparison. If the strings still differ and `maxEditDistance` or `minSimilarity` is set, Levenshtein distance is checked — passing either threshold is enough. Arrays are compared as sets (order-insensitive).
 
+**`llmJudge()`** — uses an LLM to judge eval output. You provide a `call` function that takes a prompt and returns a string. The judge constructs a grading prompt from the run output, golden (if any), and an optional rubric, then parses the LLM's JSON response for pass/fail:
+
+```ts
+import { defineConfig, llmJudge } from "easy-eval";
+
+export default defineConfig({
+  evals: {
+    default: {
+      eval: async (ctx) => { /* ... */ },
+      judge: llmJudge({
+        call: async (prompt) => {
+          // Your LLM call — any provider, any SDK
+          return await myLlm(prompt);
+        },
+        rubric: "Check that all required fields are present and accurate",
+      }),
+    },
+  },
+});
+```
+
+The LLM is prompted to return `{"pass": true/false, "summary": "..."}`. The raw response is stored in `verdict.metadata.rawResponse`. If the response can't be parsed, the verdict defaults to `pass: false`.
+
 ### Diff Schema (framework-level)
 
 `diffSchema` on an eval definition controls how the framework renders diffs in `ee report`, `ee merge`, and `ee changes`. This is separate from the judge — it's for human-readable display of output comparisons.

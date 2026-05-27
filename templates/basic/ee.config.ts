@@ -1,4 +1,4 @@
-import { defineConfig, vibecheck, exactMatch, fuzzyMatch } from "easy-eval";
+import { defineConfig, vibecheck, exactMatch, fuzzyMatch, llmJudge } from "easy-eval";
 
 export default defineConfig({
   evals: {
@@ -24,6 +24,7 @@ export default defineConfig({
       //   vibecheck()    — diffs output against golden (auto-diff or with schema)
       //   exactMatch()   — deep equality check (optionally restrict to specific fields)
       //   fuzzyMatch()   — normalized comparison (case, whitespace, numeric tolerance, Levenshtein)
+      //   llmJudge()     — LLM-as-judge (you provide the LLM call function + optional rubric)
       //
       // Examples:
       //
@@ -40,6 +41,11 @@ export default defineConfig({
       // judge: exactMatch({ fields: ["title", "score"] }),
       //
       // judge: fuzzyMatch({ numericTolerance: 0.1, minSimilarity: 0.9 }),
+      //
+      // judge: llmJudge({
+      //   call: async (prompt) => await myLlm(prompt),
+      //   rubric: "Check that all fields are present and accurate",
+      // }),
     },
   },
 });

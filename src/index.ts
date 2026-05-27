@@ -5,6 +5,8 @@ export { exactMatch } from "./judges/exactMatch";
 export type { ExactMatchOptions } from "./judges/exactMatch";
 export { fuzzyMatch } from "./judges/fuzzyMatch";
 export type { FuzzyMatchOptions } from "./judges/fuzzyMatch";
+export { llmJudge } from "./judges/llmJudge";
+export type { LlmJudgeOptions } from "./judges/llmJudge";
 export { fromZod } from "./schema/index";
 export type { ZodOverrides } from "./schema/index";
 export type {
