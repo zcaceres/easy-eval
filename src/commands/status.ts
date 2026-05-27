@@ -1,6 +1,7 @@
 import { loadConfig } from "../config/loader";
 import { getStorageRoot } from "../storage/paths";
 import { discoverDatasets } from "../storage/index";
+import { bold, dim, green, yellow } from "../render/colors";
 
 export async function cmdStatus(): Promise<void> {
   const config = await loadConfig();
@@ -11,8 +12,8 @@ export async function cmdStatus(): Promise<void> {
   if (datasets.length === 0) {
     console.log("No eval data yet.");
     console.log("\nGet started:");
-    console.log("  ee eval <datasetId>    Run your first eval");
-    console.log("  ee bless <datasetId>   Bless output as golden");
+    console.log(dim("  ee eval <datasetId>    Run your first eval"));
+    console.log(dim("  ee bless <datasetId>   Bless output as golden"));
     return;
   }
 
@@ -23,20 +24,20 @@ export async function cmdStatus(): Promise<void> {
   const W_LATEST = 20;
 
   console.log(
-    `${"Dataset".padEnd(W_DS)} ${"Worker".padEnd(W_WORKER)} ${"Golden".padEnd(W_GOLDEN)} ${"Runs".padStart(W_RUNS)} ${"Latest Run".padEnd(W_LATEST)}`,
+    bold(`${"Dataset".padEnd(W_DS)} ${"Worker".padEnd(W_WORKER)} ${"Golden".padEnd(W_GOLDEN)} ${"Runs".padStart(W_RUNS)} ${"Latest Run".padEnd(W_LATEST)}`),
   );
-  console.log("─".repeat(W_DS + W_WORKER + W_GOLDEN + W_RUNS + W_LATEST + 4));
+  console.log(dim("─".repeat(W_DS + W_WORKER + W_GOLDEN + W_RUNS + W_LATEST + 4)));
 
   for (const ds of datasets) {
     const goldenStr = ds.hasGolden && ds.goldenBlessedAt
-      ? ds.goldenBlessedAt.slice(0, 10)
-      : "—";
+      ? green(ds.goldenBlessedAt.slice(0, 10))
+      : yellow("—");
     const latestStr = ds.latestRunTimestamp
       ? ds.latestRunTimestamp.slice(0, 19)
-      : "—";
+      : dim("—");
 
     console.log(
-      `${ds.datasetId.padEnd(W_DS)} ${ds.worker.padEnd(W_WORKER)} ${goldenStr.padEnd(W_GOLDEN)} ${String(ds.runCount).padStart(W_RUNS)} ${latestStr.padEnd(W_LATEST)}`,
+      `${ds.datasetId.padEnd(W_DS)} ${dim(ds.worker.padEnd(W_WORKER))} ${goldenStr.padEnd(W_GOLDEN)} ${String(ds.runCount).padStart(W_RUNS)} ${latestStr.padEnd(W_LATEST)}`,
     );
   }
 }

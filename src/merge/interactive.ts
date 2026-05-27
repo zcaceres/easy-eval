@@ -1,6 +1,7 @@
 import { createInterface, type Interface as RLInterface } from "readline";
 import type { DiffSchema, SectionConfig } from "../types";
 import { deepEqual } from "../utils";
+import { bold, dim, cyan, magenta, green, yellow } from "../render/colors";
 
 // ─── Prompt helpers ──────────────────────────────────────────────────
 
@@ -11,11 +12,11 @@ function ask(rl: RLInterface, question: string): Promise<string> {
 }
 
 async function askSection(rl: RLInterface, title: string, summary: string): Promise<"g" | "e" | "b" | "i"> {
-  console.log(`\n── ${title} ──────────────────────────────────────────────`);
-  console.log(`  ${summary}`);
+  console.log(`\n${dim("──")} ${bold(title)} ${dim("──────────────────────────────────────────────")}`);
+  console.log(dim(`  ${summary}`));
   let answer = "";
   while (!["g", "e", "b", "i"].includes(answer)) {
-    answer = await ask(rl, "  → [g]olden / [e]val / [b]oth / [i]tem-by-item? ");
+    answer = await ask(rl, `  → [${cyan("g")}]olden / [${magenta("e")}]val / [b]oth / [i]tem-by-item? `);
   }
   return answer as "g" | "e" | "b" | "i";
 }
@@ -29,12 +30,12 @@ async function askKeep(rl: RLInterface, label: string): Promise<boolean> {
 }
 
 async function askChoice(rl: RLInterface, key: string, goldenVal: string, evalVal: string): Promise<"g" | "e" | "s"> {
-  console.log(`    ${key}:`);
-  console.log(`      G: ${goldenVal}`);
-  console.log(`      E: ${evalVal}`);
+  console.log(`    ${bold(key)}:`);
+  console.log(`      ${cyan("G:")} ${goldenVal}`);
+  console.log(`      ${magenta("E:")} ${evalVal}`);
   let answer = "";
   while (!["g", "e", "s"].includes(answer)) {
-    answer = await ask(rl, "      → [g]olden / [e]val / [s]kip? ");
+    answer = await ask(rl, `      → [${cyan("g")}]olden / [${magenta("e")}]val / [s]kip? `);
   }
   return answer as "g" | "e" | "s";
 }
@@ -71,7 +72,7 @@ async function schemaMerge(
     const eVal = getPath(eval_, section.path);
 
     if (deepEqual(gVal, eVal)) {
-      console.log(`\n✓ ${section.label}: match`);
+      console.log(dim(`\n✓ ${section.label}: match`));
       continue;
     }
 
@@ -154,7 +155,7 @@ async function mergeKeyedArray(
   const summary = `${gArr.length} golden, ${eArr.length} eval (${matching.length} match, ${goldenOnly.length} golden-only, ${evalOnly.length} eval-only, ${changed.length} changed)`;
 
   if (goldenOnly.length === 0 && evalOnly.length === 0 && changed.length === 0) {
-    console.log(`\n✓ ${config.label}: ${matching.length} match, no diffs`);
+    console.log(dim(`\n✓ ${config.label}: ${matching.length} match, no diffs`));
     return [...matching];
   }
 
@@ -167,7 +168,7 @@ async function mergeKeyedArray(
   const result = [...matching];
 
   if (goldenOnly.length > 0) {
-    console.log(`  Golden-only (${goldenOnly.length}):`);
+    console.log(`  ${cyan("Golden-only")} (${goldenOnly.length}):`);
     for (const { key, item } of goldenOnly) {
       const keep = await askKeep(rl, `${key}: ${display(item)}`);
       if (keep) result.push(item);
@@ -175,7 +176,7 @@ async function mergeKeyedArray(
   }
 
   if (evalOnly.length > 0) {
-    console.log(`  Eval-only (${evalOnly.length}):`);
+    console.log(`  ${magenta("Eval-only")} (${evalOnly.length}):`);
     for (const { key, item } of evalOnly) {
       const keep = await askKeep(rl, `${key}: ${display(item)}`);
       if (keep) result.push(item);
@@ -183,7 +184,7 @@ async function mergeKeyedArray(
   }
 
   if (changed.length > 0) {
-    console.log(`  Changed (${changed.length}):`);
+    console.log(`  ${yellow("Changed")} (${changed.length}):`);
     for (const { key, golden: gi, eval: ei } of changed) {
       const c = await askChoice(rl, key, display(gi), display(ei));
       if (c === "g") result.push(gi);
@@ -225,7 +226,7 @@ async function mergeSet(
   const summary = `${gArr.length} golden, ${eArr.length} eval (${matching.length} match, ${goldenOnly.length} golden-only, ${evalOnly.length} eval-only)`;
 
   if (goldenOnly.length === 0 && evalOnly.length === 0) {
-    console.log(`\n✓ ${config.label}: ${matching.length} match, no diffs`);
+    console.log(dim(`\n✓ ${config.label}: ${matching.length} match, no diffs`));
     return [...matching];
   }
 
@@ -238,7 +239,7 @@ async function mergeSet(
   const result = [...matching];
 
   if (goldenOnly.length > 0) {
-    console.log(`  Golden-only (${goldenOnly.length}):`);
+    console.log(`  ${cyan("Golden-only")} (${goldenOnly.length}):`);
     for (const { item } of goldenOnly) {
       const keep = await askKeep(rl, display(item));
       if (keep) result.push(item);
@@ -246,7 +247,7 @@ async function mergeSet(
   }
 
   if (evalOnly.length > 0) {
-    console.log(`  Eval-only (${evalOnly.length}):`);
+    console.log(`  ${magenta("Eval-only")} (${evalOnly.length}):`);
     for (const { item } of evalOnly) {
       const keep = await askKeep(rl, display(item));
       if (keep) result.push(item);
@@ -364,7 +365,7 @@ async function autoMerge(
         result[key] = merged;
       }
     } else if (isObject(gVal) && isObject(eVal)) {
-      console.log(`\n── ${key} ──────────────────────────────────────────────`);
+      console.log(`\n${dim("──")} ${bold(key)} ${dim("──────────────────────────────────────────────")}`);
       result[key] = await autoMerge(rl, gVal, eVal);
     } else {
       const choice = await askChoice(rl, key, defaultDisplay(gVal), defaultDisplay(eVal));

@@ -3,6 +3,7 @@ import { getStorageRoot } from "../storage/paths";
 import { saveRun, loadGolden } from "../storage/index";
 import { diff } from "../diff/index";
 import { renderDiffTable, renderDetailedDiff } from "../render/table";
+import { bold, dim, green, yellow } from "../render/colors";
 import type { EvalContext, EvalRun, CostReport } from "../types";
 
 export async function cmdEval(
@@ -13,7 +14,7 @@ export async function cmdEval(
   const { name: workerName, worker } = resolveWorker(config, opts.worker);
   const storageRoot = getStorageRoot(config);
 
-  console.log(`Running eval: ${datasetId} (worker: ${workerName})`);
+  console.log(bold(`Running eval: ${datasetId}`) + dim(` (worker: ${workerName})`));
 
   let inputs: unknown = undefined;
   if (worker.inputs) {
@@ -46,26 +47,26 @@ export async function cmdEval(
 
   await saveRun(storageRoot, workerName, datasetId, run);
 
-  console.log(`  Duration: ${(durationMs / 1000).toFixed(1)}s`);
+  console.log(dim(`  Duration: ${(durationMs / 1000).toFixed(1)}s`));
   if (cost) {
-    console.log(`  Cost: $${cost.total.toFixed(4)}`);
+    console.log(dim(`  Cost: $${cost.total.toFixed(4)}`));
   }
-  console.log(`  Run saved: .ee/${workerName}/${datasetId}/runs/`);
+  console.log(dim(`  Run saved: .ee/${workerName}/${datasetId}/runs/`));
 
   if (opts.diff === false) {
-    console.log("\nSkipping diff (--no-diff).");
+    console.log(yellow("\nSkipping diff (--no-diff)."));
     return;
   }
 
   const golden = await loadGolden(storageRoot, workerName, datasetId);
   if (!golden) {
-    console.log("\nNo golden to compare against. Run `ee bless` first.");
+    console.log(yellow("\nNo golden to compare against.") + " Run `ee bless` first.");
     console.log("\nOutput preview:");
     console.log(JSON.stringify(output, null, 2).slice(0, 500));
     return;
   }
 
-  console.log(`\nGolden: blessed ${golden.blessedAt.slice(0, 10)}`);
+  console.log(`\n${dim("Golden:")} blessed ${golden.blessedAt.slice(0, 10)}`);
 
   const result = diff(golden.output, output, worker.schema);
   console.log();
