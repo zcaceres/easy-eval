@@ -1,4 +1,4 @@
-import type { DiffSchema, SectionConfig, WorkerConfig } from "./types";
+import type { DiffSchema, SectionConfig, EvalDef } from "./types";
 
 export interface ValidationIssue {
   level: "error" | "warn";
@@ -7,19 +7,19 @@ export interface ValidationIssue {
 
 const VALID_KINDS = ["scalar", "keyed-array", "set", "ordered-array"] as const;
 
-export function validateWorkerConfig(worker: WorkerConfig): ValidationIssue[] {
+export function validateEvalDef(evalDef: EvalDef): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
 
-  if (typeof worker.run !== "function") {
-    issues.push({ level: "error", message: "`run` is not a function" });
+  if (typeof evalDef.eval !== "function") {
+    issues.push({ level: "error", message: "`eval` is not a function" });
   }
 
-  if (worker.inputs !== undefined && typeof worker.inputs !== "function") {
+  if (evalDef.inputs !== undefined && typeof evalDef.inputs !== "function") {
     issues.push({ level: "error", message: "`inputs` is defined but not a function" });
   }
 
-  if (worker.schema) {
-    issues.push(...validateSchemaConfig(worker.schema));
+  if (evalDef.diffSchema) {
+    issues.push(...validateSchemaConfig(evalDef.diffSchema));
   }
 
   return issues;

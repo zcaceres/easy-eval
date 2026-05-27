@@ -18,15 +18,15 @@ export async function cmdStatus(): Promise<void> {
   }
 
   const W_DS = 24;
-  const W_WORKER = 12;
+  const W_EVAL = 12;
   const W_GOLDEN = 14;
   const W_RUNS = 6;
   const W_LATEST = 20;
 
   console.log(
-    bold(`${"Dataset".padEnd(W_DS)} ${"Worker".padEnd(W_WORKER)} ${"Golden".padEnd(W_GOLDEN)} ${"Runs".padStart(W_RUNS)} ${"Latest Run".padEnd(W_LATEST)}`),
+    bold(`${"Dataset".padEnd(W_DS)} ${"Eval".padEnd(W_EVAL)} ${"Golden".padEnd(W_GOLDEN)} ${"Runs".padStart(W_RUNS)} ${"Latest Run".padEnd(W_LATEST)}`),
   );
-  console.log(dim("─".repeat(W_DS + W_WORKER + W_GOLDEN + W_RUNS + W_LATEST + 4)));
+  console.log(dim("─".repeat(W_DS + W_EVAL + W_GOLDEN + W_RUNS + W_LATEST + 4)));
 
   for (const ds of datasets) {
     const goldenStr = ds.hasGolden && ds.goldenBlessedAt
@@ -37,7 +37,7 @@ export async function cmdStatus(): Promise<void> {
       : dim("—");
 
     console.log(
-      `${ds.datasetId.padEnd(W_DS)} ${dim(ds.worker.padEnd(W_WORKER))} ${goldenStr.padEnd(W_GOLDEN)} ${String(ds.runCount).padStart(W_RUNS)} ${latestStr.padEnd(W_LATEST)}`,
+      `${ds.datasetId.padEnd(W_DS)} ${dim(ds.worker.padEnd(W_EVAL))} ${goldenStr.padEnd(W_GOLDEN)} ${String(ds.runCount).padStart(W_RUNS)} ${latestStr.padEnd(W_LATEST)}`,
     );
   }
 }

@@ -1,7 +1,7 @@
 // ─── Config types ──────────────────────────────────────────────────────
 
 export interface EvalConfig {
-  workers: Record<string, WorkerConfig>;
+  evals: Record<string, EvalDef>;
   storage?: StorageConfig;
 }
 
@@ -9,10 +9,10 @@ export interface StorageConfig {
   dir?: string;
 }
 
-export interface WorkerConfig {
-  run: (ctx: EvalContext) => Promise<unknown>;
+export interface EvalDef {
+  eval: (ctx: EvalContext) => Promise<unknown>;
   inputs?: (datasetId: string) => Promise<unknown>;
-  schema?: DiffSchema;
+  diffSchema?: DiffSchema;
 }
 
 // ─── Eval context (passed to the user's run function) ──────────────
@@ -20,6 +20,7 @@ export interface WorkerConfig {
 export interface EvalContext {
   datasetId: string;
   inputs: unknown;
+  vars: Record<string, string>;
   reportCost: (cost: CostReport) => void;
   reportMeta: (key: string, value: unknown) => void;
 }

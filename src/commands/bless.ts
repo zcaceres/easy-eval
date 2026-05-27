@@ -1,4 +1,4 @@
-import { loadConfig, resolveWorker } from "../config/loader";
+import { loadConfig, resolveEval } from "../config/loader";
 import { getStorageRoot } from "../storage/paths";
 import { saveGolden, loadRun, loadLatestRun } from "../storage/index";
 import { bold, dim, green } from "../render/colors";
@@ -9,13 +9,13 @@ export async function cmdBless(
   opts: { worker?: string; fromRun?: string },
 ): Promise<void> {
   const config = await loadConfig();
-  const { name: workerName, worker } = resolveWorker(config, opts.worker);
+  const { name: evalName, evalDef } = resolveEval(config, opts.worker);
   const storageRoot = getStorageRoot(config);
 
   let golden: Golden;
 
   if (opts.fromRun) {
-    const run = await loadRun(storageRoot, workerName, datasetId, opts.fromRun);
+    const run = await loadRun(storageRoot, evalName, datasetId, opts.fromRun);
     if (!run) {
       console.error(`No eval run found for ${datasetId} at ${opts.fromRun}`);
       process.exit(1);
@@ -23,19 +23,19 @@ export async function cmdBless(
     golden = {
       blessedAt: new Date().toISOString(),
       datasetId,
-      worker: workerName,
+      worker: evalName,
       output: run.output,
       metadata: run.metadata,
     };
     console.log(`Blessing from eval run ${dim(opts.fromRun)}`);
   } else {
-    const latestRun = await loadLatestRun(storageRoot, workerName, datasetId);
+    const latestRun = await loadLatestRun(storageRoot, evalName, datasetId);
 
     if (latestRun) {
       golden = {
         blessedAt: new Date().toISOString(),
         datasetId,
-        worker: workerName,
+        worker: evalName,
         output: latestRun.output,
         metadata: latestRun.metadata,
       };
@@ -44,8 +44,8 @@ export async function cmdBless(
       console.log(`No existing runs. Running eval first...`);
 
       let inputs: unknown = undefined;
-      if (worker.inputs) {
-        inputs = await worker.inputs(datasetId);
+      if (evalDef.inputs) {
+        inputs = await evalDef.inputs(datasetId);
       }
 
       let cost: CostReport | undefined;
@@ -54,16 +54,17 @@ export async function cmdBless(
       const ctx: EvalContext = {
         datasetId,
         inputs,
+        vars: {},
         reportCost: (c) => { cost = c; },
         reportMeta: (key, value) => { metadata[key] = value; },
       };
 
-      const output = await worker.run(ctx);
+      const output = await evalDef.eval(ctx);
 
       golden = {
         blessedAt: new Date().toISOString(),
         datasetId,
-        worker: workerName,
+        worker: evalName,
         output,
         metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
       };
@@ -71,7 +72,7 @@ export async function cmdBless(
     }
   }
 
-  await saveGolden(storageRoot, workerName, datasetId, golden);
-  console.log(green(`\nGolden saved for ${datasetId}`) + dim(` (worker: ${workerName})`));
-  console.log(dim(`  Location: .ee/${workerName}/${datasetId}/golden.json`));
+  await saveGolden(storageRoot, evalName, datasetId, golden);
+  console.log(green(`\nGolden saved for ${datasetId}`) + dim(` (${evalName})`));
+  console.log(dim(`  Location: .ee/${evalName}/${datasetId}/golden.json`));
 }

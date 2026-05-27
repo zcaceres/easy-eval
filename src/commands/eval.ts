@@ -1,20 +1,20 @@
-import { loadConfig, resolveWorker } from "../config/loader";
+import { loadConfig, resolveEval } from "../config/loader";
 import { getStorageRoot } from "../storage/paths";
 import { saveRun, loadGolden } from "../storage/index";
 import { diff } from "../diff/index";
 import { renderDiffTable, renderDetailedDiff, renderOutputTable } from "../render/table";
 import { bold, dim, green, red, yellow } from "../render/colors";
-import { validateWorkerConfig, validateOutput } from "../validation";
+import { validateEvalDef, validateOutput } from "../validation";
 import type { EvalContext, EvalRun, CostReport } from "../types";
 
 export async function cmdEval(
   datasetId: string,
-  opts: { worker?: string; diff?: boolean; format?: string },
+  opts: { worker?: string; var?: Record<string, string>; diff?: boolean; format?: string },
 ): Promise<void> {
   const config = await loadConfig();
-  const { name: workerName, worker } = resolveWorker(config, opts.worker);
+  const { name: evalName, evalDef } = resolveEval(config, opts.worker);
 
-  const configIssues = validateWorkerConfig(worker);
+  const configIssues = validateEvalDef(evalDef);
   const errors = configIssues.filter((i) => i.level === "error");
   if (errors.length > 0) {
     console.error(red("Config validation failed:"));
@@ -27,29 +27,32 @@ export async function cmdEval(
 
   const storageRoot = getStorageRoot(config);
 
-  console.log(bold(`Running eval: ${datasetId}`) + dim(` (worker: ${workerName})`));
+  console.log(bold(`Running eval: ${datasetId}`) + dim(` (${evalName})`));
 
   let inputs: unknown = undefined;
-  if (worker.inputs) {
-    inputs = await worker.inputs(datasetId);
+  if (evalDef.inputs) {
+    inputs = await evalDef.inputs(datasetId);
   }
 
   let cost: CostReport | undefined;
   const metadata: Record<string, unknown> = {};
 
+  const vars = opts.var ?? {};
+
   const ctx: EvalContext = {
     datasetId,
     inputs,
+    vars,
     reportCost: (c) => { cost = c; },
     reportMeta: (key, value) => { metadata[key] = value; },
   };
 
   const start = Date.now();
-  const output = await worker.run(ctx);
+  const output = await evalDef.eval(ctx);
   const durationMs = Date.now() - start;
 
-  if (worker.schema) {
-    const outputIssues = validateOutput(output, worker.schema);
+  if (evalDef.diffSchema) {
+    const outputIssues = validateOutput(output, evalDef.diffSchema);
     const outputErrors = outputIssues.filter((i) => i.level === "error");
     if (outputErrors.length > 0) {
       console.error(red("\nOutput does not match schema:"));
@@ -60,8 +63,8 @@ export async function cmdEval(
       for (const issue of warnings) {
         console.error(yellow("  " + issue.message));
       }
-      console.error(dim("\nThe run function returned data that doesn't match your configured schema."));
-      console.error(dim("Check that your run() output shape matches the paths in schema.sections."));
+      console.error(dim("\nThe eval function returned data that doesn't match your configured schema."));
+      console.error(dim("Check that your eval() output shape matches the paths in schema.sections."));
       process.exit(1);
     }
   }
@@ -69,32 +72,32 @@ export async function cmdEval(
   const run: EvalRun = {
     timestamp: new Date().toISOString(),
     datasetId,
-    worker: workerName,
+    worker: evalName,
     durationMs,
     cost,
     metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
     output,
   };
 
-  await saveRun(storageRoot, workerName, datasetId, run);
+  await saveRun(storageRoot, evalName, datasetId, run);
 
   console.log(dim(`  Duration: ${(durationMs / 1000).toFixed(1)}s`));
   if (cost) {
     console.log(dim(`  Cost: $${cost.total.toFixed(4)}`));
   }
-  console.log(dim(`  Run saved: .ee/${workerName}/${datasetId}/runs/`));
+  console.log(dim(`  Run saved: .ee/${evalName}/${datasetId}/runs/`));
 
   if (opts.diff === false) {
     console.log(yellow("\nSkipping diff (--no-diff)."));
     return;
   }
 
-  const golden = await loadGolden(storageRoot, workerName, datasetId);
+  const golden = await loadGolden(storageRoot, evalName, datasetId);
   if (!golden) {
     console.log(yellow("\nNo golden to compare against."));
     console.log(dim("Run `ee bless " + datasetId + "` to promote this output to golden.\n"));
-    if (worker.schema) {
-      console.log(renderOutputTable(output, worker.schema));
+    if (evalDef.diffSchema) {
+      console.log(renderOutputTable(output, evalDef.diffSchema));
     } else {
       console.log(JSON.stringify(output, null, 2));
     }
@@ -103,7 +106,7 @@ export async function cmdEval(
 
   console.log(`\n${dim("Golden:")} blessed ${golden.blessedAt.slice(0, 10)}`);
 
-  const result = diff(golden.output, output, worker.schema);
+  const result = diff(golden.output, output, evalDef.diffSchema);
   console.log();
   console.log(renderDiffTable(result));
   console.log();

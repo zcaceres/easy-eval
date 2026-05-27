@@ -25,33 +25,33 @@ function validateConfig(config: unknown): asserts config is EvalConfig {
     throw new Error("Config must export an object");
   }
 
-  if (!("workers" in config) || config.workers === null || typeof config.workers !== "object") {
-    throw new Error("Config must have a `workers` object");
+  if (!("evals" in config) || config.evals === null || typeof config.evals !== "object") {
+    throw new Error("Config must have an `evals` object");
   }
 
-  const workers = config.workers;
-  for (const [name, worker] of Object.entries(workers)) {
-    if (worker === null || typeof worker !== "object") {
-      throw new Error(`Worker "${name}" must be an object`);
+  const evals = config.evals;
+  for (const [name, evalDef] of Object.entries(evals)) {
+    if (evalDef === null || typeof evalDef !== "object") {
+      throw new Error(`Eval "${name}" must be an object`);
     }
-    if (!("run" in worker) || typeof worker.run !== "function") {
-      throw new Error(`Worker "${name}" must have a \`run\` function`);
+    if (!("eval" in evalDef) || typeof evalDef.eval !== "function") {
+      throw new Error(`Eval "${name}" must have an \`eval\` function`);
     }
   }
 }
 
-export function resolveWorker(config: EvalConfig, workerName: string | undefined): { name: string; worker: ReturnType<typeof getWorker> } {
-  const name = workerName ?? "default";
-  const worker = getWorker(config, name);
-  return { name, worker };
+export function resolveEval(config: EvalConfig, evalName: string | undefined): { name: string; evalDef: ReturnType<typeof getEval> } {
+  const name = evalName ?? "default";
+  const evalDef = getEval(config, name);
+  return { name, evalDef };
 }
 
-function getWorker(config: EvalConfig, name: string) {
-  const worker = config.workers[name];
-  if (!worker) {
-    const available = Object.keys(config.workers).join(", ");
-    console.error(`Worker "${name}" not found. Available: ${available}`);
+function getEval(config: EvalConfig, name: string) {
+  const evalDef = config.evals[name];
+  if (!evalDef) {
+    const available = Object.keys(config.evals).join(", ");
+    console.error(`Eval "${name}" not found. Available: ${available}`);
     process.exit(1);
   }
-  return worker;
+  return evalDef;
 }
