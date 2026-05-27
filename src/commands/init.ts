@@ -49,6 +49,20 @@ export async function cmdInit(cwd: string = process.cwd()): Promise<void> {
     }
   }
 
+  const claudeMdPath = join(cwd, "CLAUDE.md");
+  if (existsSync(claudeMdPath)) {
+    const existing = await readFile(claudeMdPath, "utf-8");
+    if (!existing.includes("<!-- ee:begin -->")) {
+      await writeFile(claudeMdPath, existing.trimEnd() + "\n\n" + CLAUDE_MD_EE_SECTION);
+      console.log(green("Updated CLAUDE.md") + dim(" (appended ee usage)"));
+    } else {
+      console.log(dim("CLAUDE.md already has ee section — skipping"));
+    }
+  } else {
+    await writeFile(claudeMdPath, CLAUDE_MD_EE_SECTION);
+    console.log(green("Created CLAUDE.md") + dim(" (ee usage instructions)"));
+  }
+
   console.log(bold("\nNext steps:"));
   console.log("");
   console.log("  1. Open " + bold("ee.config.ts") + " and define your " + bold("eval()") + " function");
@@ -66,6 +80,53 @@ export async function cmdInit(cwd: string = process.cwd()): Promise<void> {
   console.log("  (e.g. \"user-123\", \"invoice-march\", \"edge-case-empty\"). Your eval() function");
   console.log("  receives it via ctx.datasetId so it can load the right input data.");
 }
+
+const CLAUDE_MD_EE_SECTION = `<!-- ee:begin -->
+## Eval Workflow (ee)
+
+This project uses \`ee\` (easy-eval) for evaluating structured LLM outputs against golden datasets.
+
+### Commands
+
+\`\`\`
+ee eval <datasetId>                Run eval, compare against golden
+ee eval <datasetId> --no-diff      Run eval without interactive diff prompt
+ee bless <datasetId>               Promote output to golden reference
+ee runs <datasetId>                List past eval runs
+ee report <datasetId> [timestamp]  Show diff report
+ee status                          Overview of all datasets and goldens
+ee validate                        Validate ee.config.ts
+ee changes list                    List codified changes
+ee changes export                  Export changes as markdown
+\`\`\`
+
+### Key Concepts
+
+- **datasetId**: unique string identifying one test case (e.g. "user-123")
+- **Golden**: blessed reference output for comparison
+- **Worker**: named eval target, defaults to "default" (use -w to specify)
+- **Variables**: \`-v key=value\` to parameterize eval runs (access via \`ctx.vars\`)
+
+### Non-Interactive Workflow
+
+Use \`--no-diff\` with \`ee eval\` to skip the interactive "Codify this change?" prompt.
+Avoid \`ee merge\` — it requires interactive stdin.
+
+\`\`\`
+ee validate                         # verify config
+ee bless <datasetId>                # establish golden (first time)
+ee eval <datasetId> --no-diff       # run eval
+ee report <datasetId>               # view diff
+ee bless <datasetId>                # promote if better
+\`\`\`
+
+### Storage
+
+- Goldens: \`.ee/{worker}/{datasetId}/golden.json\`
+- Runs: \`.ee/{worker}/{datasetId}/runs/{timestamp}.json\`
+- Config: \`ee.config.ts\`
+<!-- ee:end -->
+`;
 
 const DEFAULT_TEMPLATE = `import { defineConfig } from "easy-eval";
 
