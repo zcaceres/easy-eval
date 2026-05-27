@@ -106,6 +106,7 @@ ee changes export                  Export changes as markdown
 - **Golden**: blessed reference output for comparison
 - **Worker**: named eval target, defaults to "default" (use -w to specify)
 - **Variables**: \`-v key=value\` to parameterize eval runs (access via \`ctx.vars\`)
+- **Regression sweep**: when codifying a change, \`ee eval\` offers to re-run with the same variables across all golden datasets to check for regressions before saving
 
 ### Non-Interactive Workflow
 

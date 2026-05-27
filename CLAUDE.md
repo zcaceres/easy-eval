@@ -34,6 +34,10 @@ ee changes show <timestamp>          View a codified change in detail
 ee changes export [-d id] [-o path]  Export changes as markdown
 ```
 
+### Regression sweep (built into `ee eval`)
+
+When codifying a change, `ee eval` checks for other golden datasets under the same worker and offers to run a regression sweep — re-running the eval with the same `-v` variables across all golden datasets. Shows a summary table, lets you drill into per-dataset diffs, and warns if regressions (changed or missing items) are found. Runs are saved via `saveRun()` so results persist in `ee runs`/`ee report`.
+
 ## Project structure
 
 ```
@@ -60,6 +64,7 @@ templates/basic/      Starter ee.config.ts for `ee init`
 - `DiffResult` — diff output: `{ sections: SectionDiff[], summary }`
 - `SectionConfig` — `scalar | keyed-array | set | ordered-array`
 - `Change` — codified improvement: `{ timestamp, datasetId, worker, runTimestamp, inputs, vars, diff, note }`
+- `SweepDatasetResult` — per-dataset result from regression sweep: `{ datasetId, status, diff, durationMs, cost, error }`
 
 ## Development
 
