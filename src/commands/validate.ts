@@ -56,7 +56,7 @@ async function probeEval(
   let inputs: unknown;
   if (evalDef.inputs) {
     try {
-      inputs = await evalDef.inputs(datasetId);
+      inputs = await evalDef.inputs(datasetId, {});
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       issues.push({ level: "error", eval: name, message: `inputs("${datasetId}") threw: ${msg}` });

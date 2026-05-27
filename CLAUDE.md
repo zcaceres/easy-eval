@@ -27,6 +27,8 @@ ee eval <datasetId>                  Run eval function, compare against golden
 ee bless <datasetId>                 Promote output to golden
 ee runs <datasetId>                  List past eval runs
 ee report <datasetId> [timestamp]    Show diff report from cached run
+ee report <id> <ts> --against <ts2>  Compare two runs directly (run-vs-run)
+ee sweep <datasetId>                 Non-interactive regression sweep
 ee merge <datasetId> [timestamp]     Interactively merge eval into golden
 ee status                            Overview of all datasets and goldens
 ee changes list [-d datasetId]       List codified changes (optionally filtered)
@@ -34,9 +36,9 @@ ee changes show <timestamp>          View a codified change in detail
 ee changes export [-d id] [-o path]  Export changes as markdown
 ```
 
-### Regression sweep (built into `ee eval`)
+### Regression sweep
 
-When codifying a change, `ee eval` checks for other golden datasets under the same worker and offers to run a regression sweep — re-running the eval with the same `-v` variables across all golden datasets. Shows a summary table, lets you drill into per-dataset diffs, and warns if regressions (changed or missing items) are found. Runs are saved via `saveRun()` so results persist in `ee runs`/`ee report`.
+Two paths: (1) built into `ee eval`'s interactive codify flow, and (2) standalone `ee sweep <datasetId>` for non-interactive/agent use. Both re-run the eval with the same `-v` variables across all other golden datasets for the same worker. Shows match/regression/skipped per dataset. Runs are saved via `saveRun()` so results persist in `ee runs`/`ee report`.
 
 ## Project structure
 
