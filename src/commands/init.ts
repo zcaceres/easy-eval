@@ -15,6 +15,10 @@ export async function cmdInit(cwd: string = process.cwd()): Promise<void> {
     console.error("Then run:");
     console.error(dim("  ee eval <datasetId>    Run eval and compare against golden"));
     console.error(dim("  ee bless <datasetId>   Promote output to golden reference"));
+    console.error("");
+    console.error("A " + bold("datasetId") + " is a unique string that identifies one input payload");
+    console.error("(e.g. \"user-123\", \"invoice-march\", \"edge-case-empty\"). Your run() function");
+    console.error("receives it via ctx.datasetId so it can load the right input data.");
     process.exit(1);
   }
 
@@ -57,6 +61,10 @@ export async function cmdInit(cwd: string = process.cwd()): Promise<void> {
   console.log("  3. Run your first eval:");
   console.log(dim("     ee eval <datasetId>    Run eval and compare against golden"));
   console.log(dim("     ee bless <datasetId>   Promote output to golden reference"));
+  console.log("");
+  console.log("  A " + bold("datasetId") + " is a unique string that identifies one input payload");
+  console.log("  (e.g. \"user-123\", \"invoice-march\", \"edge-case-empty\"). Your run() function");
+  console.log("  receives it via ctx.datasetId so it can load the right input data.");
 }
 
 const DEFAULT_TEMPLATE = `import { defineConfig } from "easy-eval";
