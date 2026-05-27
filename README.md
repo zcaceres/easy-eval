@@ -52,9 +52,27 @@ A worker is a named eval target. Most projects have one (`default`). Use multipl
 
 A golden is the blessed reference output for a dataset. When you run `ee eval`, the framework diffs your new output against the golden. When you're happy with a result, `ee bless` promotes it.
 
-### Schema (optional)
+### Variables
 
-Define `schema.sections` on a worker for structured section-by-section diffs. Without a schema, easy-eval auto-diffs by comparing JSON recursively.
+Pass `-v key=value` flags to parameterize your eval function — useful for varying models, prompts, or other settings across runs:
+
+```bash
+ee eval my-dataset -v model=claude-sonnet-4-20250514 -v prompt="be concise"
+```
+
+Access them in your eval function via `ctx.vars`:
+
+```ts
+eval: async (ctx) => {
+  const model = ctx.vars.model ?? "gpt-4o";
+  const prompt = ctx.vars.prompt ?? "default prompt";
+  return await myPipeline(ctx.inputs, { model, prompt });
+},
+```
+
+### Diff Schema (optional)
+
+Define `diffSchema.sections` on an eval for structured section-by-section diffs. Without a diffSchema, easy-eval auto-diffs by comparing JSON recursively.
 
 Section kinds: `scalar`, `keyed-array`, `set`, `ordered-array`.
 
@@ -62,7 +80,7 @@ Section kinds: `scalar`, `keyed-array`, `set`, `ordered-array`.
 
 ```
 ee init                              Scaffold ee.config.ts and .ee/
-ee eval <datasetId>                  Run eval function, compare against golden
+ee eval <datasetId> [-v key=value]    Run eval function, compare against golden
 ee bless <datasetId>                 Promote output to golden
 ee runs <datasetId>                  List past eval runs
 ee report <datasetId> [timestamp]    Show diff report from cached run
