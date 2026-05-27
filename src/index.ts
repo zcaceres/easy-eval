@@ -1,4 +1,6 @@
 export { defineConfig } from "./types";
+export { fromZod } from "./schema/index";
+export type { ZodOverrides } from "./schema/index";
 export type {
   EvalConfig,
   WorkerConfig,
