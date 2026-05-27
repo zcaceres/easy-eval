@@ -42,6 +42,11 @@ jobs:
             --target=${{ matrix.target }} \
             --outfile dist/${{ matrix.asset }}
 
+      - name: Smoke test compiled binary
+        env:
+          EE_BINARY: ${{ github.workspace }}/dist/${{ matrix.asset }}
+        run: bun run test:binary
+
       - name: Checksum
         run: shasum -a 256 dist/${{ matrix.asset }} > dist/${{ matrix.asset }}.sha256
 
