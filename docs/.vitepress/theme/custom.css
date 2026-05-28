@@ -133,9 +133,14 @@ body, .vp-doc p, .vp-doc li {
 }
 
 /* Search chip (Paper 13O-0 — 8/14 padding, translucent cream) */
+.VPNavBarSearch {
+  flex-grow: 0 !important;
+  margin-left: auto !important;
+  margin-right: 16px !important;
+}
 .VPNavBarSearch .DocSearch-Button {
-  background-color: rgba(239, 231, 211, 0.12) !important;
-  border: 1px solid rgba(239, 231, 211, 0.3) !important;
+  background-color: transparent !important;
+  border: 1px solid rgba(239, 231, 211, 0.5) !important;
   color: var(--vc-cream) !important;
   padding: 8px 14px !important;
   border-radius: 0 !important;
@@ -144,8 +149,15 @@ body, .vp-doc p, .vp-doc li {
   font-size: 11px !important;
   letter-spacing: 0.18em !important;
   font-weight: 700;
-  opacity: 0.7;
+  opacity: 1;
+  text-transform: uppercase;
 }
+.VPNavBarSearch .DocSearch-Button:hover {
+  border-color: var(--vc-cream) !important;
+  background-color: rgba(239, 231, 211, 0.08) !important;
+}
+.VPNavBarSearch .DocSearch-Search-Icon { display: none !important; }
+.VPNavBarSearch .DocSearch-Button-Keys { display: none !important; }
 .VPNavBarSearch .DocSearch-Button-Keys,
 .VPNavBarSearch .DocSearch-Button-Placeholder {
   font-family: inherit !important;
@@ -492,13 +504,13 @@ body, .vp-doc p, .vp-doc li {
 .vp-doc a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
 
 .vp-doc :not(pre) > code {
-  background-color: var(--vc-navy) !important;
-  color: var(--vc-yellow) !important;
-  padding: 2px 8px !important;
+  background-color: transparent !important;
+  color: var(--vc-accent) !important;
+  padding: 0 !important;
   border-radius: 0 !important;
   font-family: 'Space Mono', monospace !important;
-  font-size: 0.88em !important;
-  font-weight: 700;
+  font-size: 0.92em !important;
+  font-weight: 600;
 }
 
 /* Code blocks — navy with terminal chrome */
@@ -1036,11 +1048,12 @@ body, .vp-doc p, .vp-doc li {
   opacity: 0.85;
 }
 .vc-prereq .copy code {
-  background-color: var(--vc-navy);
-  color: var(--vc-yellow);
-  padding: 1px 6px;
+  background-color: transparent;
+  color: var(--vc-navy);
+  padding: 0;
   font-family: 'Space Mono', monospace;
   font-size: 12px;
+  font-weight: 700;
 }
 
 /* ─────────────────────────────────────────────────────────
