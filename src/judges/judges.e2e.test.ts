@@ -2,6 +2,7 @@ import { describe, test, expect } from "bun:test";
 import { vibecheck } from "./vibecheck";
 import { exactMatch } from "./exactMatch";
 import { fuzzyMatch } from "./fuzzyMatch";
+import { llmJudge } from "./llmJudge";
 import { extractRestaurant } from "../../example/extractor";
 import type { EvalRun, Golden, EvalDef } from "../types";
 
@@ -138,6 +139,58 @@ describe("judges e2e — example restaurant data", () => {
     });
   });
 
+  // ─── llmJudge ─────────────────────────────────────────────────
+
+  describe("llmJudge", () => {
+    function fakeLlm(pass: boolean, summary: string) {
+      return async () => JSON.stringify({ pass, summary });
+    }
+
+    test("passes when fake LLM says pass", async () => {
+      const output = extractRestaurant("golden-dragon", []);
+      const judge = llmJudge({ call: fakeLlm(true, "output matches golden") });
+      const verdict = await judge({ run: makeRun(output), golden: makeGolden(output), evalDef });
+      expect(verdict.pass).toBe(true);
+    });
+
+    test("fails when fake LLM says fail", async () => {
+      const golden = extractRestaurant("golden-dragon", []);
+      const run = extractRestaurant("the-rustic-oven", []);
+      const judge = llmJudge({ call: fakeLlm(false, "completely different restaurant") });
+      const verdict = await judge({ run: makeRun(run), golden: makeGolden(golden), evalDef });
+      expect(verdict.pass).toBe(false);
+    });
+
+    test("includes rubric in prompt sent to LLM", async () => {
+      let capturedPrompt = "";
+      const judge = llmJudge({
+        call: async (prompt) => {
+          capturedPrompt = prompt;
+          return '{"pass": true, "summary": "ok"}';
+        },
+        rubric: "Restaurant name and cuisine type must match exactly",
+      });
+      const output = extractRestaurant("cafe-lumiere", []);
+      await judge({ run: makeRun(output), golden: makeGolden(output), evalDef });
+      expect(capturedPrompt).toContain("Restaurant name and cuisine type must match exactly");
+    });
+
+    test("works with no golden", async () => {
+      const output = extractRestaurant("the-rustic-oven", []);
+      const judge = llmJudge({ call: fakeLlm(true, "output looks valid") });
+      const verdict = await judge({ run: makeRun(output), golden: null, evalDef });
+      expect(verdict.pass).toBe(true);
+    });
+
+    test("stores raw LLM response in metadata", async () => {
+      const output = extractRestaurant("golden-dragon", []);
+      const raw = '{"pass": true, "summary": "fine"}';
+      const judge = llmJudge({ call: async () => raw });
+      const verdict = await judge({ run: makeRun(output), golden: makeGolden(output), evalDef });
+      expect(verdict.metadata?.rawResponse).toBe(raw);
+    });
+  });
+
   // ─── cross-judge consistency ──────────────────────────────────
 
   describe("cross-judge consistency", () => {
@@ -148,10 +201,12 @@ describe("judges e2e — example restaurant data", () => {
       const vc = await vibecheck()(input);
       const em = await exactMatch()(input);
       const fm = await fuzzyMatch()(input);
+      const lj = await llmJudge({ call: async () => '{"pass": true, "summary": "match"}' })(input);
 
       expect(vc.pass).toBe(true);
       expect(em.pass).toBe(true);
       expect(fm.pass).toBe(true);
+      expect(lj.pass).toBe(true);
     });
 
     test("all judges pass=true with no golden", async () => {
@@ -161,17 +216,25 @@ describe("judges e2e — example restaurant data", () => {
       const vc = await vibecheck()(input);
       const em = await exactMatch()(input);
       const fm = await fuzzyMatch()(input);
+      const lj = await llmJudge({ call: async () => '{"pass": true, "summary": "ok"}' })(input);
 
       expect(vc.pass).toBe(true);
       expect(em.pass).toBe(true);
       expect(fm.pass).toBe(true);
+      expect(lj.pass).toBe(true);
     });
 
     test("all judges return valid EvalVerdict shape", async () => {
       const output = extractRestaurant("cafe-lumiere", []);
       const input = { run: makeRun(output), golden: makeGolden(output), evalDef };
 
-      for (const judge of [vibecheck(), exactMatch(), fuzzyMatch()]) {
+      const judges = [
+        vibecheck(),
+        exactMatch(),
+        fuzzyMatch(),
+        llmJudge({ call: async () => '{"pass": true, "summary": "ok"}' }),
+      ];
+      for (const judge of judges) {
         const verdict = await judge(input);
         expect(verdict).toHaveProperty("pass");
         expect(verdict).toHaveProperty("summary");
