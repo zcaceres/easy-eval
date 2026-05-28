@@ -68,5 +68,14 @@ export default defineConfig({
     search: {
       provider: "local",
     },
+    editLink: {
+      pattern: "https://github.com/zcaceres/easy-eval/edit/main/docs/:path",
+      text: "Edit this page",
+    },
+    lastUpdated: {
+      text: "Last updated",
+      formatOptions: { dateStyle: "short", timeStyle: undefined },
+    },
   },
+  lastUpdated: true,
 });

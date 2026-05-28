@@ -28,7 +28,38 @@ export default defineConfig({
 });
 ```
 
-Section kinds: `scalar`, `keyed-array`, `set`, `ordered-array`.
+### Section kinds
+
+<div class="ee-sectionkinds">
+  <div class="ee-sectionkind">
+    <div class="ee-sectionkind-name red">scalar</div>
+    <div class="ee-sectionkind-body">
+      <div class="ee-sectionkind-lead">One value, compared by deep equality.</div>
+      <div class="ee-sectionkind-detail">Best for single strings, numbers, booleans, or whole objects you want to treat as one atomic field. Renders as a single before/after row in the report.</div>
+    </div>
+  </div>
+  <div class="ee-sectionkind">
+    <div class="ee-sectionkind-name cyan">keyed-array</div>
+    <div class="ee-sectionkind-body">
+      <div class="ee-sectionkind-lead">Array of objects matched by a stable key.</div>
+      <div class="ee-sectionkind-detail">Provide <code>key: "id"</code> (or any field). Diff aligns rows by that key, so reordered or renamed entries are tracked rather than treated as deletions + insertions.</div>
+    </div>
+  </div>
+  <div class="ee-sectionkind">
+    <div class="ee-sectionkind-name ochre">set</div>
+    <div class="ee-sectionkind-body">
+      <div class="ee-sectionkind-lead">Unordered collection of primitives.</div>
+      <div class="ee-sectionkind-detail">Order-insensitive. Reports added and removed items, ignores reshuffling. Right pick for tags, labels, enabled flags, or any list where position is incidental.</div>
+    </div>
+  </div>
+  <div class="ee-sectionkind">
+    <div class="ee-sectionkind-name pink">ordered-array</div>
+    <div class="ee-sectionkind-body">
+      <div class="ee-sectionkind-lead">Sequence where position matters.</div>
+      <div class="ee-sectionkind-detail">Index-aligned diff. A swap between positions 3 and 4 shows as two changes, not zero. Use for steps, ranked results, anything where order encodes meaning.</div>
+    </div>
+  </div>
+</div>
 
 ## `exactMatch()`
 
@@ -94,3 +125,23 @@ judge: scoreThreshold(0.8),
 ```
 
 See the [API Reference](/api/) for the full `EvalMethod`, `JudgeInput`, and `EvalVerdict` type definitions.
+
+<div class="ee-otherjudges-header">
+  <div class="ee-otherjudges-diamond"></div>
+  <div class="ee-otherjudges-title">Other judges</div>
+</div>
+
+<div class="ee-otherjudges">
+  <a class="ee-otherjudge" href="#exactmatch">
+    <div class="ee-otherjudge-name cyan">exactMatch →</div>
+    <div class="ee-otherjudge-body">When you want byte-identical output, no slack.</div>
+  </a>
+  <a class="ee-otherjudge" href="#fuzzymatch">
+    <div class="ee-otherjudge-name yellow">fuzzyMatch →</div>
+    <div class="ee-otherjudge-body">Levenshtein + numeric tolerance for messy strings.</div>
+  </a>
+  <a class="ee-otherjudge" href="#llmjudge">
+    <div class="ee-otherjudge-name pink">llmJudge →</div>
+    <div class="ee-otherjudge-body">Bring your own LLM. Rubric optional.</div>
+  </a>
+</div>
