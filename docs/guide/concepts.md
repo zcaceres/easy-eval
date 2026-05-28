@@ -2,7 +2,7 @@
 
 ## Dataset ID
 
-Every `ee` command takes a **datasetId** — a unique string identifying one input payload you want to evaluate. Think of it as a test case name.
+Every `vibecheck` command takes a **datasetId** — a unique string identifying one input payload you want to evaluate. Think of it as a test case name.
 
 Examples: `"user-123"`, `"invoice-march"`, `"edge-case-empty-cart"`, `"joes-pizza"`.
 
@@ -21,7 +21,7 @@ export default defineConfig({
 });
 ```
 
-Each datasetId gets its own golden and run history under `.ee/{worker}/{datasetId}/`.
+Each datasetId gets its own golden and run history under `.vibecheck/{worker}/{datasetId}/`.
 
 ## Workers
 
@@ -29,16 +29,16 @@ A worker is a named eval target. Most projects have one (`default`). Use multipl
 
 ## Goldens
 
-A golden is the blessed reference output for a dataset. When you `ee eval`, the framework runs your eval function and diffs the new output against the golden. When you're happy with a result, `ee bless` promotes it to the new golden.
+A golden is the blessed reference output for a dataset. When you `vibecheck eval`, the framework runs your eval function and diffs the new output against the golden. When you're happy with a result, `vibecheck bless` promotes it to the new golden.
 
-Goldens live in `.ee/{worker}/{datasetId}/golden.json` — commit them to git so your team shares the same reference data.
+Goldens live in `.vibecheck/{worker}/{datasetId}/golden.json` — commit them to git so your team shares the same reference data.
 
 ## Variables
 
 Pass `-v key=value` flags to parameterize an eval — useful for varying models, prompts, or other settings across runs:
 
 ```bash
-ee eval my-dataset -v model=claude-sonnet-4 -v prompt="be concise"
+vibecheck eval my-dataset -v model=claude-sonnet-4 -v prompt="be concise"
 ```
 
 Access them in your eval function via `ctx.vars`:
@@ -53,7 +53,7 @@ eval: async (ctx) => {
 
 ## Cost tracking
 
-Report cost from inside your eval function via `ctx.reportCost()`. The framework stores and displays it in `ee runs` and `ee report`. Cost reporting is opt-in — the framework doesn't measure anything itself.
+Report cost from inside your eval function via `ctx.reportCost()`. The framework stores and displays it in `vibecheck runs` and `vibecheck report`. Cost reporting is opt-in — the framework doesn't measure anything itself.
 
 ```ts
 eval: async (ctx) => {
@@ -65,6 +65,6 @@ eval: async (ctx) => {
 
 ## Codified changes
 
-After an eval shows a difference, you can **codify** the change — record it as a structured entry with a note explaining what improved. Codified changes accumulate in `.ee/{worker}/changes/` and can be reviewed with `ee changes`.
+After an eval shows a difference, you can **codify** the change — record it as a structured entry with a note explaining what improved. Codified changes accumulate in `.vibecheck/{worker}/changes/` and can be reviewed with `vibecheck changes`.
 
 This makes it easy to track *why* a golden moved over time, not just *that* it moved.

@@ -1,4 +1,4 @@
-import { defineConfig, vibecheck, exactMatch, fuzzyMatch, llmJudge } from "easy-eval";
+import { defineConfig, vibecheck, exactMatch, fuzzyMatch, llmJudge } from "vibecheck";
 
 export default defineConfig({
   evals: {
@@ -7,7 +7,7 @@ export default defineConfig({
       // Replace this with your actual pipeline logic.
       //
       // Use ctx.vars to read CLI variables passed via -v key=value:
-      //   ee eval my-dataset -v model=gpt-4o -v prompt="be concise"
+      //   vibecheck eval my-dataset -v model=gpt-4o -v prompt="be concise"
       eval: async (ctx) => {
         // const model = ctx.vars.model ?? "gpt-4o";
         // const prompt = ctx.vars.prompt ?? "default prompt";

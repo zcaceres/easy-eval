@@ -2,13 +2,13 @@ import { defineConfig } from "vitepress";
 
 export default defineConfig({
   base: "/",
-  title: "easy-eval",
+  title: "vibecheck",
   description: "CLI toolkit for evaluating structured LLM outputs against golden datasets",
   cleanUrls: true,
   appearance: "dark",
   head: [
     ["meta", { property: "og:type", content: "website" }],
-    ["meta", { property: "og:title", content: "easy-eval" }],
+    ["meta", { property: "og:title", content: "vibecheck" }],
     [
       "meta",
       {
@@ -60,16 +60,16 @@ export default defineConfig({
         ],
       },
     ],
-    socialLinks: [{ icon: "github", link: "https://github.com/zcaceres/easy-eval" }],
+    socialLinks: [{ icon: "github", link: "https://github.com/zcaceres/vibecheck" }],
     footer: {
       message: "MIT · BUILT WITH BUN + VITEPRESS · NOT AFFILIATED WITH BAYINDIR, BURDUR",
-      copyright: "github.com/zcaceres/easy-eval · v0.1.0",
+      copyright: "github.com/zcaceres/vibecheck · v0.1.0",
     },
     search: {
       provider: "local",
     },
     editLink: {
-      pattern: "https://github.com/zcaceres/easy-eval/edit/main/docs/:path",
+      pattern: "https://github.com/zcaceres/vibecheck/edit/main/docs/:path",
       text: "Edit this page",
     },
     lastUpdated: {

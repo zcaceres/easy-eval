@@ -74,5 +74,5 @@ export async function cmdBless(
 
   await saveGolden(storageRoot, evalName, datasetId, golden);
   console.log(green(`\nGolden saved for ${datasetId}`) + dim(` (${evalName})`));
-  console.log(dim(`  Location: .ee/${evalName}/${datasetId}/golden.json`));
+  console.log(dim(`  Location: .vibecheck/${evalName}/${datasetId}/golden.json`));
 }

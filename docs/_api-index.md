@@ -4,7 +4,7 @@ outline: [2, 3]
 
 # API Reference
 
-TypeDoc-generated documentation for the `easy-eval` package — useful when writing custom judges, schemas, or extending the framework.
+TypeDoc-generated documentation for the `vibecheck` package — useful when writing custom judges, schemas, or extending the framework.
 
 ## Top-level exports
 

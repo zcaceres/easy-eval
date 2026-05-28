@@ -19,11 +19,11 @@ const crumbs = computed(() => {
 </script>
 
 <template>
-  <nav v-if="crumbs.length" class="ee-breadcrumbs" aria-label="Breadcrumb">
+  <nav v-if="crumbs.length" class="vc-breadcrumbs" aria-label="Breadcrumb">
     <template v-for="(c, i) in crumbs" :key="c.href">
-      <span v-if="i > 0" class="ee-breadcrumbs-sep">→</span>
-      <a v-if="!c.last" class="ee-breadcrumbs-link" :href="c.href">{{ c.label }}</a>
-      <span v-else class="ee-breadcrumbs-current">{{ c.label }}</span>
+      <span v-if="i > 0" class="vc-breadcrumbs-sep">→</span>
+      <a v-if="!c.last" class="vc-breadcrumbs-link" :href="c.href">{{ c.label }}</a>
+      <span v-else class="vc-breadcrumbs-current">{{ c.label }}</span>
     </template>
   </nav>
 </template>

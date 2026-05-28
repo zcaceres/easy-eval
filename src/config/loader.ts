@@ -2,7 +2,7 @@ import { join, resolve } from "path";
 import { existsSync } from "fs";
 import type { EvalConfig } from "../types";
 
-const CONFIG_FILENAMES = ["ee.config.ts", "ee.config.js"];
+const CONFIG_FILENAMES = ["vibecheck.config.ts", "vibecheck.config.js"];
 
 export async function loadConfig(configPath?: string): Promise<EvalConfig> {
   if (configPath) {
@@ -28,8 +28,8 @@ export async function loadConfig(configPath?: string): Promise<EvalConfig> {
     }
   }
 
-  console.error("No ee.config.ts found in current directory.");
-  console.error("Run `ee init` to create one, or pass --config <path>.");
+  console.error("No vibecheck.config.ts found in current directory.");
+  console.error("Run `vibecheck init` to create one, or pass --config <path>.");
   process.exit(1);
 }
 

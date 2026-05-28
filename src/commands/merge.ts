@@ -18,7 +18,7 @@ export async function cmdMerge(
 
   const golden = await loadGolden(storageRoot, evalName, datasetId);
   if (!golden) {
-    console.error(`No golden for ${datasetId}. Run \`ee bless\` first.`);
+    console.error(`No golden for ${datasetId}. Run \`vibecheck bless\` first.`);
     process.exit(1);
   }
 

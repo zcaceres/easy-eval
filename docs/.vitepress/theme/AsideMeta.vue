@@ -17,14 +17,14 @@ const editHref = computed(() => {
 </script>
 
 <template>
-  <div class="ee-aside-meta">
-    <a class="ee-aside-card ee-aside-edit" :href="editHref" target="_blank" rel="noreferrer">
-      <span class="ee-aside-card-label">Edit this page</span>
-      <span class="ee-aside-card-path">{{ editPath }}</span>
+  <div class="vc-aside-meta">
+    <a class="vc-aside-card vc-aside-edit" :href="editHref" target="_blank" rel="noreferrer">
+      <span class="vc-aside-card-label">Edit this page</span>
+      <span class="vc-aside-card-path">{{ editPath }}</span>
     </a>
-    <div class="ee-aside-card ee-aside-updated">
-      <span class="ee-aside-card-label">Last updated</span>
-      <span class="ee-aside-card-path">{{ new Date().toISOString().slice(0, 10) }}</span>
+    <div class="vc-aside-card vc-aside-updated">
+      <span class="vc-aside-card-label">Last updated</span>
+      <span class="vc-aside-card-path">{{ new Date().toISOString().slice(0, 10) }}</span>
     </div>
   </div>
 </template>

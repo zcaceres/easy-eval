@@ -17,8 +17,8 @@ export async function cmdStatus(opts: { format?: string; config?: string } = {})
   if (datasets.length === 0) {
     console.log("No eval data yet.");
     console.log("\nGet started:");
-    console.log(dim("  ee eval <datasetId>    Run your first eval"));
-    console.log(dim("  ee bless <datasetId>   Bless output as golden"));
+    console.log(dim("  vibecheck eval <datasetId>    Run your first eval"));
+    console.log(dim("  vibecheck bless <datasetId>   Bless output as golden"));
     return;
   }
 

@@ -1,77 +1,77 @@
 ---
 layout: page
-title: easy-eval
+title: vibecheck
 ---
 
-<div class="ee-hero">
-  <div class="ee-hero-mark"></div>
-  <div class="ee-hero-stack">
-    <div class="ee-hero-title">easy-eval</div>
-    <div class="ee-hero-tag">A CLI for evaluating structured LLM outputs against goldens.</div>
+<div class="vc-hero">
+  <div class="vc-hero-mark"></div>
+  <div class="vc-hero-stack">
+    <div class="vc-hero-title">vibecheck</div>
+    <div class="vc-hero-tag">A CLI for evaluating structured LLM outputs against goldens.</div>
   </div>
-  <div class="ee-hero-chip">v0.1.0</div>
+  <div class="vc-hero-chip">v0.1.0</div>
 </div>
 
-<div class="ee-disambig-header">
-  <div class="ee-disambig-header-dot"></div>
-  <div class="ee-disambig-header-text">ee — may refer to:</div>
+<div class="vc-disambig-header">
+  <div class="vc-disambig-header-dot"></div>
+  <div class="vc-disambig-header-text">vibecheck — may refer to:</div>
 </div>
 
-<div class="ee-disambig">
-  <a class="ee-disambig-row" href="/guide/getting-started">
-    <div class="ee-shape ee-shape-dot-red"></div>
-    <div class="ee-disambig-intent">Run my first eval</div>
-    <div class="ee-disambig-route">→ getting started</div>
+<div class="vc-disambig">
+  <a class="vc-disambig-row" href="/guide/getting-started">
+    <div class="vc-shape vc-shape-dot-red"></div>
+    <div class="vc-disambig-intent">Run my first eval</div>
+    <div class="vc-disambig-route">→ getting started</div>
   </a>
-  <a class="ee-disambig-row" href="/guide/sweep">
-    <div class="ee-shape ee-shape-diamond-cyan"></div>
-    <div class="ee-disambig-intent">Debug a regression across datasets</div>
-    <div class="ee-disambig-route">→ regression sweep</div>
+  <a class="vc-disambig-row" href="/guide/sweep">
+    <div class="vc-shape vc-shape-diamond-cyan"></div>
+    <div class="vc-disambig-intent">Debug a regression across datasets</div>
+    <div class="vc-disambig-route">→ regression sweep</div>
   </a>
-  <a class="ee-disambig-row" href="/guide/judges">
-    <div class="ee-shape ee-shape-square-yellow"></div>
-    <div class="ee-disambig-intent">Write a custom judge for my domain</div>
-    <div class="ee-disambig-route">→ judges</div>
+  <a class="vc-disambig-row" href="/guide/judges">
+    <div class="vc-shape vc-shape-square-yellow"></div>
+    <div class="vc-disambig-intent">Write a custom judge for my domain</div>
+    <div class="vc-disambig-route">→ judges</div>
   </a>
-  <a class="ee-disambig-row" href="/api/">
-    <div class="ee-shape ee-shape-dot-pink"></div>
-    <div class="ee-disambig-intent">Integrate ee into my pipeline programmatically</div>
-    <div class="ee-disambig-route">→ api reference</div>
+  <a class="vc-disambig-row" href="/api/">
+    <div class="vc-shape vc-shape-dot-pink"></div>
+    <div class="vc-disambig-intent">Integrate vibecheck into my pipeline programmatically</div>
+    <div class="vc-disambig-route">→ api reference</div>
   </a>
-  <a class="ee-disambig-row" href="/cli">
-    <div class="ee-shape ee-shape-square-ochre"></div>
-    <div class="ee-disambig-intent">Look up a CLI command</div>
-    <div class="ee-disambig-route">→ cli reference</div>
+  <a class="vc-disambig-row" href="/cli">
+    <div class="vc-shape vc-shape-square-ochre"></div>
+    <div class="vc-disambig-intent">Look up a CLI command</div>
+    <div class="vc-disambig-route">→ cli reference</div>
   </a>
 </div>
 
-<div class="ee-divider">
-  <div class="ee-divider-rule"></div>
-  <div class="ee-divider-shape" style="background-color: var(--ee-yellow);"></div>
-  <div class="ee-divider-label">What You Get</div>
-  <div class="ee-divider-shape" style="background-color: var(--ee-turquoise); transform: rotate(45deg);"></div>
-  <div class="ee-divider-rule"></div>
+<div class="vc-divider">
+  <div class="vc-divider-rule"></div>
+  <div class="vc-divider-shape" style="background-color: var(--vc-yellow);"></div>
+  <div class="vc-divider-label">What You Get</div>
+  <div class="vc-divider-shape" style="background-color: var(--vc-turquoise); transform: rotate(45deg);"></div>
+  <div class="vc-divider-rule"></div>
 </div>
 
-<div class="ee-features">
-  <div class="ee-feature">
-    <div class="ee-feature-title red">Pluggable judges</div>
-    <div class="ee-feature-body">Default vibecheck diff, plus exactMatch, fuzzyMatch, and llmJudge. Bring your own by writing a function.</div>
+<div class="vc-features">
+  <div class="vc-feature">
+    <div class="vc-feature-title red">Pluggable judges</div>
+    <div class="vc-feature-body">Default vibecheck diff, plus exactMatch, fuzzyMatch, and llmJudge. Bring your own by writing a function.</div>
   </div>
-  <div class="ee-feature">
-    <div class="ee-feature-title cyan">Goldens you can commit</div>
-    <div class="ee-feature-body">Storage is project-local at <code>.ee/</code>. Goldens live next to your code; runs and reports stay ephemeral.</div>
+  <div class="vc-feature">
+    <div class="vc-feature-title cyan">Goldens you can commit</div>
+    <div class="vc-feature-body">Storage is project-local at <code>.vibecheck/</code>. Goldens live next to your code; runs and reports stay ephemeral.</div>
   </div>
-  <div class="ee-feature">
-    <div class="ee-feature-title yellow">Standalone binary</div>
-    <div class="ee-feature-body">Built with Bun. Distributed as a ~64MB executable — no Node, no Bun, no node_modules required.</div>
+  <div class="vc-feature">
+    <div class="vc-feature-title yellow">Standalone binary</div>
+    <div class="vc-feature-body">Built with Bun. Distributed as a ~64MB executable — no Node, no Bun, no node_modules required.</div>
   </div>
-  <div class="ee-feature">
-    <div class="ee-feature-title pink">Codified changes</div>
-    <div class="ee-feature-body">When an eval improves the golden, record it as a structured change with a note. Sweep regressions before saving.</div>
+  <div class="vc-feature">
+    <div class="vc-feature-title pink">Codified changes</div>
+    <div class="vc-feature-body">When an eval improves the golden, record it as a structured change with a note. Sweep regressions before saving.</div>
   </div>
 </div>
 
-<div class="ee-legalese">
+<div class="vc-legalese">
   MIT · No refunds · Diff at your own risk · Goldens subject to change · Bring your own LLM · Not affiliated with Bayındır, Burdur
 </div>

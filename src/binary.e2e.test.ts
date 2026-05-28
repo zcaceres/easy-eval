@@ -4,7 +4,7 @@ import { tmpdir } from "os";
 import { join } from "path";
 
 const REPO_ROOT = join(import.meta.dir, "..");
-const BINARY = process.env.EE_BINARY ?? join(REPO_ROOT, "dist", "ee");
+const BINARY = process.env.VIBECHECK_BINARY ?? join(REPO_ROOT, "dist", "vibecheck");
 
 async function run(
   args: string[],
@@ -25,7 +25,7 @@ async function run(
   return { stdout, stderr, exitCode };
 }
 
-describe("compiled ee binary e2e", () => {
+describe("compiled vibecheck binary e2e", () => {
   let tmp: string;
 
   beforeAll(async () => {
@@ -41,7 +41,7 @@ describe("compiled ee binary e2e", () => {
   });
 
   beforeEach(() => {
-    tmp = mkdtempSync(join(tmpdir(), "ee-e2e-"));
+    tmp = mkdtempSync(join(tmpdir(), "vc-e2e-"));
   });
 
   afterEach(() => {
@@ -51,7 +51,7 @@ describe("compiled ee binary e2e", () => {
   test("--help prints usage", async () => {
     const { stdout, exitCode } = await run(["--help"], tmp);
     expect(exitCode).toBe(0);
-    expect(stdout).toContain("Usage: ee");
+    expect(stdout).toContain("Usage: vibecheck");
     expect(stdout).toContain("eval");
     expect(stdout).toContain("bless");
   });
@@ -62,14 +62,14 @@ describe("compiled ee binary e2e", () => {
     expect(stdout.trim()).toMatch(/^\d+\.\d+\.\d+/);
   });
 
-  test("init scaffolds ee.config.ts and .ee/", async () => {
+  test("init scaffolds vibecheck.config.ts and .vibecheck/", async () => {
     const { exitCode } = await run(["init"], tmp);
     expect(exitCode).toBe(0);
-    expect(existsSync(join(tmp, "ee.config.ts"))).toBe(true);
-    expect(existsSync(join(tmp, ".ee"))).toBe(true);
+    expect(existsSync(join(tmp, "vibecheck.config.ts"))).toBe(true);
+    expect(existsSync(join(tmp, ".vibecheck"))).toBe(true);
 
-    const config = readFileSync(join(tmp, "ee.config.ts"), "utf8");
-    expect(config).toContain('from "easy-eval"');
+    const config = readFileSync(join(tmp, "vibecheck.config.ts"), "utf8");
+    expect(config).toContain('from "vibecheck"');
   });
 
   test("eval runs scaffolded config WITHOUT node_modules (virtual module shim)", async () => {
@@ -82,7 +82,7 @@ describe("compiled ee binary e2e", () => {
     expect(stdout).toContain("my-dataset");
     expect(stdout).toContain("Result for my-dataset");
 
-    const runsDir = join(tmp, ".ee", "default", "my-dataset", "runs");
+    const runsDir = join(tmp, ".vibecheck", "default", "my-dataset", "runs");
     expect(existsSync(runsDir)).toBe(true);
     expect(readdirSync(runsDir).length).toBeGreaterThan(0);
   });
@@ -93,7 +93,7 @@ describe("compiled ee binary e2e", () => {
 
     const blessRes = await run(["bless", "my-dataset"], tmp);
     expect(blessRes.exitCode).toBe(0);
-    expect(existsSync(join(tmp, ".ee", "default", "my-dataset", "golden.json"))).toBe(true);
+    expect(existsSync(join(tmp, ".vibecheck", "default", "my-dataset", "golden.json"))).toBe(true);
 
     // eval prompts "Codify this change? [y/N]" — piping "n" exits cleanly
     const evalRes = await run(["eval", "my-dataset"], tmp, { stdin: "n\n" });
@@ -113,6 +113,6 @@ describe("compiled ee binary e2e", () => {
   test("fails with helpful error when no config present", async () => {
     const { stderr, exitCode } = await run(["eval", "anything"], tmp);
     expect(exitCode).not.toBe(0);
-    expect(stderr).toContain("No ee.config.ts");
+    expect(stderr).toContain("No vibecheck.config.ts");
   });
 });

@@ -1,8 +1,8 @@
 // Input data for the example eval pipeline.
 // Each entry is a dataset: a restaurant ID paired with raw review text.
-// The eval function in ee.config.ts loads these via the inputs() hook.
+// The eval function in vibecheck.config.ts loads these via the inputs() hook.
 //
-// Available datasets (use as datasetId with ee commands):
+// Available datasets (use as datasetId with vibecheck commands):
 //   golden-dragon     — Chinese / Sichuan restaurant
 //   the-rustic-oven   — Italian / Neapolitan pizza
 //   cafe-lumiere      — French bistro

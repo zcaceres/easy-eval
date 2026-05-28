@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "easy-eval",
+      "name": "vibecheck",
       "dependencies": {
         "commander": "^14.0.3",
       },

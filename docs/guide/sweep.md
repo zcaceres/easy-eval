@@ -4,20 +4,20 @@ When you change your eval function (a new prompt, model, or pipeline tweak), you
 
 ## Two entry points
 
-**Interactive** — built into `ee eval`'s codify flow. After you see a diff and decide to codify the change, the CLI offers to sweep before saving.
+**Interactive** — built into `vibecheck eval`'s codify flow. After you see a diff and decide to codify the change, the CLI offers to sweep before saving.
 
 **Non-interactive** — standalone command, useful for agents and CI:
 
 ```bash
-ee sweep my-dataset
+vibecheck sweep my-dataset
 ```
 
-Both re-run the eval with the same `-v` variables across every other golden dataset under the worker, then summarize match/regression/skipped counts per dataset. Results are saved as runs (visible in `ee runs` and `ee report`).
+Both re-run the eval with the same `-v` variables across every other golden dataset under the worker, then summarize match/regression/skipped counts per dataset. Results are saved as runs (visible in `vibecheck runs` and `vibecheck report`).
 
 ## Example
 
 ```bash
-ee eval invoice-march -v model=claude-opus-4
+vibecheck eval invoice-march -v model=claude-opus-4
 # Diff looks great — codify it
 # CLI: "Sweep 8 other datasets for regressions? [Y/n] y"
 #
