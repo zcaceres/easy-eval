@@ -1,17 +1,15 @@
 import { describe, test, expect, beforeAll, beforeEach, afterEach } from "bun:test";
 import { mkdtempSync, existsSync, rmSync, readFileSync, readdirSync } from "fs";
 import { tmpdir } from "os";
-import { join, dirname } from "path";
+import { join } from "path";
 
-// Path to the compiled binary. Override with EE_BINARY env var
-// (used in the release workflow where the binary name is platform-specific).
 const REPO_ROOT = join(import.meta.dir, "..");
 const BINARY = process.env.EE_BINARY ?? join(REPO_ROOT, "dist", "ee");
 
 async function run(
   args: string[],
   cwd: string,
-  opts: { stdin?: string; timeoutMs?: number } = {},
+  opts: { stdin?: string } = {},
 ): Promise<{ stdout: string; stderr: string; exitCode: number }> {
   const proc = Bun.spawn([BINARY, ...args], {
     cwd,
@@ -32,7 +30,6 @@ describe("compiled ee binary e2e", () => {
 
   beforeAll(async () => {
     if (!existsSync(BINARY)) {
-      // Auto-compile for host platform if no binary exists yet.
       const proc = Bun.spawn(["bun", "run", "compile"], {
         cwd: REPO_ROOT,
         stdout: "inherit",
@@ -71,16 +68,11 @@ describe("compiled ee binary e2e", () => {
     expect(existsSync(join(tmp, "ee.config.ts"))).toBe(true);
     expect(existsSync(join(tmp, ".ee"))).toBe(true);
 
-    // The scaffolded config imports from "easy-eval" — the very thing the
-    // virtual-module shim in src/cli.ts is needed to resolve at runtime.
     const config = readFileSync(join(tmp, "ee.config.ts"), "utf8");
     expect(config).toContain('from "easy-eval"');
   });
 
   test("eval runs scaffolded config WITHOUT node_modules (virtual module shim)", async () => {
-    // This is the critical test: no `bun install` happens in tmp, so the
-    // only way `import { defineConfig } from "easy-eval"` can resolve is
-    // via the Bun.plugin virtual module registered in src/cli.ts.
     await run(["init"], tmp);
     expect(existsSync(join(tmp, "node_modules"))).toBe(false);
 
@@ -90,7 +82,6 @@ describe("compiled ee binary e2e", () => {
     expect(stdout).toContain("my-dataset");
     expect(stdout).toContain("Result for my-dataset");
 
-    // Run file written to disk.
     const runsDir = join(tmp, ".ee", "default", "my-dataset", "runs");
     expect(existsSync(runsDir)).toBe(true);
     expect(readdirSync(runsDir).length).toBeGreaterThan(0);
@@ -104,8 +95,7 @@ describe("compiled ee binary e2e", () => {
     expect(blessRes.exitCode).toBe(0);
     expect(existsSync(join(tmp, ".ee", "default", "my-dataset", "golden.json"))).toBe(true);
 
-    // Re-eval with golden present. The eval command prompts "Codify this
-    // change? [y/N]" at the end; piping "n" answers no and exits cleanly.
+    // eval prompts "Codify this change? [y/N]" — piping "n" exits cleanly
     const evalRes = await run(["eval", "my-dataset"], tmp, { stdin: "n\n" });
     expect(evalRes.exitCode).toBe(0);
     expect(evalRes.stdout).toContain("title");
