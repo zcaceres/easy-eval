@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "test": "bun test",
     "test:e2e": "bun test src/judges/judges.e2e.test.ts",
+    "test:binary": "bun test src/binary.e2e.test.ts",
     "compile": "bun build src/cli.ts --compile --minify --sourcemap --outfile dist/ee",
     "compile:all": "bun run compile:darwin-arm64 && bun run compile:darwin-x64 && bun run compile:linux-x64 && bun run compile:linux-arm64",
     "compile:darwin-arm64": "bun build src/cli.ts --compile --minify --sourcemap --target=bun-darwin-arm64 --outfile dist/ee-darwin-arm64",
