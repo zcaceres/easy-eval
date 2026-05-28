@@ -5,6 +5,7 @@ import { diff } from "../diff/index";
 import { renderDiffTable } from "../render/table";
 import { interactiveMerge } from "../merge/interactive";
 import { bold, dim, green, cyan, magenta } from "../render/colors";
+import { validateIdentifier, validateTimestamp } from "../validation";
 import type { Golden } from "../types";
 
 export async function cmdMerge(
@@ -12,6 +13,9 @@ export async function cmdMerge(
   timestamp: string | undefined,
   opts: { worker?: string; config?: string },
 ): Promise<void> {
+  validateIdentifier(datasetId, "datasetId");
+  if (opts.worker !== undefined) validateIdentifier(opts.worker, "--worker");
+  if (timestamp !== undefined) validateTimestamp(timestamp, "[timestamp]");
   const config = await loadConfig(opts.config);
   const { name: evalName, evalDef } = resolveEval(config, opts.worker);
   const storageRoot = getStorageRoot(config);
@@ -50,6 +54,8 @@ export async function cmdMerge(
     worker: evalName,
     output: merged,
     metadata: run.metadata,
+    vars: run.vars,
+    runTimestamp: run.timestamp,
   };
 
   await saveGolden(storageRoot, evalName, datasetId, newGolden);

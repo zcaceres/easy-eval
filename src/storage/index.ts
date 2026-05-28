@@ -1,5 +1,5 @@
 import { join } from "path";
-import { readdir, readFile, writeFile, mkdir } from "fs/promises";
+import { readdir, readFile, writeFile, mkdir, stat } from "fs/promises";
 import type { Golden, EvalRun, Change } from "../types";
 import {
   goldenPath,
@@ -8,10 +8,41 @@ import {
   changesDir,
   tsToFilename,
   filenameToTs,
+  RESERVED_WORKER_NAMES,
 } from "./paths";
 
 async function ensureDir(dir: string): Promise<void> {
   await mkdir(dir, { recursive: true });
+}
+
+// `Date.toISOString()` has millisecond resolution. Two evals firing in the same
+// ms (fast/mocked eval fns, agent loops, concurrent CLI invocations) would
+// otherwise silently overwrite each other's run file. We open with `wx` (atomic
+// exclusive create) and, on EEXIST, bump the timestamp by 1ms and retry. The
+// caller learns the actually-used timestamp so its in-memory copy stays in sync
+// with what's on disk.
+const WRITE_UNIQUE_MAX_ATTEMPTS = 100;
+
+async function writeUnique(
+  dir: string,
+  baseTs: string,
+  body: string,
+  ext: string,
+): Promise<string> {
+  let ts = baseTs;
+  for (let attempt = 0; attempt < WRITE_UNIQUE_MAX_ATTEMPTS; attempt++) {
+    const target = join(dir, `${tsToFilename(ts)}${ext}`);
+    try {
+      await writeFile(target, body, { flag: "wx" });
+      return ts;
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException)?.code !== "EEXIST") throw err;
+      ts = new Date(new Date(ts).getTime() + 1).toISOString();
+    }
+  }
+  throw new Error(
+    `Could not allocate a unique filename in ${dir} after ${WRITE_UNIQUE_MAX_ATTEMPTS} attempts`,
+  );
 }
 
 // ─── Golden ────────────────────────────────────────────────────────
@@ -50,8 +81,8 @@ export async function saveRun(
 ): Promise<void> {
   const dir = runsDir(storageRoot, worker, datasetId);
   await ensureDir(dir);
-  const filename = `${tsToFilename(run.timestamp)}.json`;
-  await writeFile(join(dir, filename), JSON.stringify(run, null, 2));
+  const usedTs = await writeUnique(dir, run.timestamp, JSON.stringify(run, null, 2), ".json");
+  if (usedTs !== run.timestamp) run.timestamp = usedTs;
 }
 
 export async function loadRun(
@@ -89,7 +120,7 @@ export async function listRuns(
   }
 
   const summaries: RunSummary[] = [];
-  for (const file of files.filter((f) => f.endsWith(".json")).sort()) {
+  for (const file of files.filter((f) => f.endsWith(".json"))) {
     try {
       const raw = await readFile(join(dir, file), "utf-8");
       const run = JSON.parse(raw) as EvalRun;
@@ -102,6 +133,10 @@ export async function listRuns(
       // skip corrupt files
     }
   }
+  // Sort by parsed timestamp, not filename. Filename sort is fine today
+  // (ISO 8601 sorts lexicographically), but a hand-edited or non-ISO
+  // `run.timestamp` would make "latest" silently wrong.
+  summaries.sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp));
   return summaries;
 }
 
@@ -127,10 +162,8 @@ export async function saveReport(
 ): Promise<string> {
   const dir = reportsDir(storageRoot, worker, datasetId);
   await ensureDir(dir);
-  const filename = `${tsToFilename(timestamp)}.md`;
-  const filepath = join(dir, filename);
-  await writeFile(filepath, markdown);
-  return filepath;
+  const usedTs = await writeUnique(dir, timestamp, markdown, ".md");
+  return join(dir, `${tsToFilename(usedTs)}.md`);
 }
 
 // ─── Changes ──────────────────────────────────────────────────────
@@ -141,8 +174,8 @@ export async function saveChange(
 ): Promise<void> {
   const dir = changesDir(storageRoot);
   await ensureDir(dir);
-  const filename = `${tsToFilename(change.timestamp)}.json`;
-  await writeFile(join(dir, filename), JSON.stringify(change, null, 2));
+  const usedTs = await writeUnique(dir, change.timestamp, JSON.stringify(change, null, 2), ".json");
+  if (usedTs !== change.timestamp) change.timestamp = usedTs;
 }
 
 export async function loadChange(
@@ -179,7 +212,7 @@ export async function listChanges(
   }
 
   const summaries: ChangeSummary[] = [];
-  for (const file of files.filter((f) => f.endsWith(".json")).sort()) {
+  for (const file of files.filter((f) => f.endsWith(".json"))) {
     try {
       const raw = await readFile(join(dir, file), "utf-8");
       const change = JSON.parse(raw) as Change;
@@ -195,6 +228,7 @@ export async function listChanges(
       // skip corrupt files
     }
   }
+  summaries.sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp));
   return summaries;
 }
 
@@ -222,7 +256,14 @@ export async function discoverDatasets(
   }
 
   for (const workerName of workerDirs) {
+    // Skip reserved top-level dirs (e.g. `changes/`), dotfiles, and anything
+    // that isn't a directory — these used to pollute `vibecheck status`.
+    if (RESERVED_WORKER_NAMES.has(workerName)) continue;
+    if (workerName.startsWith(".")) continue;
     const workerPath = join(storageRoot, workerName);
+    const st = await stat(workerPath).catch(() => null);
+    if (!st?.isDirectory()) continue;
+
     let datasetDirs: string[];
     try {
       datasetDirs = await readdir(workerPath);
@@ -231,6 +272,10 @@ export async function discoverDatasets(
     }
 
     for (const dsId of datasetDirs) {
+      if (dsId.startsWith(".")) continue;
+      const dsPath = join(workerPath, dsId);
+      const dsSt = await stat(dsPath).catch(() => null);
+      if (!dsSt?.isDirectory()) continue;
       const golden = await loadGolden(storageRoot, workerName, dsId);
       const runs = await listRuns(storageRoot, workerName, dsId);
 

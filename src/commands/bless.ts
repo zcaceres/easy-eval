@@ -2,12 +2,16 @@ import { loadConfig, resolveEval } from "../config/loader";
 import { getStorageRoot } from "../storage/paths";
 import { saveGolden, loadRun, loadLatestRun } from "../storage/index";
 import { bold, dim, green } from "../render/colors";
+import { validateIdentifier, validateTimestamp } from "../validation";
 import type { EvalContext, Golden, CostReport } from "../types";
 
 export async function cmdBless(
   datasetId: string,
   opts: { worker?: string; fromRun?: string; config?: string },
 ): Promise<void> {
+  validateIdentifier(datasetId, "datasetId");
+  if (opts.worker !== undefined) validateIdentifier(opts.worker, "--worker");
+  if (opts.fromRun !== undefined) validateTimestamp(opts.fromRun, "--from-run");
   const config = await loadConfig(opts.config);
   const { name: evalName, evalDef } = resolveEval(config, opts.worker);
   const storageRoot = getStorageRoot(config);
@@ -26,6 +30,8 @@ export async function cmdBless(
       worker: evalName,
       output: run.output,
       metadata: run.metadata,
+      vars: run.vars,
+      runTimestamp: run.timestamp,
     };
     console.log(`Blessing from eval run ${dim(opts.fromRun)}`);
   } else {
@@ -38,6 +44,8 @@ export async function cmdBless(
         worker: evalName,
         output: latestRun.output,
         metadata: latestRun.metadata,
+        vars: latestRun.vars,
+        runTimestamp: latestRun.timestamp,
       };
       console.log(`Blessing from latest eval run ${dim(`(${latestRun.timestamp.slice(0, 19)})`)}`);
     } else {

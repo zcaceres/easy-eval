@@ -106,6 +106,8 @@ export interface Golden<TOutput = unknown> {
   tag?: string;
   output: TOutput;
   metadata?: Record<string, unknown>;
+  vars?: Record<string, string>;
+  runTimestamp?: string;
 }
 
 // ─── Eval Run Snapshot ─────────────────────────────────────────────

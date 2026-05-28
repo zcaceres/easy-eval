@@ -5,7 +5,7 @@ import { saveRun, loadGolden, saveChange, discoverDatasets } from "../storage/in
 import type { DatasetInfo } from "../storage/index";
 import { renderDiffTable, renderDetailedDiff, renderOutputTable, renderSweepTable } from "../render/table";
 import { bold, dim, green, red, yellow } from "../render/colors";
-import { validateEvalDef, validateOutput } from "../validation";
+import { validateEvalDef, validateOutput, validateIdentifier } from "../validation";
 import { vibecheck } from "../judges/vibecheck";
 import type { EvalContext, EvalRun, CostReport, Change, EvalVerdict, EvalDef, SweepDatasetResult } from "../types";
 
@@ -13,6 +13,8 @@ export async function cmdEval(
   datasetId: string,
   opts: { worker?: string; var?: Record<string, string>; diff?: boolean; format?: string; config?: string },
 ): Promise<void> {
+  validateIdentifier(datasetId, "datasetId");
+  if (opts.worker !== undefined) validateIdentifier(opts.worker, "--worker");
   const config = await loadConfig(opts.config);
   const { name: evalName, evalDef } = resolveEval(config, opts.worker);
 
@@ -106,12 +108,13 @@ export async function cmdEval(
   }
 
   const golden = await loadGolden(storageRoot, evalName, datasetId);
-  const judge = evalDef.judge ?? vibecheck();
-  const verdict = await judge({ run, golden, evalDef });
 
   if (!golden) {
+    // Skip judge invocation entirely — user-supplied judges (exactMatch, llmJudge,
+    // etc.) typically deref `golden.output` and would crash. The "no golden, just
+    // show output" path doesn't need a verdict anyway.
     if (isJson) {
-      console.log(JSON.stringify({ run, verdict, golden: null }, null, 2));
+      console.log(JSON.stringify({ run, verdict: null, golden: null }, null, 2));
     } else {
       console.log(yellow("\nNo golden to compare against."));
       console.log(dim("Run `vibecheck bless " + datasetId + "` to promote this output to golden.\n"));
@@ -123,6 +126,9 @@ export async function cmdEval(
     }
     return;
   }
+
+  const judge = evalDef.judge ?? vibecheck();
+  const verdict = await judge({ run, golden, evalDef });
 
   if (isJson) {
     console.log(JSON.stringify({
