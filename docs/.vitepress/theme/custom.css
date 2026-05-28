@@ -321,7 +321,7 @@ body, .vp-doc p, .vp-doc li {
   margin-bottom: 4px;
 }
 .VPSidebarItem.is-active > .item .link .text {
-  color: var(--vc-red) !important;
+  color: var(--vc-accent) !important;
   font-weight: 700 !important;
 }
 
