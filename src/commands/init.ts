@@ -129,7 +129,7 @@ ee bless <datasetId>                # promote if better
 <!-- ee:end -->
 `;
 
-const DEFAULT_TEMPLATE = `import { defineConfig, vibecheck } from "easy-eval";
+const DEFAULT_TEMPLATE = `import { defineConfig, vibecheck, exactMatch, fuzzyMatch } from "easy-eval";
 
 export default defineConfig({
   evals: {
@@ -149,9 +149,14 @@ export default defineConfig({
         };
       },
 
-      // Judge determines pass/fail. vibecheck() diffs output against golden.
-      // Omit to use vibecheck() with auto-diff by default.
-      // Pass a schema for structured section-by-section diffs:
+      // Judge determines pass/fail. Omit to use vibecheck() by default.
+      //
+      // Built-in judges:
+      //   vibecheck()    — diffs output against golden (auto-diff or with schema)
+      //   exactMatch()   — deep equality check (optionally restrict to specific fields)
+      //   fuzzyMatch()   — normalized comparison (case, whitespace, numeric tolerance, Levenshtein)
+      //
+      // Examples:
       //
       // judge: vibecheck({
       //   schema: {
@@ -162,6 +167,10 @@ export default defineConfig({
       //     ],
       //   },
       // }),
+      //
+      // judge: exactMatch({ fields: ["title", "score"] }),
+      //
+      // judge: fuzzyMatch({ numericTolerance: 0.1, minSimilarity: 0.9 }),
     },
   },
 });

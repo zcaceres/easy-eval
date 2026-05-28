@@ -9,7 +9,9 @@
   },
   "scripts": {
     "ee": "bun run src/cli.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "test:e2e": "bun test src/judges/judges.e2e.test.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
