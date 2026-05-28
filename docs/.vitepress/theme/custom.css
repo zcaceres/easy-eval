@@ -102,14 +102,15 @@ body, .vp-doc p, .vp-doc li {
 .VPNavBarTitle .title::after {
   content: "v0.1.0";
   display: inline-block;
-  padding: 4px 8px;
+  padding: 4px 10px;
   background-color: var(--vc-yellow);
   color: var(--vc-navy);
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 0.18em;
+  font-size: 10px;
+  letter-spacing: 0.2em;
   font-weight: 700;
   line-height: 12px;
+  text-transform: uppercase;
 }
 
 /* Center nav (Paper 13H-0 — gap 36, Space Mono 13px 0.15em uppercase) */
@@ -139,17 +140,18 @@ body, .vp-doc p, .vp-doc li {
   margin-right: 16px !important;
 }
 .VPNavBarSearch .DocSearch-Button {
-  background-color: transparent !important;
-  border: 1px solid rgba(239, 231, 211, 0.5) !important;
+  background-color: rgba(239, 231, 211, 0.12) !important;
+  border: 1px solid rgba(239, 231, 211, 0.3) !important;
   color: var(--vc-cream) !important;
   padding: 8px 14px !important;
   border-radius: 0 !important;
   height: auto !important;
   font-family: 'Space Mono', monospace !important;
   font-size: 11px !important;
-  letter-spacing: 0.18em !important;
+  letter-spacing: 0.15em !important;
+  line-height: 14px !important;
   font-weight: 700;
-  opacity: 1;
+  opacity: 0.85;
   text-transform: uppercase;
 }
 .VPNavBarSearch .DocSearch-Button:hover {
@@ -190,7 +192,8 @@ body, .vp-doc p, .vp-doc li {
   opacity: 1 !important;
   font-family: 'Space Mono', monospace !important;
   font-size: 11px !important;
-  letter-spacing: 0.18em !important;
+  letter-spacing: 0.2em !important;
+  line-height: 14px !important;
   font-weight: 700 !important;
   text-transform: uppercase !important;
 }
@@ -349,7 +352,7 @@ body, .vp-doc p, .vp-doc li {
   flex-shrink: 0;
 }
 .VPDocAsideOutline .root {
-  border-left: 3px solid var(--vc-accent) !important;
+  border-left: 2px solid var(--vc-accent) !important;
   padding-left: 14px !important;
   margin-left: 0 !important;
 }
@@ -360,14 +363,16 @@ body, .vp-doc p, .vp-doc li {
   letter-spacing: 0 !important;
   text-transform: none !important;
   color: var(--vc-navy) !important;
-  opacity: 0.7;
-  padding: 2px 0 !important;
-  line-height: 22px !important;
+  opacity: 1;
+  padding: 0 !important;
+  line-height: 30px !important;
 }
 .VPDocAsideOutline .outline-link.nested {
   font-size: 13px !important;
-  opacity: 0.6;
-  padding-left: 12px !important;
+  font-weight: 400 !important;
+  opacity: 0.75;
+  padding-left: 14px !important;
+  line-height: 26px !important;
 }
 .VPDocAsideOutline .outline-link.active {
   color: var(--vc-accent) !important;
@@ -634,12 +639,14 @@ body, .vp-doc p, .vp-doc li {
 .vc-aside-card {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  background-color: var(--vc-navy);
-  padding: 12px 14px;
   text-decoration: none !important;
 }
-.vc-aside-card-label {
+.vc-aside-edit {
+  gap: 6px;
+  background-color: var(--vc-navy);
+  padding: 14px 16px;
+}
+.vc-aside-edit .vc-aside-card-label {
   font-family: 'Space Mono', monospace;
   font-size: 11px;
   font-weight: 700;
@@ -648,15 +655,41 @@ body, .vp-doc p, .vp-doc li {
   color: var(--vc-yellow);
   line-height: 14px;
 }
-.vc-aside-card-path {
+.vc-aside-edit .vc-aside-card-path {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--vc-cream);
+  opacity: 0.85;
+  word-break: break-all;
+  line-height: 14px;
+}
+.vc-aside-edit:hover .vc-aside-card-path { color: var(--vc-yellow); opacity: 1; }
+.vc-aside-updated {
+  gap: 4px;
+  background-color: transparent;
+  padding: 6px 0 0;
+  border-top: 1px dashed var(--vc-navy);
+}
+.vc-aside-updated .vc-aside-card-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--vc-navy);
+  opacity: 0.6;
+  line-height: 12px;
+}
+.vc-aside-updated .vc-aside-card-path {
   font-family: 'Space Mono', monospace;
   font-size: 12px;
-  letter-spacing: 0.05em;
-  color: var(--vc-cream);
-  word-break: break-all;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--vc-navy);
   line-height: 16px;
 }
-.vc-aside-edit:hover .vc-aside-card-path { color: var(--vc-yellow); }
 
 /* ─────────────────────────────────────────────────────────
    HERO DISPLAY — "vibe / check.", "Getting / started.", etc.
@@ -1295,7 +1328,8 @@ body, .vp-doc p, .vp-doc li {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background-color: rgba(63, 184, 181, 0.15);
+  background-color: rgba(63, 184, 181, 0.18);
+  border-left: 4px solid var(--vc-teal);
   padding: 14px 16px;
   margin-top: 14px;
 }
@@ -1303,7 +1337,8 @@ body, .vp-doc p, .vp-doc li {
   font-family: 'Space Mono', monospace;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
+  line-height: 12px;
   text-transform: uppercase;
   color: var(--vc-navy);
   opacity: 0.7;
@@ -1313,14 +1348,16 @@ body, .vp-doc p, .vp-doc li {
   align-items: center;
   gap: 8px;
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 14px;
   color: var(--vc-navy);
 }
 .vc-legend .row::before {
   content: "";
   display: inline-block;
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   flex-shrink: 0;
 }
 .vc-legend .row.ok::before   { background-color: var(--vc-teal); }
@@ -1342,17 +1379,26 @@ body, .vp-doc p, .vp-doc li {
   font-family: 'Space Mono', monospace;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
+  line-height: 14px;
   text-transform: uppercase;
   color: var(--vc-teal);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
 }
 .vc-flags-banner .label::before {
-  content: "◆ ";
-  color: var(--vc-teal);
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: var(--vc-teal);
+  transform: rotate(45deg);
+  flex-shrink: 0;
 }
 .vc-flags-banner .body {
   font-family: 'Archivo', system-ui, sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   color: var(--vc-cream);
   line-height: 1.5;
@@ -1367,14 +1413,16 @@ body, .vp-doc p, .vp-doc li {
 .vc-flags-banner a {
   background-color: var(--vc-teal);
   color: var(--vc-navy) !important;
-  padding: 12px 18px;
+  padding: 10px 16px;
   font-family: 'Space Mono', monospace;
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.12em;
+  line-height: 16px;
   text-transform: uppercase;
   text-decoration: none !important;
   flex-shrink: 0;
+  align-self: center;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -1609,20 +1657,26 @@ body, .vp-doc p, .vp-doc li {
 }
 .vc-pagenav a {
   border: 2px solid var(--vc-navy);
-  padding: 22px 26px;
-  background-color: var(--vc-cream);
+  padding: 18px 24px;
+  background-color: transparent;
   color: var(--vc-navy) !important;
   text-decoration: none !important;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-.vc-pagenav a.next { background-color: var(--vc-navy); color: var(--vc-cream) !important; }
+.vc-pagenav a.next {
+  background-color: var(--vc-navy);
+  color: var(--vc-cream) !important;
+  align-items: flex-end;
+  text-align: right;
+}
 .vc-pagenav .step {
   font-family: 'Space Mono', monospace;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
+  line-height: 14px;
   text-transform: uppercase;
   opacity: 0.6;
 }
@@ -1644,27 +1698,30 @@ body, .vp-doc p, .vp-doc li {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background-color: rgba(255, 210, 63, 0.22);
-  padding: 12px 14px;
+  background-color: rgba(255, 210, 63, 0.18);
+  border-left: 4px solid var(--vc-yellow);
+  padding: 14px 16px;
   margin-top: 14px;
 }
 .vc-progress .label {
   font-family: 'Space Mono', monospace;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
+  line-height: 12px;
   text-transform: uppercase;
   color: var(--vc-navy);
   opacity: 0.7;
 }
 .vc-progress .bars { display: flex; gap: 4px; }
-.vc-progress .bar { flex: 1; height: 6px; background-color: rgba(29, 53, 87, 0.18); }
-.vc-progress .bar.on { background-color: var(--vc-yellow); }
+.vc-progress .bar { flex: 1; height: 6px; background-color: rgba(29, 53, 87, 0.25); }
+.vc-progress .bar.on { background-color: var(--vc-navy); }
 .vc-progress .meta {
   font-family: 'Space Mono', monospace;
   font-size: 11px;
+  font-weight: 700;
+  line-height: 14px;
   color: var(--vc-navy);
-  opacity: 0.7;
 }
 
 /* Hide VitePress curtain artifacts */
