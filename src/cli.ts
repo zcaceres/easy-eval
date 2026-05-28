@@ -25,6 +25,7 @@ import { cmdValidate } from "./commands/validate";
 import { cmdChanges, cmdChange, cmdExportChanges, cmdAddChange } from "./commands/changes";
 import { cmdSweep } from "./commands/sweep";
 import { collectVars } from "./vars";
+import { VibecheckInputError } from "./validation";
 
 const program = new Command();
 
@@ -235,4 +236,18 @@ Examples:
   $ vibecheck changes export -d user-123 -o report.md`)
   .action((opts) => cmdExportChanges({ ...opts, ...globalOpts() }));
 
-program.parse();
+// `parseAsync` surfaces rejected action handlers; a top-level catch turns
+// user-input errors into one-line messages (no stack) and exits 1. Anything
+// else falls through to the default verbose dump.
+program.parseAsync().catch((err: unknown) => {
+  if (err instanceof VibecheckInputError) {
+    console.error(`Error: ${err.message}`);
+    process.exit(1);
+  }
+  const code = (err as { code?: string } | null)?.code;
+  if (code === "commander.helpDisplayed" || code === "commander.help") {
+    process.exit(0);
+  }
+  console.error(err);
+  process.exit(1);
+});

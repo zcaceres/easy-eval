@@ -4,12 +4,17 @@ import { loadRun, loadLatestRun, loadGolden } from "../storage/index";
 import { diff } from "../diff/index";
 import { renderDiffTable, renderDetailedDiff } from "../render/table";
 import { bold, dim, cyan } from "../render/colors";
+import { validateIdentifier, validateTimestamp } from "../validation";
 
 export async function cmdReport(
   datasetId: string,
   timestamp: string | undefined,
   opts: { worker?: string; format?: string; against?: string; config?: string },
 ): Promise<void> {
+  validateIdentifier(datasetId, "datasetId");
+  if (opts.worker !== undefined) validateIdentifier(opts.worker, "--worker");
+  if (timestamp !== undefined) validateTimestamp(timestamp, "[timestamp]");
+  if (opts.against !== undefined) validateTimestamp(opts.against, "--against");
   const config = await loadConfig(opts.config);
   const { name: evalName, evalDef } = resolveEval(config, opts.worker);
   const storageRoot = getStorageRoot(config);

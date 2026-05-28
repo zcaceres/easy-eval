@@ -404,7 +404,10 @@ describe("error handling for agent mistakes", () => {
   test("report with bad timestamp gives helpful error", async () => {
     const { stderr, exitCode } = await runCli("report", "test-dataset", "not-a-timestamp");
     expect(exitCode).not.toBe(0);
-    expect(stderr).toContain("No eval run");
+    // Now rejected at CLI boundary with a clear input-validation message
+    // (used to fall through to a "No eval run" miss-message after attempting
+    // to read a path-traversal-style filename).
+    expect(stderr).toContain("ISO 8601");
   });
 
   test("changes show with nonexistent timestamp gives helpful error", async () => {

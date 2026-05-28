@@ -1,15 +1,26 @@
 import { join } from "path";
 import type { EvalConfig } from "../types";
+import { validateIdentifier } from "../validation";
+
+// Reserved top-level directory names inside the storage root that aren't workers.
+// `discoverDatasets` skips these so they don't pollute `vibecheck status` output.
+export const RESERVED_WORKER_NAMES = new Set(["changes"]);
 
 export function getStorageRoot(config: EvalConfig, cwd: string = process.cwd()): string {
   return join(cwd, config.storage?.dir ?? ".vibecheck");
 }
 
+// Defense in depth: commands already validate at the CLI boundary, but
+// re-validating here means any future caller that forgets cannot escape the
+// storage root via path-traversal segments.
 export function workerDir(root: string, worker: string): string {
+  validateIdentifier(worker, "worker");
   return join(root, worker);
 }
 
 export function datasetDir(root: string, worker: string, datasetId: string): string {
+  validateIdentifier(worker, "worker");
+  validateIdentifier(datasetId, "datasetId");
   return join(root, worker, datasetId);
 }
 

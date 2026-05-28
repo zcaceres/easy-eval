@@ -4,12 +4,15 @@ import { saveRun, loadGolden, discoverDatasets } from "../storage/index";
 import { renderSweepTable, renderDiffTable, renderDetailedDiff } from "../render/table";
 import { bold, dim, green, red, yellow } from "../render/colors";
 import { vibecheck } from "../judges/vibecheck";
+import { validateIdentifier } from "../validation";
 import type { EvalContext, EvalRun, CostReport, EvalDef, SweepDatasetResult } from "../types";
 
 export async function cmdSweep(
   datasetId: string,
   opts: { worker?: string; var?: Record<string, string>; format?: string; config?: string },
 ): Promise<void> {
+  validateIdentifier(datasetId, "datasetId");
+  if (opts.worker !== undefined) validateIdentifier(opts.worker, "--worker");
   const config = await loadConfig(opts.config);
   const { name: evalName, evalDef } = resolveEval(config, opts.worker);
   const storageRoot = getStorageRoot(config);

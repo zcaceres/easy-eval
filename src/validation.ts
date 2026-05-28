@@ -5,6 +5,61 @@ export interface ValidationIssue {
   message: string;
 }
 
+// Tagged so the CLI top-level handler can print `Error: <message>` (one line, no
+// stack) and exit 1, instead of dumping a raw stack trace for user-input mistakes.
+export class VibecheckInputError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "VibecheckInputError";
+  }
+}
+
+// Identifiers (datasetId, worker) become filesystem path segments. The strict
+// charset blocks path traversal (`..`, `/`, `\`), shell metacharacters, and
+// whitespace. Leading `.` is rejected so ids cannot become hidden dirs or `..`.
+const ID_RE = /^[A-Za-z0-9._-]+$/;
+const ID_MAX = 128;
+const ISO_TS_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+const LIMIT_MAX = 10000;
+
+export function validateIdentifier(value: unknown, label: string): string {
+  if (typeof value !== "string" || value.length === 0) {
+    throw new VibecheckInputError(`${label} is required`);
+  }
+  if (value.length > ID_MAX) {
+    throw new VibecheckInputError(`${label} exceeds ${ID_MAX} characters`);
+  }
+  if (value.startsWith(".")) {
+    throw new VibecheckInputError(`${label} must not start with "."`);
+  }
+  if (!ID_RE.test(value)) {
+    throw new VibecheckInputError(
+      `${label} must match ${ID_RE} (got "${value}")`,
+    );
+  }
+  return value;
+}
+
+export function validateTimestamp(value: unknown, label: string): string {
+  if (typeof value !== "string" || !ISO_TS_RE.test(value)) {
+    throw new VibecheckInputError(
+      `${label} must be ISO 8601 (YYYY-MM-DDTHH:MM:SS.sssZ), got "${String(value)}"`,
+    );
+  }
+  return value;
+}
+
+export function validateLimit(raw: string | undefined, fallback = 20): number {
+  if (raw === undefined) return fallback;
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n <= 0 || n > LIMIT_MAX) {
+    throw new VibecheckInputError(
+      `--limit must be a positive integer ≤ ${LIMIT_MAX}, got "${raw}"`,
+    );
+  }
+  return n;
+}
+
 const VALID_KINDS = ["scalar", "keyed-array", "set", "ordered-array"] as const;
 
 export function validateEvalDef(evalDef: EvalDef): ValidationIssue[] {

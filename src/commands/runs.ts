@@ -2,15 +2,18 @@ import { loadConfig, resolveEval } from "../config/loader";
 import { getStorageRoot } from "../storage/paths";
 import { listRuns, loadGolden } from "../storage/index";
 import { bold, dim, cyan } from "../render/colors";
+import { validateIdentifier, validateLimit } from "../validation";
 
 export async function cmdRuns(
   datasetId: string,
   opts: { worker?: string; limit?: string; format?: string; config?: string },
 ): Promise<void> {
+  validateIdentifier(datasetId, "datasetId");
+  if (opts.worker !== undefined) validateIdentifier(opts.worker, "--worker");
+  const limit = validateLimit(opts.limit);
   const config = await loadConfig(opts.config);
   const { name: evalName } = resolveEval(config, opts.worker);
   const storageRoot = getStorageRoot(config);
-  const limit = opts.limit ? parseInt(opts.limit, 10) : 20;
 
   const runs = await listRuns(storageRoot, evalName, datasetId);
 

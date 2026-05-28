@@ -1,15 +1,20 @@
 import { writeFile } from "fs/promises";
+import { existsSync } from "fs";
+import { resolve, sep } from "path";
+import { createInterface } from "readline";
 import { loadConfig, resolveEval } from "../config/loader";
 import { getStorageRoot } from "../storage/paths";
 import { listChanges, loadChange, loadLatestRun, loadRun, loadGolden, saveChange } from "../storage/index";
 import { diff } from "../diff/index";
 import { renderDiffTable } from "../render/table";
-import { bold, dim, cyan, green, red } from "../render/colors";
+import { bold, dim, cyan, green, red, yellow } from "../render/colors";
+import { validateIdentifier, validateTimestamp, VibecheckInputError } from "../validation";
 import type { Change } from "../types";
 
 export async function cmdChanges(
   opts: { dataset?: string; format?: string; config?: string },
 ): Promise<void> {
+  if (opts.dataset !== undefined) validateIdentifier(opts.dataset, "--dataset");
   const config = await loadConfig(opts.config);
   const storageRoot = getStorageRoot(config);
 
@@ -59,6 +64,7 @@ export async function cmdChange(
   timestamp: string,
   opts: { format?: string; config?: string },
 ): Promise<void> {
+  validateTimestamp(timestamp, "<timestamp>");
   const config = await loadConfig(opts.config);
   const storageRoot = getStorageRoot(config);
 
@@ -112,6 +118,9 @@ export async function cmdAddChange(
   runTimestamp: string | undefined,
   opts: { worker?: string; note?: string; config?: string },
 ): Promise<void> {
+  validateIdentifier(datasetId, "datasetId");
+  if (opts.worker !== undefined) validateIdentifier(opts.worker, "--worker");
+  if (runTimestamp !== undefined) validateTimestamp(runTimestamp, "[runTimestamp]");
   const config = await loadConfig(opts.config);
   const { name: evalName, evalDef } = resolveEval(config, opts.worker);
   const storageRoot = getStorageRoot(config);
@@ -150,6 +159,7 @@ export async function cmdAddChange(
 export async function cmdExportChanges(
   opts: { dataset?: string; out?: string; config?: string },
 ): Promise<void> {
+  if (opts.dataset !== undefined) validateIdentifier(opts.dataset, "--dataset");
   const config = await loadConfig(opts.config);
   const storageRoot = getStorageRoot(config);
 
@@ -204,10 +214,44 @@ export async function cmdExportChanges(
   const markdown = lines.join("\n");
 
   if (opts.out) {
-    await writeFile(opts.out, markdown);
-    console.log(`Exported ${summaries.length} change${summaries.length === 1 ? "" : "s"} to ${bold(opts.out)}`);
+    const resolved = resolve(opts.out);
+    const outsideCwd = !resolved.startsWith(process.cwd() + sep);
+    const exists = existsSync(resolved);
+
+    if (outsideCwd || exists) {
+      const reasons: string[] = [];
+      if (outsideCwd) reasons.push("outside the current directory");
+      if (exists)     reasons.push("already exists (will be overwritten)");
+      console.error(yellow(`Warning: --out path "${resolved}" is ${reasons.join(" and ")}.`));
+
+      if (!process.stdin.isTTY) {
+        // Non-interactive (script/agent): refuse rather than silently doing
+        // the dangerous thing. The user can re-run from a TTY to confirm.
+        throw new VibecheckInputError(
+          `Refusing to write to "${resolved}" non-interactively. Re-run from a TTY to confirm.`,
+        );
+      }
+      const ok = await promptYesNo("Proceed? [y/N] ");
+      if (!ok) {
+        console.error("Aborted.");
+        process.exit(1);
+      }
+    }
+
+    await writeFile(resolved, markdown);
+    console.log(`Exported ${summaries.length} change${summaries.length === 1 ? "" : "s"} to ${bold(resolved)}`);
   } else {
     console.log(markdown);
+  }
+}
+
+async function promptYesNo(question: string): Promise<boolean> {
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  try {
+    const answer = await new Promise<string>((res) => rl.question(question, (a) => res(a.trim().toLowerCase())));
+    return answer === "y" || answer === "yes";
+  } finally {
+    rl.close();
   }
 }
 
