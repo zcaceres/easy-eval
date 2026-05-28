@@ -1,0 +1,531 @@
+/* Memphis Lineup docset theme — derived from ACID TRIP #F4A950 */
+
+@import url('https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Bungee&family=Bowlby+One&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Rubik+Mono+One&display=swap');
+
+:root {
+  /* Memphis palette */
+  --ee-cream: #EFE7D3;
+  --ee-navy: #1D3557;
+  --ee-red: #E63946;
+  --ee-turquoise: #3FB8B5;
+  --ee-yellow: #FFD23F;
+  --ee-pink: #FF6B9D;
+  --ee-ochre: #C9923E;
+
+  /* Override VitePress tokens */
+  --vp-c-bg: var(--ee-cream);
+  --vp-c-bg-alt: #E5DBC2;
+  --vp-c-bg-elv: #F5EFE0;
+  --vp-c-bg-soft: #E5DBC2;
+
+  --vp-c-text-1: var(--ee-navy);
+  --vp-c-text-2: rgba(29, 53, 87, 0.75);
+  --vp-c-text-3: rgba(29, 53, 87, 0.55);
+
+  --vp-c-brand-1: var(--ee-red);
+  --vp-c-brand-2: var(--ee-red);
+  --vp-c-brand-3: var(--ee-red);
+  --vp-c-brand-soft: rgba(230, 57, 70, 0.15);
+
+  --vp-c-divider: rgba(29, 53, 87, 0.2);
+  --vp-c-gutter: rgba(29, 53, 87, 0.1);
+
+  --vp-font-family-base: 'Bungee', 'Helvetica Neue', sans-serif;
+  --vp-font-family-mono: 'Space Mono', ui-monospace, monospace;
+
+  --vp-code-block-bg: var(--ee-navy);
+  --vp-code-color: var(--ee-cream);
+
+  --vp-button-brand-bg: var(--ee-red);
+  --vp-button-brand-hover-bg: #C92B38;
+  --vp-button-brand-text: var(--ee-cream);
+  --vp-button-brand-border: var(--ee-red);
+}
+
+/* Body & headings */
+body {
+  background-color: var(--ee-cream);
+}
+
+h2, h3 {
+  font-family: 'Bungee', sans-serif !important;
+  letter-spacing: -0.01em !important;
+  color: var(--ee-navy);
+}
+
+/* H1 = page title showpiece: huge Bagel Fat One */
+.VPDoc h1, .vp-doc h1 {
+  font-family: 'Bagel Fat One', cursive !important;
+  font-size: 96px !important;
+  line-height: 0.9 !important;
+  letter-spacing: -0.04em !important;
+  color: var(--ee-navy) !important;
+  margin-top: 0 !important;
+  margin-bottom: 20px !important;
+}
+h2 { font-size: 32px !important; line-height: 1.15 !important; margin-top: 56px !important; padding-top: 0 !important; border-top: none !important; }
+h3 { font-size: 22px !important; line-height: 1.2 !important; }
+
+/* Lede paragraph — the first <p> after h1 */
+.vp-doc h1 + p {
+  font-family: 'Bungee', sans-serif !important;
+  font-size: 22px !important;
+  line-height: 1.4 !important;
+  color: var(--ee-navy) !important;
+  margin-bottom: 36px !important;
+}
+
+p, li {
+  font-family: 'Space Mono', monospace;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+a {
+  color: var(--ee-red) !important;
+  text-decoration: none;
+  font-weight: 700;
+}
+a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+/* Code blocks — navy with Memphis bands */
+div[class*="language-"] {
+  background-color: var(--ee-navy) !important;
+  border-top: 6px solid var(--ee-red);
+  border-bottom: 6px solid var(--ee-yellow);
+  border-radius: 0 !important;
+  margin: 24px 0 !important;
+}
+div[class*="language-"] pre {
+  background-color: transparent !important;
+}
+div[class*="language-"] code,
+div[class*="language-"] pre code {
+  color: var(--ee-cream) !important;
+  font-family: 'Space Mono', monospace !important;
+}
+:not(pre) > code {
+  background-color: var(--ee-navy) !important;
+  color: var(--ee-yellow) !important;
+  padding: 2px 8px !important;
+  border-radius: 0 !important;
+  font-family: 'Space Mono', monospace !important;
+  font-size: 0.85em !important;
+}
+
+/* Callouts — border-left, no boxes */
+.custom-block {
+  background-color: transparent !important;
+  border: none !important;
+  border-left: 8px solid var(--ee-turquoise) !important;
+  padding: 16px 20px !important;
+  border-radius: 0 !important;
+}
+.custom-block.tip { border-left-color: var(--ee-turquoise) !important; }
+.custom-block.info { border-left-color: var(--ee-navy) !important; }
+.custom-block.warning { border-left-color: var(--ee-yellow) !important; }
+.custom-block.danger { border-left-color: var(--ee-red) !important; }
+.custom-block-title {
+  font-family: 'Bungee', sans-serif !important;
+  font-size: 14px !important;
+  letter-spacing: 0.05em !important;
+  color: var(--ee-navy) !important;
+  margin-bottom: 6px !important;
+}
+
+/* Nav bar — navy strip */
+.VPNav, .VPNavBar {
+  background-color: var(--ee-navy) !important;
+  border-bottom: none !important;
+}
+.VPNavBar .title,
+.VPNavBar .VPNavBarTitle .title {
+  color: var(--ee-cream) !important;
+  font-family: 'Bagel Fat One', cursive !important;
+  font-size: 24px !important;
+  letter-spacing: -0.02em !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+/* Red brand dot before the wordmark */
+.VPNavBar .VPNavBarTitle .title::before {
+  content: "";
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  background-color: var(--ee-red);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+/* Yellow version chip after the wordmark */
+.VPNavBar .VPNavBarTitle .title::after {
+  content: "v0.1.0";
+  display: inline-block;
+  padding: 3px 8px;
+  background-color: var(--ee-yellow);
+  color: var(--ee-navy);
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+  margin-left: 4px;
+}
+.VPNavBar .VPNavBarMenu .VPNavBarMenuLink {
+  color: var(--ee-cream) !important;
+  opacity: 0.7;
+  font-family: 'Space Mono', monospace !important;
+  font-size: 13px !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.VPNavBar .VPNavBarMenu .VPNavBarMenuLink:hover,
+.VPNavBar .VPNavBarMenu .VPNavBarMenuLink.active {
+  color: var(--ee-yellow) !important;
+  opacity: 1;
+}
+.VPNavBarSearch .DocSearch-Button {
+  background-color: rgba(239, 231, 211, 0.12) !important;
+  border: 1px solid rgba(239, 231, 211, 0.3) !important;
+  color: var(--ee-cream) !important;
+}
+.VPNavBarHamburger .container .top,
+.VPNavBarHamburger .container .middle,
+.VPNavBarHamburger .container .bottom {
+  background-color: var(--ee-cream) !important;
+}
+
+/* Footer */
+.VPFooter {
+  background-color: var(--ee-navy) !important;
+  border-top: none !important;
+  color: var(--ee-cream) !important;
+}
+.VPFooter .message, .VPFooter .copyright {
+  color: var(--ee-cream) !important;
+  font-family: 'Space Mono', monospace !important;
+  font-size: 11px !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase;
+}
+.VPFooter a { color: var(--ee-yellow) !important; }
+
+/* ─── Landing page Memphis components ─── */
+
+.ee-hero {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 24px;
+  padding: 48px 0 24px;
+  border-bottom: 2px dashed var(--ee-navy);
+  margin-bottom: 48px;
+}
+.ee-hero-mark {
+  width: 64px;
+  height: 64px;
+  background-color: var(--ee-red);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ee-hero-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ee-hero-title {
+  font-family: 'Bagel Fat One', cursive;
+  font-size: 84px;
+  line-height: 0.9;
+  color: var(--ee-navy);
+  letter-spacing: -0.04em;
+}
+.ee-hero-tag {
+  font-family: 'Bungee', sans-serif;
+  font-size: 18px;
+  color: var(--ee-navy);
+  letter-spacing: 0;
+  margin-top: 4px;
+}
+.ee-hero-chip {
+  padding: 6px 12px;
+  background-color: var(--ee-yellow);
+  color: var(--ee-navy);
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  align-self: flex-start;
+  margin-top: 16px;
+}
+
+.ee-disambig-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+.ee-disambig-header-dot {
+  width: 16px;
+  height: 16px;
+  background-color: var(--ee-red);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ee-disambig-header-text {
+  font-family: 'Bungee', sans-serif;
+  font-size: 32px;
+  color: var(--ee-navy);
+}
+
+.ee-disambig {
+  display: flex;
+  flex-direction: column;
+  border-top: 2px solid var(--ee-navy);
+  margin-bottom: 64px;
+}
+.ee-disambig-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 24px;
+  padding: 20px 0;
+  border-bottom: 1px dashed var(--ee-navy);
+  text-decoration: none !important;
+  color: var(--ee-navy) !important;
+  transition: background-color 120ms;
+}
+.ee-disambig-row:hover {
+  background-color: rgba(255, 210, 63, 0.18);
+  text-decoration: none !important;
+}
+.ee-disambig-row:last-child {
+  border-bottom: 2px solid var(--ee-navy);
+}
+.ee-shape {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+}
+.ee-shape-dot-red { background-color: var(--ee-red); border-radius: 50%; }
+.ee-shape-diamond-cyan { background-color: var(--ee-turquoise); transform: rotate(45deg); }
+.ee-shape-square-yellow { background-color: var(--ee-yellow); }
+.ee-shape-dot-pink { background-color: var(--ee-pink); border-radius: 50%; }
+.ee-shape-square-ochre { background-color: var(--ee-ochre); transform: rotate(15deg); }
+.ee-disambig-intent {
+  flex: 1;
+  font-family: 'Bungee', sans-serif;
+  font-size: 22px;
+  color: var(--ee-navy);
+  letter-spacing: -0.005em;
+}
+.ee-disambig-route {
+  flex-shrink: 0;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ee-red);
+  opacity: 0.8;
+  font-weight: 700;
+  text-align: right;
+  min-width: 180px;
+}
+
+/* Page-layout pages (landing) get a comfortable max-width and centered padding */
+.Layout:has(> .VPContent .vp-doc:not(:has(*))),
+.VPContent > .vp-page {
+  padding: 0 64px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.ee-divider {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  margin: 48px 0 32px;
+}
+.ee-divider-rule {
+  flex: 1;
+  height: 2px;
+  background-color: var(--ee-navy);
+}
+.ee-divider-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.35em;
+  color: var(--ee-navy);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.ee-divider-shape {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.ee-features {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  border-top: 2px solid var(--ee-navy);
+  border-bottom: 2px solid var(--ee-navy);
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+}
+.ee-feature {
+  flex: 1 1 calc(50% - 0px);
+  min-width: 260px;
+  padding: 24px;
+  border-right: 1px dashed var(--ee-navy);
+  border-bottom: 1px dashed var(--ee-navy);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ee-feature:nth-child(2n) { border-right: none; }
+.ee-feature:nth-last-child(-n+2) { border-bottom: none; }
+.ee-feature-title {
+  font-family: 'Bagel Fat One', cursive;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.ee-feature-title.red { color: var(--ee-red); }
+.ee-feature-title.cyan { color: var(--ee-turquoise); }
+.ee-feature-title.yellow { color: var(--ee-yellow); -webkit-text-stroke: 1px var(--ee-navy); }
+.ee-feature-title.pink { color: var(--ee-pink); }
+.ee-feature-body {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ee-navy);
+  opacity: 0.85;
+}
+
+.ee-legalese {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ee-navy);
+  opacity: 0.6;
+  text-align: center;
+  margin-top: 48px;
+  padding: 16px 0;
+}
+
+/* Sidebar — Memphis categories with colored shape per group */
+.VPSidebar {
+  background-color: var(--ee-cream) !important;
+  border-right: 2px dashed var(--ee-navy) !important;
+  padding-top: 32px !important;
+}
+.VPSidebarItem .text {
+  font-family: 'Space Mono', monospace !important;
+  color: var(--ee-navy) !important;
+  font-size: 14px !important;
+}
+.VPSidebarItem.level-0 > .item > .text,
+.VPSidebarItem.level-0 > .item > .indicator + .text {
+  font-family: 'Bungee', sans-serif !important;
+  font-size: 14px !important;
+  letter-spacing: 0.05em !important;
+  color: var(--ee-navy) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+/* Memphis shape per top-level category — assigned by order */
+.VPSidebarItem.level-0 > .item > .text::before,
+.VPSidebarItem.level-0 > .item > .indicator + .text::before {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+.group:nth-of-type(1) .VPSidebarItem.level-0 > .item > .text::before { background-color: var(--ee-red); border-radius: 50%; }
+.group:nth-of-type(2) .VPSidebarItem.level-0 > .item > .text::before { background-color: var(--ee-turquoise); transform: rotate(45deg); }
+.group:nth-of-type(3) .VPSidebarItem.level-0 > .item > .text::before { background-color: var(--ee-yellow); }
+.group:nth-of-type(4) .VPSidebarItem.level-0 > .item > .text::before { background-color: var(--ee-pink); border-radius: 50%; }
+.group:nth-of-type(5) .VPSidebarItem.level-0 > .item > .text::before { background-color: var(--ee-ochre); }
+
+/* Active sidebar link — Memphis red */
+.VPSidebarItem .VPLink.link.active .text,
+.VPSidebarItem.is-active > .item .link .text {
+  color: var(--ee-red) !important;
+  font-weight: 700 !important;
+}
+
+/* Hide the GitHub icon's color override (it inherited red from generic a rule) */
+.VPNavBarSocialLinks .VPSocialLink {
+  color: var(--ee-cream) !important;
+  opacity: 0.85;
+}
+.VPNavBarSocialLinks .VPSocialLink:hover {
+  color: var(--ee-yellow) !important;
+  opacity: 1;
+}
+
+/* Right TOC */
+.VPDocAside .VPDocAsideOutline .outline-title {
+  font-family: 'Bungee', sans-serif !important;
+  font-size: 13px !important;
+  letter-spacing: 0.05em !important;
+  color: var(--ee-navy) !important;
+}
+.VPDocAside .VPDocAsideOutline .outline-link {
+  font-family: 'Space Mono', monospace !important;
+  font-size: 13px !important;
+  color: var(--ee-navy) !important;
+  opacity: 0.7;
+  letter-spacing: 0.03em !important;
+}
+.VPDocAside .VPDocAsideOutline .outline-link.active {
+  color: var(--ee-red) !important;
+  opacity: 1;
+  font-weight: 700 !important;
+}
+.VPDocAside .VPDocAsideOutline .root {
+  border-left: 3px solid var(--ee-yellow) !important;
+  padding-left: 14px !important;
+}
+
+/* Page footer (prev/next) */
+.VPDocFooter .pager-link {
+  border: 2px solid var(--ee-navy) !important;
+  border-radius: 0 !important;
+  padding: 16px 20px !important;
+  background-color: var(--ee-cream) !important;
+}
+.VPDocFooter .pager-link.next {
+  background-color: var(--ee-navy) !important;
+}
+.VPDocFooter .pager-link.next .desc,
+.VPDocFooter .pager-link.next .title {
+  color: var(--ee-cream) !important;
+}
+.VPDocFooter .pager-link .desc {
+  font-family: 'Space Mono', monospace !important;
+  font-size: 10px !important;
+  letter-spacing: 0.3em !important;
+  text-transform: uppercase !important;
+}
+.VPDocFooter .pager-link .title {
+  font-family: 'Bungee', sans-serif !important;
+  font-size: 18px !important;
+  color: var(--ee-red) !important;
+}
+
+/* Doc page content — let Memphis fonts breathe */
+.VPDoc .content-container {
+  max-width: 920px;
+}
