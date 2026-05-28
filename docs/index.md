@@ -22,7 +22,7 @@ outline: [2, 3]
 
 <div class="vc-section-h2">
   <div class="left">
-    <span class="mark"></span>
+    <span class="mark" style="background-color: var(--vc-yellow);"></span>
     <span class="title">What you get</span>
   </div>
   <span class="counter">§ 01 / 03</span>

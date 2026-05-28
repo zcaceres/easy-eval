@@ -303,7 +303,7 @@ body, .vp-doc p, .vp-doc li {
 .VPSidebarItem.level-1 .text,
 .VPSidebarItem.level-2 .text {
   font-family: 'Archivo', system-ui, sans-serif !important;
-  font-size: 14px !important;
+  font-size: 15px !important;
   font-weight: 500 !important;
   letter-spacing: 0 !important;
   text-transform: none !important;
@@ -429,7 +429,7 @@ body, .vp-doc p, .vp-doc li {
 }
 .vc-breadcrumbs a:hover { color: var(--vc-accent) !important; }
 .vc-breadcrumbs .vc-breadcrumbs-sep { color: rgba(29, 53, 87, 0.55); }
-.vc-breadcrumbs .vc-breadcrumbs-current { color: rgba(29, 53, 87, 0.55); }
+.vc-breadcrumbs .vc-breadcrumbs-current { color: var(--vc-accent); }
 
 /* ─────────────────────────────────────────────────────────
    DOC PROSE — generic markdown styling
@@ -517,7 +517,8 @@ body, .vp-doc p, .vp-doc li {
 .vp-doc div[class*="language-"] {
   background-color: var(--vc-navy) !important;
   border-radius: 0 !important;
-  border-bottom: 4px solid var(--vc-accent) !important;
+  border-top: 4px solid var(--vc-yellow) !important;
+  border-bottom: 4px solid var(--vc-red) !important;
   margin: 20px 0 !important;
   padding: 36px 0 0 0 !important;
   position: relative !important;
@@ -717,9 +718,9 @@ body, .vp-doc p, .vp-doc li {
   gap: 12px;
   padding: 18px 26px;
   font-family: 'Space Mono', monospace;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   line-height: 18px;
   text-decoration: none !important;
@@ -740,7 +741,7 @@ body, .vp-doc p, .vp-doc li {
   background: none;
   color: var(--vc-navy);
   padding: 18px 0;
-  letter-spacing: 0.05em;
+  letter-spacing: 0;
   text-transform: none;
 }
 .vc-cta-install .prompt { color: var(--vc-accent); margin-right: 8px; }
@@ -778,12 +779,13 @@ body, .vp-doc p, .vp-doc li {
 }
 .vc-section-h2 .counter {
   font-family: 'Space Mono', monospace;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--vc-navy);
-  opacity: 0.45;
+  opacity: 0.6;
+  line-height: 16px;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -802,7 +804,7 @@ body, .vp-doc p, .vp-doc li {
   border-right: 1px dashed var(--vc-navy);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
 }
 .vc-feature-cell:nth-child(2n) { border-right: none; }
 .vc-feature-cell:nth-last-child(-n+2) { border-bottom: none; }
@@ -861,15 +863,15 @@ body, .vp-doc p, .vp-doc li {
 }
 .vc-step .body { flex: 1; display: flex; flex-direction: column; gap: 10px; }
 .vc-step .title {
-  font-family: 'Bagel Fat One', cursive;
-  font-size: 26px;
-  line-height: 1;
-  letter-spacing: -0.02em;
+  font-family: 'Archivo', system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
   color: var(--vc-navy);
 }
 .vc-step .note {
   font-family: 'Archivo', system-ui, sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 400;
   line-height: 1.5;
   color: var(--vc-navy);
@@ -897,7 +899,8 @@ body, .vp-doc p, .vp-doc li {
   padding: 36px 0 0 0;
   position: relative;
   margin: 12px 0;
-  border-bottom: 4px solid var(--vc-accent);
+  border-top: 4px solid var(--vc-yellow);
+  border-bottom: 4px solid var(--vc-red);
 }
 .vc-terminal::before {
   content: "";
@@ -1005,9 +1008,10 @@ body, .vp-doc p, .vp-doc li {
 .vc-path .read {
   flex-shrink: 0;
   font-family: 'Space Mono', monospace;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.1em;
+  line-height: 18px;
   color: var(--vc-navy);
 }
 
@@ -1017,35 +1021,36 @@ body, .vp-doc p, .vp-doc li {
 .vc-prereq {
   display: grid;
   grid-template-columns: 80px 1fr;
-  gap: 24px;
-  background-color: rgba(255, 210, 63, 0.22);
-  border-left: 6px solid var(--vc-yellow);
-  padding: 18px 22px;
+  gap: 18px;
+  background-color: rgba(255, 210, 63, 0.12);
+  border-left: 8px solid var(--vc-yellow);
+  padding: 18px 24px;
   margin: 0 0 56px;
 }
 .vc-prereq .tag {
   font-family: 'Space Mono', monospace;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--vc-navy);
-  opacity: 0.7;
-  line-height: 16px;
+  line-height: 14px;
 }
 .vc-prereq .copy { display: flex; flex-direction: column; gap: 6px; }
 .vc-prereq .copy strong {
   font-family: 'Archivo', system-ui, sans-serif;
   font-size: 16px;
   font-weight: 700;
+  line-height: 1.4;
   color: var(--vc-navy);
 }
 .vc-prereq .copy span {
   font-family: 'Archivo', system-ui, sans-serif;
   font-size: 14px;
+  font-weight: 400;
   line-height: 1.5;
   color: var(--vc-navy);
-  opacity: 0.85;
+  opacity: 0.75;
 }
 .vc-prereq .copy code {
   background-color: transparent;
@@ -1059,51 +1064,60 @@ body, .vp-doc p, .vp-doc li {
 /* ─────────────────────────────────────────────────────────
    NUMBERED SPINE (Guide page)
    ───────────────────────────────────────────────────────── */
-.vc-spine { display: flex; flex-direction: column; gap: 56px; margin: 0 0 56px; }
-.vc-spine-step { display: grid; grid-template-columns: 80px 1fr; gap: 24px; }
+.vc-spine { display: flex; flex-direction: column; margin: 0 0 56px; }
+.vc-spine-step {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 32px;
+  padding-bottom: 40px;
+  margin-bottom: 40px;
+  border-bottom: 1px dashed var(--vc-navy);
+}
+.vc-spine-step:last-child { border-bottom: none; margin-bottom: 0; }
 .vc-spine-step .badge {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
+  align-items: center;
+  gap: 14px;
   flex-shrink: 0;
 }
 .vc-spine-step .badge .num {
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--vc-yellow);
+  background-color: var(--vc-navy);
   font-family: 'Bagel Fat One', cursive;
-  font-size: 28px;
+  font-size: 44px;
   line-height: 1;
-  color: var(--vc-navy);
+  color: var(--vc-yellow);
 }
 .vc-spine-step .badge .min {
   font-family: 'Space Mono', monospace;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--vc-navy);
   opacity: 0.55;
-  line-height: 14px;
+  line-height: 12px;
 }
 .vc-spine-step .body { display: flex; flex-direction: column; gap: 14px; }
 .vc-spine-step .title {
   font-family: 'Bagel Fat One', cursive;
-  font-size: 38px;
+  font-size: 40px;
   line-height: 1;
   letter-spacing: -0.02em;
   color: var(--vc-navy);
 }
 .vc-spine-step .lede {
   font-family: 'Archivo', system-ui, sans-serif;
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 400;
   line-height: 1.55;
   color: var(--vc-navy);
+  opacity: 0.85;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -1111,15 +1125,15 @@ body, .vp-doc p, .vp-doc li {
    ───────────────────────────────────────────────────────── */
 .vc-cmd-grouphead {
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
   justify-content: space-between;
   margin: 56px 0 24px;
-  padding: 0 0 10px;
+  padding: 0 0 14px;
   border-bottom: 2px solid var(--vc-navy);
 }
 .vc-cmd-grouphead .title {
   font-family: 'Bagel Fat One', cursive;
-  font-size: 34px;
+  font-size: 32px;
   line-height: 1;
   letter-spacing: -0.02em;
   color: var(--vc-navy);
@@ -1128,25 +1142,27 @@ body, .vp-doc p, .vp-doc li {
 .vc-cmd-grouphead .blurb {
   flex: 1;
   font-family: 'Archivo', system-ui, sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
+  line-height: 18px;
   color: var(--vc-navy);
-  opacity: 0.75;
+  opacity: 0.7;
 }
 .vc-cmd-grouphead .count {
   font-family: 'Space Mono', monospace;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
+  line-height: 14px;
   text-transform: uppercase;
   color: var(--vc-navy);
-  opacity: 0.5;
+  opacity: 0.55;
 }
 .vc-cmd-rows { display: flex; flex-direction: column; }
 .vc-cmd {
   display: grid;
-  grid-template-columns: 200px 1fr 100px;
-  gap: 28px;
+  grid-template-columns: 280px 1fr 96px;
+  gap: 24px;
   padding: 24px 0;
   border-bottom: 1px dashed var(--vc-navy);
   align-items: flex-start;
@@ -1177,17 +1193,17 @@ body, .vp-doc p, .vp-doc li {
 .vc-cmd .desc { display: flex; flex-direction: column; gap: 6px; }
 .vc-cmd .desc .head {
   font-family: 'Archivo', system-ui, sans-serif;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--vc-navy);
-  line-height: 1.45;
+  line-height: 1.4;
 }
 .vc-cmd .desc .body {
   font-family: 'Archivo', system-ui, sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: var(--vc-navy);
-  opacity: 0.78;
+  opacity: 0.75;
   line-height: 1.55;
 }
 .vc-cmd .exits { display: flex; flex-direction: column; gap: 6px; }
@@ -1231,7 +1247,8 @@ body, .vp-doc p, .vp-doc li {
   background-color: var(--vc-navy);
   padding: 36px 0 16px;
   position: relative;
-  border-bottom: 4px solid var(--vc-accent);
+  border-top: 4px solid var(--vc-teal);
+  border-bottom: 4px solid var(--vc-yellow);
   font-family: 'Space Mono', monospace;
   font-size: 12px;
   line-height: 1.6;
@@ -1365,7 +1382,8 @@ body, .vp-doc p, .vp-doc li {
    ───────────────────────────────────────────────────────── */
 .vc-fn-card {
   background-color: #FFFFFF;
-  margin: 0 0 64px;
+  border: 2px solid var(--vc-navy);
+  margin: 0 0 56px;
   display: flex;
   flex-direction: column;
 }
@@ -1374,14 +1392,14 @@ body, .vp-doc p, .vp-doc li {
   align-items: center;
   gap: 14px;
   padding: 16px 22px;
-  border-bottom: 1px dashed rgba(29, 53, 87, 0.25);
+  border-bottom: 1px dashed var(--vc-navy);
 }
 .vc-fn-card .chrome .kind {
   background-color: var(--vc-pink);
   color: var(--vc-navy);
   padding: 4px 10px;
   font-family: 'Space Mono', monospace;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -1389,22 +1407,25 @@ body, .vp-doc p, .vp-doc li {
 }
 .vc-fn-card .chrome .name {
   font-family: 'Bagel Fat One', cursive;
-  font-size: 24px;
+  font-size: 28px;
   line-height: 1;
   letter-spacing: -0.02em;
   color: var(--vc-navy);
 }
 .vc-fn-card .chrome .sig {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: 13px;
+  line-height: 16px;
   color: var(--vc-navy);
-  opacity: 0.75;
+  opacity: 0.6;
   flex: 1;
 }
 .vc-fn-card .chrome .path {
   font-family: 'Space Mono', monospace;
   font-size: 11px;
-  letter-spacing: 0.1em;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  line-height: 14px;
   color: var(--vc-navy);
   opacity: 0.55;
 }
@@ -1412,13 +1433,13 @@ body, .vp-doc p, .vp-doc li {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 28px;
-  padding: 24px 22px;
+  padding: 24px 24px 28px;
 }
-.vc-fn-card .copy { display: flex; flex-direction: column; gap: 10px; }
+.vc-fn-card .copy { display: flex; flex-direction: column; gap: 10px; max-width: 360px; }
 .vc-fn-card .copy .head {
   font-family: 'Archivo', system-ui, sans-serif;
-  font-size: 17px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   color: var(--vc-navy);
   line-height: 1.4;
 }
@@ -1427,7 +1448,7 @@ body, .vp-doc p, .vp-doc li {
   font-size: 14px;
   font-weight: 400;
   color: var(--vc-navy);
-  opacity: 0.78;
+  opacity: 0.75;
   line-height: 1.55;
 }
 .vc-fn-card .copy .chip {
@@ -1444,10 +1465,10 @@ body, .vp-doc p, .vp-doc li {
 }
 .vc-fn-card .preview {
   background-color: var(--vc-navy);
-  padding: 18px 18px 18px 18px;
+  padding: 16px 18px;
   font-family: 'Space Mono', monospace;
   font-size: 12px;
-  line-height: 1.6;
+  line-height: 1.65;
   color: var(--vc-cream);
   overflow-x: auto;
   margin: 0;
@@ -1455,7 +1476,7 @@ body, .vp-doc p, .vp-doc li {
 .vc-fn-card .preview > div {
   font-family: 'Space Mono', monospace;
   font-size: 12px;
-  line-height: 1.6;
+  line-height: 1.65;
   white-space: pre;
 }
 .vc-fn-card .preview .keyword { color: var(--vc-pink); }
@@ -1470,12 +1491,12 @@ body, .vp-doc p, .vp-doc li {
   margin: 0 0 64px;
 }
 .vc-judge-cell {
-  padding: 24px 22px 28px;
+  padding: 24px 24px 28px;
   border-right: 1px dashed var(--vc-navy);
   border-bottom: 1px dashed var(--vc-navy);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 .vc-judge-cell:nth-child(2n) { border-right: none; }
 .vc-judge-cell:nth-last-child(-n+2) { border-bottom: none; }
@@ -1514,17 +1535,17 @@ body, .vp-doc p, .vp-doc li {
 .vc-judge-cell.pink .name    { color: var(--vc-pink); }
 .vc-judge-cell .sig {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: 11px;
+  line-height: 14px;
   color: var(--vc-navy);
-  opacity: 0.75;
+  opacity: 0.65;
 }
 .vc-judge-cell .body {
   font-family: 'Archivo', system-ui, sans-serif;
   font-size: 14px;
   font-weight: 400;
-  line-height: 1.55;
+  line-height: 1.5;
   color: var(--vc-navy);
-  opacity: 0.85;
 }
 
 .vc-types {
@@ -1536,8 +1557,8 @@ body, .vp-doc p, .vp-doc li {
 }
 .vc-type {
   display: grid;
-  grid-template-columns: 64px 200px 1fr 80px;
-  gap: 24px;
+  grid-template-columns: 36px 200px 1fr 56px;
+  gap: 20px;
   align-items: center;
   padding: 16px 6px;
   border-bottom: 1px dashed var(--vc-navy);
@@ -1548,30 +1569,32 @@ body, .vp-doc p, .vp-doc li {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.15em;
-  color: var(--vc-navy);
-  opacity: 0.55;
+  line-height: 14px;
+  color: var(--vc-accent);
 }
 .vc-type .name {
   font-family: 'Space Mono', monospace;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
+  line-height: 18px;
   color: var(--vc-navy);
 }
 .vc-type .body {
   font-family: 'Archivo', system-ui, sans-serif;
   font-size: 14px;
-  font-weight: 400;
-  line-height: 1.5;
+  font-weight: 500;
+  line-height: 1.45;
   color: var(--vc-navy);
-  opacity: 0.78;
 }
 .vc-type .kind {
   font-family: 'Space Mono', monospace;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.15em;
+  line-height: 14px;
   text-transform: uppercase;
-  color: var(--vc-pink);
+  color: var(--vc-navy);
+  opacity: 0.55;
   text-align: right;
 }
 
