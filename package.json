@@ -11,7 +11,13 @@
     "ee": "bun run src/cli.ts",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "test:e2e": "bun test src/judges/judges.e2e.test.ts"
+    "test:e2e": "bun test src/judges/judges.e2e.test.ts",
+    "compile": "bun build src/cli.ts --compile --minify --sourcemap --outfile dist/ee",
+    "compile:all": "bun run compile:darwin-arm64 && bun run compile:darwin-x64 && bun run compile:linux-x64 && bun run compile:linux-arm64",
+    "compile:darwin-arm64": "bun build src/cli.ts --compile --minify --sourcemap --target=bun-darwin-arm64 --outfile dist/ee-darwin-arm64",
+    "compile:darwin-x64": "bun build src/cli.ts --compile --minify --sourcemap --target=bun-darwin-x64 --outfile dist/ee-darwin-x64",
+    "compile:linux-x64": "bun build src/cli.ts --compile --minify --sourcemap --target=bun-linux-x64 --outfile dist/ee-linux-x64",
+    "compile:linux-arm64": "bun build src/cli.ts --compile --minify --sourcemap --target=bun-linux-arm64 --outfile dist/ee-linux-arm64"
   },
   "devDependencies": {
     "@types/bun": "latest",
