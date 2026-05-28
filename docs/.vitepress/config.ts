@@ -32,6 +32,7 @@ export default defineConfig({
         items: [
           { text: "Introduction", link: "/" },
           { text: "What you get", link: "/#what-you-get" },
+          { text: "Install", link: "/#install" },
           { text: "Quick start", link: "/#quick-start" },
           { text: "Pick your path", link: "/#pick-your-path" },
         ],
