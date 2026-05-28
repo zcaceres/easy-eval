@@ -30,7 +30,7 @@ exitLegend: true
 </div>
 
 <div class="vc-cmd-grouphead">
-  <span class="title">Write</span>
+  <h2 id="write" class="title">Write</h2>
   <span class="blurb">Commands that change golden or config on disk.</span>
   <span class="count">3 commands</span>
 </div>
@@ -39,7 +39,7 @@ exitLegend: true
 
   <div class="vc-cmd">
     <div class="lhs">
-      <div class="name">init</div>
+      <h3 id="init" class="name">init</h3>
       <div class="sig"><span class="prompt">$</span>vibecheck init</div>
     </div>
     <div class="desc">
@@ -55,7 +55,7 @@ exitLegend: true
 
   <div class="vc-cmd">
     <div class="lhs">
-      <div class="name">bless</div>
+      <h3 id="bless" class="name">bless</h3>
       <div class="sig"><span class="prompt">$</span>vibecheck bless &lt;id&gt;</div>
     </div>
     <div class="desc">
@@ -71,7 +71,7 @@ exitLegend: true
 
   <div class="vc-cmd">
     <div class="lhs">
-      <div class="name">merge</div>
+      <h3 id="merge" class="name">merge</h3>
       <div class="sig"><span class="prompt">$</span>vibecheck merge &lt;id&gt;</div>
     </div>
     <div class="desc">
@@ -88,7 +88,7 @@ exitLegend: true
 </div>
 
 <div class="vc-cmd-grouphead">
-  <span class="title">Run &amp; read</span>
+  <h2 id="run-and-read" class="title">Run &amp; read</h2>
   <span class="blurb">Re-run evals, list history, surface diffs and decisions.</span>
   <span class="count">6 commands</span>
 </div>
@@ -97,7 +97,7 @@ exitLegend: true
 
   <div class="vc-cmd">
     <div class="lhs">
-      <div class="name">eval</div>
+      <h3 id="eval" class="name">eval</h3>
       <div class="sig"><span class="prompt">$</span>vibecheck eval &lt;id&gt;</div>
     </div>
     <div class="desc">
@@ -113,7 +113,7 @@ exitLegend: true
 
   <div class="vc-cmd">
     <div class="lhs">
-      <div class="name">sweep</div>
+      <h3 id="sweep" class="name">sweep</h3>
       <div class="sig"><span class="prompt">$</span>vibecheck sweep &lt;id&gt;</div>
     </div>
     <div class="desc">
@@ -129,7 +129,7 @@ exitLegend: true
 
   <div class="vc-cmd">
     <div class="lhs">
-      <div class="name">runs</div>
+      <h3 id="runs" class="name">runs</h3>
       <div class="sig"><span class="prompt">$</span>vibecheck runs &lt;id&gt;</div>
     </div>
     <div class="desc">
@@ -144,7 +144,7 @@ exitLegend: true
 
   <div class="vc-cmd">
     <div class="lhs">
-      <div class="name">report</div>
+      <h3 id="report" class="name">report</h3>
       <div class="sig"><span class="prompt">$</span>vibecheck report &lt;id&gt; [ts]</div>
     </div>
     <div class="desc">
@@ -159,7 +159,7 @@ exitLegend: true
 
   <div class="vc-cmd">
     <div class="lhs">
-      <div class="name">status</div>
+      <h3 id="status" class="name">status</h3>
       <div class="sig"><span class="prompt">$</span>vibecheck status</div>
     </div>
     <div class="desc">
@@ -174,7 +174,7 @@ exitLegend: true
 
   <div class="vc-cmd">
     <div class="lhs">
-      <div class="name">changes</div>
+      <h3 id="changes" class="name">changes</h3>
       <div class="sig"><span class="prompt">$</span>vibecheck changes &lt;sub&gt;</div>
     </div>
     <div class="desc">

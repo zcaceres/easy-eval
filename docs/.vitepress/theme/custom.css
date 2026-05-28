@@ -367,6 +367,7 @@ body, .vp-doc p, .vp-doc li {
   padding: 0 !important;
   line-height: 30px !important;
 }
+.VPDocAsideOutline .nested .outline-link,
 .VPDocAsideOutline .outline-link.nested {
   font-size: 13px !important;
   font-weight: 400 !important;
@@ -493,6 +494,94 @@ body, .vp-doc p, .vp-doc li {
   transform: rotate(45deg);
 }
 .vp-doc h2 > a.header-anchor { order: 2; }
+
+/* Reset .vp-doc heading styles inside bespoke component blocks — let the
+   component classes (.vc-spine-step .title, .vc-cmd-grouphead .title, .vc-cmd .name)
+   continue to control appearance while the h2/h3 tag provides TOC anchors. */
+.vc-spine-step h2.title,
+.vc-cmd-grouphead h2.title,
+.vc-cmd h3.name {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  display: block !important;
+  gap: 0 !important;
+}
+.vc-spine-step h2.title::before,
+.vc-cmd-grouphead h2.title::before,
+.vc-cmd h3.name::before {
+  content: none !important;
+  display: none !important;
+}
+.vc-spine-step h2.title > a.header-anchor,
+.vc-cmd-grouphead h2.title > a.header-anchor,
+.vc-cmd h3.name > a.header-anchor {
+  display: none !important;
+}
+
+/* Visually hidden but reachable in the accessibility tree — used to anchor
+   sections (e.g. "Pre-requisite") so they appear in the TOC without
+   showing duplicate text on screen. */
+.vp-doc h2.vc-sr-only,
+.vp-doc h3.vc-sr-only,
+.vc-sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  display: block !important;
+  font-size: 0 !important;
+}
+.vp-doc h2.vc-sr-only::before,
+.vp-doc h3.vc-sr-only::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* Compact Install block on Home, between What-you-get and Quick start */
+.vc-install {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 24px;
+  align-items: center;
+  margin: 0 0 56px;
+  padding: 20px 24px;
+  background-color: rgba(29, 53, 87, 0.04);
+  border-left: 4px solid var(--vc-navy);
+}
+.vc-install-eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 14px;
+  text-transform: uppercase;
+  color: var(--vc-navy);
+  opacity: 0.6;
+}
+.vc-install-body { display: flex; flex-direction: column; gap: 8px; }
+.vc-install-line {
+  font-family: 'Space Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--vc-navy);
+  line-height: 20px;
+}
+.vc-install-line .prompt { color: var(--vc-accent); margin-right: 8px; }
+.vc-install-note {
+  font-family: 'Archivo', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--vc-navy);
+  opacity: 0.7;
+}
+.vc-install-note a { color: var(--vc-accent) !important; font-weight: 700; }
 .vp-doc h3 {
   font-family: 'Bungee', sans-serif !important;
   font-size: 18px !important;

@@ -51,6 +51,16 @@ outline: [2, 3]
   </div>
 </div>
 
+<h2 id="install" class="vc-sr-only">Install</h2>
+
+<div class="vc-install">
+  <div class="vc-install-eyebrow">Install</div>
+  <div class="vc-install-body">
+    <div class="vc-install-line"><span class="prompt">$</span>bun add -d vibecheck</div>
+    <div class="vc-install-note">Bun ≥ 1.1.0 required. vibecheck is Bun-only — no Node, no tsx. <a href="/guide/getting-started#install">Full guide →</a></div>
+  </div>
+</div>
+
 <div class="vc-section-h2">
   <div class="left">
     <span class="mark" style="background-color: var(--vc-teal); border-radius: 50%; transform: none;"></span>

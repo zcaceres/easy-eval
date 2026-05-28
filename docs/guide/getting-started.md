@@ -14,6 +14,8 @@ guideProgress: { step: 2, total: 5 }
   <div class="head">Five steps from an empty project to a working evaluation loop. By the end you'll have a golden reference, a passing baseline, and a diff that catches drift the moment it happens.</div>
 </div>
 
+<h2 id="pre-requisite" class="vc-sr-only">Pre-requisite</h2>
+
 <div class="vc-prereq">
   <div class="tag">Pre-req</div>
   <div class="copy">
@@ -29,7 +31,7 @@ guideProgress: { step: 2, total: 5 }
       <div class="min">~1 min</div>
     </div>
     <div class="body">
-      <div class="title">Install</div>
+      <h2 id="install" class="title">Install</h2>
       <div class="lede">Add vibecheck as a dev dependency. It exposes a single binary (<code>vibecheck</code>) you'll call from package.json scripts or directly via <code>bunx</code>.</div>
 <div class="vc-terminal">
 <span class="label">Shell</span>
@@ -46,7 +48,7 @@ guideProgress: { step: 2, total: 5 }
       <div class="min">~30 sec</div>
     </div>
     <div class="body">
-      <div class="title">Initialize</div>
+      <h2 id="initialize" class="title">Initialize</h2>
       <div class="lede"><code>vibecheck init</code> scaffolds a typed config and a project-local <code>.vibecheck/</code> store. Everything stays in your repo — no global cache, no daemon.</div>
 <div class="vc-terminal">
 <span class="label">Shell</span>
@@ -63,7 +65,7 @@ guideProgress: { step: 2, total: 5 }
       <div class="min">~3 min</div>
     </div>
     <div class="body">
-      <div class="title">Write your eval</div>
+      <h2 id="write-your-eval" class="title">Write your eval</h2>
       <div class="lede">Open <code>vibecheck.config.ts</code> and point <code>eval()</code> at your generator. The framework manages outputs only — you supply inputs and the function that produces the result.</div>
 <div class="vc-terminal">
 <span class="label">TypeScript</span>
@@ -80,7 +82,7 @@ guideProgress: { step: 2, total: 5 }
       <div class="min">~1 min</div>
     </div>
     <div class="body">
-      <div class="title">Bless a golden</div>
+      <h2 id="bless-a-golden" class="title">Bless a golden</h2>
       <div class="lede">Run your eval once and promote the output as the reference. Commit <code>.vibecheck/{worker}/{datasetId}/golden.json</code> to git like any snapshot.</div>
 <div class="vc-terminal">
 <span class="label">Shell</span>
@@ -97,7 +99,7 @@ guideProgress: { step: 2, total: 5 }
       <div class="min">~30 sec</div>
     </div>
     <div class="body">
-      <div class="title">Compare</div>
+      <h2 id="compare" class="title">Compare</h2>
       <div class="lede">Re-run any time. vibecheck diffs the new output against golden section-by-section and exits non-zero if anything drifted. Wire it into CI and you're done.</div>
 <div class="vc-terminal">
 <span class="label">Shell</span>
