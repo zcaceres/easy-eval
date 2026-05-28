@@ -539,6 +539,48 @@ body, .vp-doc p, .vp-doc li {
   font-weight: 600;
 }
 
+/* Tables — Memphis dashed rows */
+.vp-doc table {
+  width: 100% !important;
+  margin: 28px 0 56px !important;
+  border-collapse: collapse !important;
+  border-top: 2px solid var(--vc-navy) !important;
+  border-bottom: 2px solid var(--vc-navy) !important;
+  display: table !important;
+}
+.vp-doc table tr {
+  border-bottom: 1px dashed var(--vc-navy) !important;
+  background: transparent !important;
+}
+.vp-doc table tr:last-child { border-bottom: none !important; }
+.vp-doc table th {
+  font-family: 'Space Mono', monospace !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase !important;
+  color: var(--vc-navy) !important;
+  opacity: 0.6 !important;
+  text-align: left !important;
+  padding: 14px 12px !important;
+  background: transparent !important;
+  border: none !important;
+}
+.vp-doc table td {
+  font-family: 'Archivo', system-ui, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: var(--vc-navy) !important;
+  padding: 14px 12px !important;
+  border: none !important;
+  vertical-align: top !important;
+}
+.vp-doc table td:first-child {
+  font-family: 'Space Mono', monospace !important;
+  font-weight: 700 !important;
+  width: 80px !important;
+}
+
 /* Code blocks — navy with terminal chrome */
 .vp-doc div[class*="language-"] {
   background-color: var(--vc-navy) !important;
