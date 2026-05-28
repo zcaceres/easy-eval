@@ -10,7 +10,15 @@ export function llmJudge(options: LlmJudgeOptions): EvalMethod {
 
   return async ({ run, golden }) => {
     const prompt = buildPrompt(run.output, golden?.output ?? null, rubric);
-    const raw = await call(prompt);
+
+    let raw: string;
+    try {
+      raw = await call(prompt);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return { diff: null, pass: false, summary: `llmJudge call failed: ${msg}` };
+    }
+
     const parsed = parseResponse(raw);
 
     return {
@@ -24,7 +32,7 @@ export function llmJudge(options: LlmJudgeOptions): EvalMethod {
 
 function buildPrompt(
   runOutput: unknown,
-  goldenOutput: unknown | null,
+  goldenOutput: unknown,
   rubric?: string,
 ): string {
   const lines: string[] = [
@@ -59,7 +67,7 @@ function buildPrompt(
 }
 
 function parseResponse(raw: string): { pass: boolean; summary: string } {
-  const jsonMatch = raw.match(/\{[\s\S]*?\}/);
+  const jsonMatch = raw.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
     return { pass: false, summary: `failed to parse LLM response: ${raw.slice(0, 200)}` };
   }
