@@ -1,11 +1,8 @@
 #!/usr/bin/env bun
 import * as easyEvalApi from "./index";
 
-// When this CLI is shipped as a compiled standalone binary, user configs
-// loaded via dynamic import can't resolve `easy-eval` from their own
-// node_modules (the binary has no access to it). Register the embedded
-// API as a virtual `easy-eval` module so `import { defineConfig } from
-// "easy-eval"` resolves inside compiled binaries.
+// Lets user `ee.config.ts` files resolve `import "easy-eval"` when running from
+// the compiled standalone binary, which has no access to their node_modules.
 Bun.plugin({
   name: "easy-eval-self",
   setup(build) {
