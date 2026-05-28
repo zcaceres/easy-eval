@@ -19,8 +19,8 @@ const LABELS: Record<string, string> = {
 const crumbs = computed(() => {
   if (frontmatter.value?.hideBreadcrumbs) return [];
   const path = route.path.replace(/^\/|\/$/g, "");
-  const root = { label: "DOCS", href: "/", last: !path };
-  if (!path) return [root];
+  const root = { label: "DOCS", href: "/", last: false };
+  if (!path) return [root, { label: "INTRODUCTION", href: "/", last: true }];
   const parts = path.split("/").filter(Boolean);
   const tail = parts.map((p, i) => ({
     label: LABELS[p] ?? p.replace(/-/g, " ").toUpperCase(),

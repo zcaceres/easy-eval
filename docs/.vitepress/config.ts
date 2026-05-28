@@ -19,6 +19,7 @@ export default defineConfig({
   ],
   themeConfig: {
     nav: [
+      { text: "Docs", link: "/" },
       { text: "Guide", link: "/guide/getting-started" },
       { text: "Judges", link: "/guide/judges" },
       { text: "CLI", link: "/cli" },
