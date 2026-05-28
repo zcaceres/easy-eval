@@ -1,0 +1,13 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["./src/index.ts"],
+  "out": "./docs/api",
+  "plugin": ["typedoc-plugin-markdown"],
+  "outputFileStrategy": "modules",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "exclude": ["**/*.test.ts", "**/*.e2e.test.ts"],
+  "readme": "none",
+  "hideBreadcrumbs": true,
+  "hidePageHeader": true
+}

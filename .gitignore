@@ -36,3 +36,8 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 # easy-eval runs (goldens can be committed separately)
 .ee/*/runs/
 .ee/*/reports/
+
+# docs build artifacts
+docs/api/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
