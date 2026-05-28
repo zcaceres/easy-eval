@@ -6,9 +6,9 @@ import { saveGolden, saveRun, saveChange } from "../storage/index";
 import type { Golden, EvalRun, Change } from "../types";
 
 // All CLI subprocesses run with cwd set to a temp directory.
-// The config inside that temp dir uses storage: { dir: ".ee" }, which
+// The config inside that temp dir uses storage: { dir: ".vibecheck" }, which
 // getStorageRoot resolves relative to cwd — so all reads and writes
-// land in $TMPDIR/ee-test-xxx/.ee/, never in the project tree.
+// land in $TMPDIR/vc-test-xxx/.vibecheck/, never in the project tree.
 
 const CLI_PATH = join(import.meta.dir, "..", "cli.ts");
 const PROJECT_ROOT = resolve(import.meta.dir, "..", "..");
@@ -65,10 +65,10 @@ async function getDirMtime(path: string): Promise<number | null> {
 }
 
 beforeAll(async () => {
-  projectEeMtimeBefore = await getDirMtime(join(PROJECT_ROOT, ".ee"));
+  projectEeMtimeBefore = await getDirMtime(join(PROJECT_ROOT, ".vibecheck"));
 
-  tmpDir = await mkdtemp(join(tmpdir(), "ee-test-"));
-  storageRoot = join(tmpDir, ".ee");
+  tmpDir = await mkdtemp(join(tmpdir(), "vc-test-"));
+  storageRoot = join(tmpDir, ".vibecheck");
 
   const configContent = `
 export default {
@@ -85,10 +85,10 @@ export default {
       }),
     },
   },
-  storage: { dir: ".ee" },
+  storage: { dir: ".vibecheck" },
 };
 `;
-  await writeFile(join(tmpDir, "ee.config.ts"), configContent);
+  await writeFile(join(tmpDir, "vibecheck.config.ts"), configContent);
 
   const golden: Golden = {
     blessedAt: "2026-01-10T08:00:00.000Z",
@@ -170,14 +170,14 @@ describe("test isolation", () => {
     expect(tmpDir.startsWith(tmpdir())).toBe(true);
     expect(storageRoot.startsWith(tmpDir)).toBe(true);
 
-    const currentMtime = await getDirMtime(join(PROJECT_ROOT, ".ee"));
+    const currentMtime = await getDirMtime(join(PROJECT_ROOT, ".vibecheck"));
     expect(currentMtime).toBe(projectEeMtimeBefore);
   });
 });
 
 // ─── JSON Output Format Tests ────────────────────────────────────
 
-describe("ee eval -f json", () => {
+describe("vibecheck eval -f json", () => {
   test("returns structured JSON with run, verdict, and golden", async () => {
     const { stdout, exitCode } = await runCli("eval", "test-dataset", "-f", "json");
     expect(exitCode).toBe(0);
@@ -239,7 +239,7 @@ describe("ee eval -f json", () => {
   });
 });
 
-describe("ee report -f json", () => {
+describe("vibecheck report -f json", () => {
   test("returns structured JSON with run, golden, and diff", async () => {
     const { stdout, exitCode } = await runCli("report", "test-dataset", RUN_TIMESTAMP, "-f", "json");
     expect(exitCode).toBe(0);
@@ -269,7 +269,7 @@ describe("ee report -f json", () => {
   });
 });
 
-describe("ee runs -f json", () => {
+describe("vibecheck runs -f json", () => {
   test("returns run list with datasetId and worker", async () => {
     const { stdout, exitCode } = await runCli("runs", "test-dataset", "-f", "json");
     expect(exitCode).toBe(0);
@@ -295,7 +295,7 @@ describe("ee runs -f json", () => {
   });
 });
 
-describe("ee status -f json", () => {
+describe("vibecheck status -f json", () => {
   test("returns datasets array with discovery info", async () => {
     const { stdout, exitCode } = await runCli("status", "-f", "json");
     expect(exitCode).toBe(0);
@@ -316,7 +316,7 @@ describe("ee status -f json", () => {
   });
 });
 
-describe("ee changes list -f json", () => {
+describe("vibecheck changes list -f json", () => {
   test("returns changes array with summaries", async () => {
     const { stdout, exitCode } = await runCli("changes", "list", "-f", "json");
     expect(exitCode).toBe(0);
@@ -342,7 +342,7 @@ describe("ee changes list -f json", () => {
   });
 });
 
-describe("ee changes show -f json", () => {
+describe("vibecheck changes show -f json", () => {
   test("returns full change object", async () => {
     const { stdout, exitCode } = await runCli("changes", "show", CHANGE_TIMESTAMP, "-f", "json");
     expect(exitCode).toBe(0);
@@ -361,9 +361,9 @@ describe("ee changes show -f json", () => {
   });
 });
 
-// ─── ee changes add ──────────────────────────────────────────────
+// ─── vibecheck changes add ──────────────────────────────────────────────
 
-describe("ee changes add", () => {
+describe("vibecheck changes add", () => {
   test("creates a change from latest run", async () => {
     const { stdout, stderr, exitCode } = await runCli("changes", "add", "test-dataset", "--note", "added by agent");
     expect(exitCode).toBe(0);

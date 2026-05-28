@@ -1,17 +1,17 @@
 # Getting Started
 
-`easy-eval` (`ee`) is a CLI for running evals on structured LLM outputs and comparing them against blessed reference data ("goldens").
+`vibecheck` (`vibecheck`) is a CLI for running evals on structured LLM outputs and comparing them against blessed reference data ("goldens").
 
 ## Install
 
 ### Option 1: Standalone binary (recommended)
 
-Download the binary for your platform from [GitHub Releases](https://github.com/zcaceres/easy-eval/releases) and put it on your `PATH`:
+Download the binary for your platform from [GitHub Releases](https://github.com/zcaceres/vibecheck/releases) and put it on your `PATH`:
 
 ```bash
-curl -L -o /usr/local/bin/ee \
-  https://github.com/zcaceres/easy-eval/releases/latest/download/ee-darwin-arm64
-chmod +x /usr/local/bin/ee
+curl -L -o /usr/local/bin/vibecheck \
+  https://github.com/zcaceres/vibecheck/releases/latest/download/vc-darwin-arm64
+chmod +x /usr/local/bin/vibecheck
 ```
 
 No Bun, Node, or `node_modules` required — the binary is self-contained.
@@ -19,8 +19,8 @@ No Bun, Node, or `node_modules` required — the binary is self-contained.
 ### Option 2: From source
 
 ```bash
-git clone https://github.com/zcaceres/easy-eval
-cd easy-eval
+git clone https://github.com/zcaceres/vibecheck
+cd vibecheck
 bun install
 bun link
 ```
@@ -30,20 +30,20 @@ Requires [Bun](https://bun.sh).
 ## Scaffold a project
 
 ```bash
-ee init
+vibecheck init
 ```
 
 This creates:
 
-- `ee.config.ts` — your config (eval functions, judges, schemas)
-- `.ee/` — storage for goldens, runs, and reports
+- `vibecheck.config.ts` — your config (eval functions, judges, schemas)
+- `.vibecheck/` — storage for goldens, runs, and reports
 
 ## Write your eval function
 
-Open `ee.config.ts` and replace the placeholder `eval` function with your pipeline:
+Open `vibecheck.config.ts` and replace the placeholder `eval` function with your pipeline:
 
 ```ts
-import { defineConfig, vibecheck } from "easy-eval";
+import { defineConfig, vibecheck } from "vibecheck";
 
 export default defineConfig({
   evals: {
@@ -61,16 +61,16 @@ export default defineConfig({
 ## Run your first eval
 
 ```bash
-ee eval my-dataset
+vibecheck eval my-dataset
 ```
 
 The first run has no golden to compare against. Promote the output:
 
 ```bash
-ee bless my-dataset
+vibecheck bless my-dataset
 ```
 
-Now subsequent `ee eval my-dataset` runs diff against the saved golden.
+Now subsequent `vibecheck eval my-dataset` runs diff against the saved golden.
 
 ## Next steps
 

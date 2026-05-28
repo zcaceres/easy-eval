@@ -23,7 +23,7 @@ export async function cmdEval(
     for (const issue of errors) {
       console.error(red("  " + issue.message));
     }
-    console.error(dim("\nRun `ee validate` for full details."));
+    console.error(dim("\nRun `vibecheck validate` for full details."));
     process.exit(1);
   }
 
@@ -93,7 +93,7 @@ export async function cmdEval(
     if (cost) {
       console.log(dim(`  Cost: $${cost.total.toFixed(4)}`));
     }
-    console.log(dim(`  Run saved: .ee/${evalName}/${datasetId}/runs/`));
+    console.log(dim(`  Run saved: .vibecheck/${evalName}/${datasetId}/runs/`));
   }
 
   if (opts.diff === false) {
@@ -114,7 +114,7 @@ export async function cmdEval(
       console.log(JSON.stringify({ run, verdict, golden: null }, null, 2));
     } else {
       console.log(yellow("\nNo golden to compare against."));
-      console.log(dim("Run `ee bless " + datasetId + "` to promote this output to golden.\n"));
+      console.log(dim("Run `vibecheck bless " + datasetId + "` to promote this output to golden.\n"));
       if (evalDef.diffSchema) {
         console.log(renderOutputTable(output, evalDef.diffSchema));
       } else {
@@ -237,7 +237,7 @@ async function promptCodify(
     };
 
     await saveChange(storageRoot, change);
-    console.log(green("✓ Change saved") + dim(` to .ee/changes/`));
+    console.log(green("✓ Change saved") + dim(` to .vibecheck/changes/`));
   } finally {
     rl.close();
   }

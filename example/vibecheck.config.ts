@@ -1,21 +1,21 @@
-// Example: restaurant review extraction pipeline evaluated with easy-eval.
+// Example: restaurant review extraction pipeline evaluated with vibecheck.
 //
 // This example simulates an LLM extraction pipeline that reads restaurant
 // reviews and produces structured data (dishes, ratings, highlights, etc.).
 // The extractor intentionally introduces random variation to mimic LLM
-// non-determinism, making it useful for exercising ee's diff/merge features.
+// non-determinism, making it useful for exercising vibecheck's diff/merge features.
 //
 // Try it:
-//   ee eval golden-dragon
-//   ee eval the-rustic-oven
-//   ee eval cafe-lumiere
+//   vibecheck eval golden-dragon
+//   vibecheck eval the-rustic-oven
+//   vibecheck eval cafe-lumiere
 
 import { defineConfig, vibecheck, fromZod } from "../src/index";
 import { REVIEWS } from "./reviews";
 import { extractRestaurant } from "./extractor";
 import { ExtractedRestaurantSchema } from "./schema";
 
-// Convert the Zod schema into an ee DiffSchema for structured diffs.
+// Convert the Zod schema into an vibecheck DiffSchema for structured diffs.
 // Overrides control how items are displayed in diff output.
 const schema = fromZod(ExtractedRestaurantSchema, {
   dishes: { display: (item: any) => `${item.name} (${item.sentiment})` },
@@ -52,11 +52,11 @@ export default defineConfig({
       // Passing the schema gives structured section-by-section diffs instead of raw JSON diff.
       judge: vibecheck({ schema }),
 
-      // diffSchema controls how ee report / ee merge render diffs (framework-level display).
+      // diffSchema controls how vibecheck report / vibecheck merge render diffs (framework-level display).
       // Often the same schema object as the judge, but conceptually independent.
       diffSchema: schema,
     },
   },
 
-  storage: { dir: ".ee" },
+  storage: { dir: ".vibecheck" },
 });

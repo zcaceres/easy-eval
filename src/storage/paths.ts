@@ -2,7 +2,7 @@ import { join } from "path";
 import type { EvalConfig } from "../types";
 
 export function getStorageRoot(config: EvalConfig, cwd: string = process.cwd()): string {
-  return join(cwd, config.storage?.dir ?? ".ee");
+  return join(cwd, config.storage?.dir ?? ".vibecheck");
 }
 
 export function workerDir(root: string, worker: string): string {

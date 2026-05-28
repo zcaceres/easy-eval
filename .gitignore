@@ -33,11 +33,16 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 # Finder (MacOS) folder config
 .DS_Store
 
-# easy-eval runs (goldens can be committed separately)
-.ee/*/runs/
-.ee/*/reports/
+# vibecheck runs (goldens can be committed separately)
+.vibecheck/*/runs/
+.vibecheck/*/reports/
 
 # docs build artifacts
 docs/api/
 docs/.vitepress/dist/
 docs/.vitepress/cache/
+
+.antigravitycli
+.claude
+.ee
+.playwright-mcp

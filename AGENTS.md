@@ -1,4 +1,4 @@
-# Easy Eval (ee) — Agent Guide
+# Easy Eval (vibecheck) — Agent Guide
 
 A CLI toolkit for evaluating structured LLM outputs against golden (reference) datasets.
 
@@ -7,37 +7,37 @@ A CLI toolkit for evaluating structured LLM outputs against golden (reference) d
 ## Quick Start
 
 ```bash
-ee init                            # scaffold ee.config.ts and .ee/
-# edit ee.config.ts — define your eval() function
-ee eval <datasetId>                # run eval, diff against golden
-ee bless <datasetId>               # promote output to golden
+vibecheck init                            # scaffold vibecheck.config.ts and .vibecheck/
+# edit vibecheck.config.ts — define your eval() function
+vibecheck eval <datasetId>                # run eval, diff against golden
+vibecheck bless <datasetId>               # promote output to golden
 ```
 
 ## Key Concepts
 
 **datasetId** — A unique string identifying one input payload (test case). Examples: `"user-123"`, `"invoice-march"`, `"edge-case-empty"`. Your `eval()` function receives it via `ctx.datasetId` and uses it to load the right input data.
 
-**Worker** — A named eval target in the `evals` map of `ee.config.ts`. Most projects have one (`default`). Use `-w <name>` to target others.
+**Worker** — A named eval target in the `evals` map of `vibecheck.config.ts`. Most projects have one (`default`). Use `-w <name>` to target others.
 
-**Golden** — The blessed reference output for a dataset. `ee eval` diffs new output against it. `ee bless` promotes a run to golden.
+**Golden** — The blessed reference output for a dataset. `vibecheck eval` diffs new output against it. `vibecheck bless` promotes a run to golden.
 
 **Variables** — `-v key=value` flags parameterize eval runs (e.g., model, prompt). Access via `ctx.vars` in your eval function. Repeatable.
 
-**Changes** — Codified improvements from eval runs. After `ee eval` shows a diff, you can record a structured change with context (dataset, worker, variables, inputs, diff, note). Before codifying, the CLI offers a regression sweep across all other golden datasets to validate the change doesn't cause regressions.
+**Changes** — Codified improvements from eval runs. After `vibecheck eval` shows a diff, you can record a structured change with context (dataset, worker, variables, inputs, diff, note). Before codifying, the CLI offers a regression sweep across all other golden datasets to validate the change doesn't cause regressions.
 
-**diffSchema** (optional) — Define `diffSchema` on a worker for structured section-by-section diffs using section kinds: `scalar`, `keyed-array`, `set`, `ordered-array`. Without it, ee auto-diffs by comparing JSON recursively.
+**diffSchema** (optional) — Define `diffSchema` on a worker for structured section-by-section diffs using section kinds: `scalar`, `keyed-array`, `set`, `ordered-array`. Without it, vibecheck auto-diffs by comparing JSON recursively.
 
 ## Commands Reference
 
-### ee init
+### vibecheck init
 
-Scaffold `ee.config.ts`, `.ee/` directory, and `CLAUDE.md` in the current project.
+Scaffold `vibecheck.config.ts`, `.vibecheck/` directory, and `CLAUDE.md` in the current project.
 
 ```bash
-ee init
+vibecheck init
 ```
 
-### ee eval \<datasetId\>
+### vibecheck eval \<datasetId\>
 
 Run the eval function and compare output against golden.
 
@@ -50,19 +50,19 @@ Options:
 ```
 
 ```bash
-ee eval user-123                             # run eval and diff against golden
-ee eval user-123 --no-diff                   # run without diffing (non-interactive)
-ee eval user-123 -v model=gpt-4o             # parameterize with variables
-ee eval user-123 -v model=gpt-4o -v temp=0.5 # multiple variables
-ee eval user-123 -w my-worker                # target a specific worker
-ee eval user-123 -f json                     # output as JSON
+vibecheck eval user-123                             # run eval and diff against golden
+vibecheck eval user-123 --no-diff                   # run without diffing (non-interactive)
+vibecheck eval user-123 -v model=gpt-4o             # parameterize with variables
+vibecheck eval user-123 -v model=gpt-4o -v temp=0.5 # multiple variables
+vibecheck eval user-123 -w my-worker                # target a specific worker
+vibecheck eval user-123 -f json                     # output as JSON
 ```
 
 **Note:** Without `--no-diff`, this command prompts "Codify this change? [y/N]" after showing the diff. Use `--no-diff` for non-interactive / agent usage.
 
-**Regression sweep:** When codifying, if other golden datasets exist for the same worker, `ee eval` offers to run a regression sweep — re-running the eval with the same `-v` variables across all golden datasets. Shows a summary table (match/changed/missing/new per dataset), lets you inspect individual diffs by name, and warns if regressions are found. Sweep runs are saved and visible via `ee runs`/`ee report`.
+**Regression sweep:** When codifying, if other golden datasets exist for the same worker, `vibecheck eval` offers to run a regression sweep — re-running the eval with the same `-v` variables across all golden datasets. Shows a summary table (match/changed/missing/new per dataset), lets you inspect individual diffs by name, and warns if regressions are found. Sweep runs are saved and visible via `vibecheck runs`/`vibecheck report`.
 
-### ee bless \<datasetId\>
+### vibecheck bless \<datasetId\>
 
 Promote the latest eval output (or a specific past run) to golden reference.
 
@@ -73,14 +73,14 @@ Options:
 ```
 
 ```bash
-ee bless user-123                              # bless latest run as golden
-ee bless user-123 --from-run 2025-01-15T10-30-00.000Z
-ee bless user-123 -w my-worker
+vibecheck bless user-123                              # bless latest run as golden
+vibecheck bless user-123 --from-run 2025-01-15T10-30-00.000Z
+vibecheck bless user-123 -w my-worker
 ```
 
-If no runs exist, ee runs the eval function first and blesses the result.
+If no runs exist, vibecheck runs the eval function first and blesses the result.
 
-### ee runs \<datasetId\>
+### vibecheck runs \<datasetId\>
 
 List past eval runs with timestamp, duration, and cost.
 
@@ -91,11 +91,11 @@ Options:
 ```
 
 ```bash
-ee runs user-123
-ee runs user-123 -l 5                        # show last 5 runs only
+vibecheck runs user-123
+vibecheck runs user-123 -l 5                        # show last 5 runs only
 ```
 
-### ee report \<datasetId\> [timestamp]
+### vibecheck report \<datasetId\> [timestamp]
 
 Show diff report comparing an eval run against golden (or against another run). Uses latest run if no timestamp given.
 
@@ -107,16 +107,16 @@ Options:
 ```
 
 ```bash
-ee report user-123                             # diff latest run vs golden
-ee report user-123 2025-01-15T10-30-00.000Z    # specific run
-ee report user-123 -f json                     # output as JSON (agent-friendly)
-ee report user-123 <ts1> --against <ts2>       # compare two runs directly
-ee report user-123 -f md                       # output as markdown
+vibecheck report user-123                             # diff latest run vs golden
+vibecheck report user-123 2025-01-15T10-30-00.000Z    # specific run
+vibecheck report user-123 -f json                     # output as JSON (agent-friendly)
+vibecheck report user-123 <ts1> --against <ts2>       # compare two runs directly
+vibecheck report user-123 -f md                       # output as markdown
 ```
 
-### ee sweep \<datasetId\>
+### vibecheck sweep \<datasetId\>
 
-Run regression sweep: re-eval all other golden datasets for the same worker. Non-interactive alternative to the sweep built into `ee eval`'s codify flow.
+Run regression sweep: re-eval all other golden datasets for the same worker. Non-interactive alternative to the sweep built into `vibecheck eval`'s codify flow.
 
 ```
 Options:
@@ -126,9 +126,9 @@ Options:
 ```
 
 ```bash
-ee sweep user-123                              # check all other goldens
-ee sweep user-123 -v model=gpt-4o              # sweep with variables
-ee sweep user-123 -f json                      # output as JSON (agent-friendly)
+vibecheck sweep user-123                              # check all other goldens
+vibecheck sweep user-123 -v model=gpt-4o              # sweep with variables
+vibecheck sweep user-123 -f json                      # output as JSON (agent-friendly)
 ```
 
 JSON output shape:
@@ -144,9 +144,9 @@ JSON output shape:
 }
 ```
 
-Each sweep run is saved and visible via `ee runs` / `ee report`.
+Each sweep run is saved and visible via `vibecheck runs` / `vibecheck report`.
 
-### ee merge \<datasetId\> [timestamp]
+### vibecheck merge \<datasetId\> [timestamp]
 
 Interactively merge an eval run into golden, section by section.
 
@@ -155,19 +155,19 @@ Options:
   -w, --worker <name>     Named eval target from config (default: "default")
 ```
 
-**Interactive — not suitable for agent use.** For each diffing section, prompts: [g]olden / [e]val / [b]oth / [i]tem-by-item. Use `ee bless` instead for non-interactive promotion.
+**Interactive — not suitable for agent use.** For each diffing section, prompts: [g]olden / [e]val / [b]oth / [i]tem-by-item. Use `vibecheck bless` instead for non-interactive promotion.
 
-### ee status
+### vibecheck status
 
 Show overview of all datasets, goldens, and run counts across workers. No arguments.
 
 ```bash
-ee status
+vibecheck status
 ```
 
-### ee validate
+### vibecheck validate
 
-Validate `ee.config.ts` configuration: check eval functions, diffSchema, and optionally probe output shape.
+Validate `vibecheck.config.ts` configuration: check eval functions, diffSchema, and optionally probe output shape.
 
 ```
 Options:
@@ -176,12 +176,12 @@ Options:
 ```
 
 ```bash
-ee validate                                  # check all workers
-ee validate -w my-worker                     # check one worker
-ee validate --probe user-123                 # run eval and validate output shape
+vibecheck validate                                  # check all workers
+vibecheck validate -w my-worker                     # check one worker
+vibecheck validate --probe user-123                 # run eval and validate output shape
 ```
 
-### ee changes list
+### vibecheck changes list
 
 List codified changes, showing timestamp, dataset, note, and variables.
 
@@ -191,19 +191,19 @@ Options:
 ```
 
 ```bash
-ee changes list
-ee changes list -d user-123
+vibecheck changes list
+vibecheck changes list -d user-123
 ```
 
-### ee changes show \<timestamp\>
+### vibecheck changes show \<timestamp\>
 
 View a single codified change in detail: dataset, worker, variables, inputs, and diff.
 
 ```bash
-ee changes show 2025-01-15T10-30-00.000Z
+vibecheck changes show 2025-01-15T10-30-00.000Z
 ```
 
-### ee changes export
+### vibecheck changes export
 
 Export codified changes as a markdown changelog.
 
@@ -214,31 +214,31 @@ Options:
 ```
 
 ```bash
-ee changes export                            # print to stdout
-ee changes export -o changelog.md            # write to file
-ee changes export -d user-123 -o report.md   # filtered, to file
+vibecheck changes export                            # print to stdout
+vibecheck changes export -o changelog.md            # write to file
+vibecheck changes export -d user-123 -o report.md   # filtered, to file
 ```
 
 ### Global Options
 
 ```
--c, --config <path>    Path to ee.config.ts (default: auto-detect in cwd)
+-c, --config <path>    Path to vibecheck.config.ts (default: auto-detect in cwd)
 -V, --version          Output version number
 -h, --help             Display help for any command
 ```
 
-Run `ee <command> --help` for detailed usage of any command.
+Run `vibecheck <command> --help` for detailed usage of any command.
 
 ## Agent Workflow Recommendations
 
 ### Non-interactive workflow (recommended for agents)
 
 ```bash
-ee validate                          # confirm config is valid
-ee bless <datasetId>                 # establish golden (first time only)
-ee eval <datasetId> --no-diff        # run eval without interactive prompts
-ee report <datasetId> -f json        # view diff as structured JSON
-ee bless <datasetId>                 # promote if output is better
+vibecheck validate                          # confirm config is valid
+vibecheck bless <datasetId>                 # establish golden (first time only)
+vibecheck eval <datasetId> --no-diff        # run eval without interactive prompts
+vibecheck report <datasetId> -f json        # view diff as structured JSON
+vibecheck bless <datasetId>                 # promote if output is better
 ```
 
 ### Improvement loop (agent + human collaboration)
@@ -247,57 +247,57 @@ The core iteration cycle for improving eval outputs:
 
 ```bash
 # 1. Orient — understand the baseline
-ee status -f json                              # see all datasets and goldens
-ee report <datasetId> -f json                  # current diff against golden
+vibecheck status -f json                              # see all datasets and goldens
+vibecheck report <datasetId> -f json                  # current diff against golden
 
-# 2. Hypothesize — propose a change (tweak prompt, vars, code in ee.config.ts)
+# 2. Hypothesize — propose a change (tweak prompt, vars, code in vibecheck.config.ts)
 
 # 3. Test — run eval with proposed changes
-ee eval <datasetId> -v key=value --no-diff -f json
+vibecheck eval <datasetId> -v key=value --no-diff -f json
 
 # 4. Assess — read the diff
-ee report <datasetId> <timestamp> -f json      # vs golden
-ee report <datasetId> <ts1> --against <ts2>    # vs a previous iteration
+vibecheck report <datasetId> <timestamp> -f json      # vs golden
+vibecheck report <datasetId> <ts1> --against <ts2>    # vs a previous iteration
 
 # 5. Verify — check for regressions across other datasets
-ee sweep <datasetId> -v key=value -f json
+vibecheck sweep <datasetId> -v key=value -f json
 
 # 6. Record — codify the improvement
-ee changes add <datasetId> <timestamp> --note "what improved"
+vibecheck changes add <datasetId> <timestamp> --note "what improved"
 
 # 7. Repeat from step 2
 ```
 
 **Key patterns:**
 - Use `-f json` on all read commands for machine-parseable output
-- Use `--no-diff` on `ee eval` to skip interactive prompts
-- Use `--against` on `ee report` to compare two iterations directly
-- Use `ee sweep` to verify a change doesn't regress other datasets
+- Use `--no-diff` on `vibecheck eval` to skip interactive prompts
+- Use `--against` on `vibecheck report` to compare two iterations directly
+- Use `vibecheck sweep` to verify a change doesn't regress other datasets
 - Use `-v key=value` to parameterize experiments (model, temperature, prompt variant)
 - Variables flow to both `eval(ctx)` via `ctx.vars` and `inputs(datasetId, vars)`
 
 ### Comparing parameter variations
 
 ```bash
-ee eval my-dataset -v model=claude-sonnet-4-20250514 --no-diff -f json
-ee eval my-dataset -v model=gpt-4o --no-diff -f json
-ee runs my-dataset -f json                   # see both runs with cost/duration
-ee report my-dataset <ts1> --against <ts2>   # compare the two runs directly
+vibecheck eval my-dataset -v model=claude-sonnet-4-20250514 --no-diff -f json
+vibecheck eval my-dataset -v model=gpt-4o --no-diff -f json
+vibecheck runs my-dataset -f json                   # see both runs with cost/duration
+vibecheck report my-dataset <ts1> --against <ts2>   # compare the two runs directly
 ```
 
 ### Interactive commands to avoid
 
-- **`ee merge`** — requires interactive stdin (golden/eval/both/item-by-item prompts per section)
-- **`ee eval` without `--no-diff`** — prompts "Codify this change? [y/N]" after diff, then optionally a regression sweep with per-dataset inspection
+- **`vibecheck merge`** — requires interactive stdin (golden/eval/both/item-by-item prompts per section)
+- **`vibecheck eval` without `--no-diff`** — prompts "Codify this change? [y/N]" after diff, then optionally a regression sweep with per-dataset inspection
 
 ### Reading eval output programmatically
 
-Use `-f json` with `ee eval`, `ee report`, `ee runs`, `ee status`, `ee sweep`, and `ee changes` to get structured JSON output.
+Use `-f json` with `vibecheck eval`, `vibecheck report`, `vibecheck runs`, `vibecheck status`, `vibecheck sweep`, and `vibecheck changes` to get structured JSON output.
 
 ## Storage Layout
 
 ```
-.ee/
+.vibecheck/
   {worker}/{datasetId}/
     golden.json                    # blessed reference output
     runs/{timestamp}.json          # eval run snapshots
@@ -306,14 +306,14 @@ Use `-f json` with `ee eval`, `ee report`, `ee runs`, `ee status`, `ee sweep`, a
     {timestamp}.json               # codified improvements
 ```
 
-Goldens can be committed to git. Runs and reports are ephemeral (`.gitignore`'d by `ee init`).
+Goldens can be committed to git. Runs and reports are ephemeral (`.gitignore`'d by `vibecheck init`).
 
-## Config File (`ee.config.ts`)
+## Config File (`vibecheck.config.ts`)
 
 Uses `defineConfig()` for type safety. The `evals` map contains named eval targets.
 
 ```typescript
-import { defineConfig } from "easy-eval";
+import { defineConfig } from "vibecheck";
 
 export default defineConfig({
   evals: {
@@ -326,7 +326,7 @@ export default defineConfig({
       diffSchema: { sections: [/* ... */] },
     },
   },
-  storage: { dir: ".ee" },
+  storage: { dir: ".vibecheck" },
 });
 ```
 

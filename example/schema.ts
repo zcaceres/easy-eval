@@ -1,6 +1,6 @@
 // Zod schema for the structured output produced by the extraction pipeline.
-// This defines the shape that extractRestaurant() returns and that ee diffs against golden.
-// Used by ee.config.ts via fromZod() to generate a DiffSchema for structured diffs.
+// This defines the shape that extractRestaurant() returns and that vibecheck diffs against golden.
+// Used by vibecheck.config.ts via fromZod() to generate a DiffSchema for structured diffs.
 
 import { z } from "zod";
 

@@ -26,7 +26,7 @@ export async function cmdChanges(
     } else {
       console.log("No changes codified yet.");
     }
-    console.log(dim("\nRun `ee eval <datasetId>` and codify a change after reviewing the diff."));
+    console.log(dim("\nRun `vibecheck eval <datasetId>` and codify a change after reviewing the diff."));
     return;
   }
 
@@ -144,7 +144,7 @@ export async function cmdAddChange(
   };
 
   await saveChange(storageRoot, change);
-  console.log(green("✓ Change saved") + dim(` to .ee/changes/`));
+  console.log(green("✓ Change saved") + dim(` to .vibecheck/changes/`));
 }
 
 export async function cmdExportChanges(

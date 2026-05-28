@@ -58,7 +58,7 @@ export async function cmdSweep(
   if (summary.regression > 0) {
     console.log();
     console.log(red(`${summary.regression} regression${summary.regression !== 1 ? "s" : ""} detected.`));
-    console.log(dim("Use ee report <datasetId> -f json to inspect individual datasets."));
+    console.log(dim("Use vibecheck report <datasetId> -f json to inspect individual datasets."));
   } else if (summary.clean > 0) {
     console.log();
     console.log(green("No regressions detected."));

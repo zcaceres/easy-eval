@@ -2,7 +2,7 @@
 // restaurant data from reviews. Returns an ExtractedRestaurant with
 // intentional random variation (jittered ratings, dropped/added items,
 // flipped sentiments) so each eval run produces slightly different output.
-// This makes it useful for exercising ee's diff, merge, and sweep features.
+// This makes it useful for exercising vibecheck's diff, merge, and sweep features.
 //
 // In a real project, this file would call an actual LLM API.
 

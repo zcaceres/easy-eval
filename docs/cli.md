@@ -1,74 +1,74 @@
 # CLI Reference
 
-All commands accept a global `-c, --config <path>` flag to point at a custom config file (default: auto-detect `ee.config.ts` in cwd).
+All commands accept a global `-c, --config <path>` flag to point at a custom config file (default: auto-detect `vibecheck.config.ts` in cwd).
 
-## `ee init`
+## `vibecheck init`
 
-Scaffold `ee.config.ts`, `.ee/` directory, and `CLAUDE.md` in the current project.
+Scaffold `vibecheck.config.ts`, `.vibecheck/` directory, and `CLAUDE.md` in the current project.
 
-## `ee eval <datasetId>`
+## `vibecheck eval <datasetId>`
 
 Run the eval function for a dataset and compare against golden.
 
 ```bash
-ee eval my-dataset                  # use default worker
-ee eval my-dataset -w my-worker     # named worker
-ee eval my-dataset -v model=gpt-4o  # pass variables
+vibecheck eval my-dataset                  # use default worker
+vibecheck eval my-dataset -w my-worker     # named worker
+vibecheck eval my-dataset -v model=gpt-4o  # pass variables
 ```
 
 After the diff, the CLI prompts to **codify** the change (record it as a structured entry).
 
-## `ee bless <datasetId>`
+## `vibecheck bless <datasetId>`
 
 Promote the latest run (or a specific past run via `--from-run`) to golden.
 
 ```bash
-ee bless my-dataset
-ee bless my-dataset --from-run 2025-01-15T10-30-00.000Z
+vibecheck bless my-dataset
+vibecheck bless my-dataset --from-run 2025-01-15T10-30-00.000Z
 ```
 
 If no runs exist, runs the eval first, then blesses.
 
-## `ee runs <datasetId>`
+## `vibecheck runs <datasetId>`
 
 List past eval runs with timestamp, duration, and cost.
 
-## `ee report <datasetId> [timestamp]`
+## `vibecheck report <datasetId> [timestamp]`
 
 Show the diff report for a past run (latest if no timestamp).
 
 ```bash
-ee report my-dataset                                    # latest vs golden
-ee report my-dataset 2025-01-15T10-30-00.000Z          # specific run vs golden
-ee report my-dataset 2025-01-15T10-30-00 --against ...  # run vs run
+vibecheck report my-dataset                                    # latest vs golden
+vibecheck report my-dataset 2025-01-15T10-30-00.000Z          # specific run vs golden
+vibecheck report my-dataset 2025-01-15T10-30-00 --against ...  # run vs run
 ```
 
-## `ee merge <datasetId> [timestamp]`
+## `vibecheck merge <datasetId> [timestamp]`
 
 Interactively merge a run into golden, section by section. Accept or reject each diff.
 
-## `ee sweep <datasetId>`
+## `vibecheck sweep <datasetId>`
 
 Non-interactive regression sweep: re-eval all other golden datasets for the same worker with the current code/variables. See the [Regression Sweep](/guide/sweep) guide.
 
-## `ee status`
+## `vibecheck status`
 
 Overview of all datasets, goldens, and run counts across workers.
 
-## `ee changes`
+## `vibecheck changes`
 
 Manage codified changes — structured records of eval improvements.
 
 ```bash
-ee changes list                       # all changes
-ee changes list -d my-dataset         # filter by dataset
-ee changes show <timestamp>           # detail view
-ee changes export -d my-dataset -o changes.md
+vibecheck changes list                       # all changes
+vibecheck changes list -d my-dataset         # filter by dataset
+vibecheck changes show <timestamp>           # detail view
+vibecheck changes export -d my-dataset -o changes.md
 ```
 
-## `ee validate`
+## `vibecheck validate`
 
-Validate `ee.config.ts`: check eval functions, diffSchema, and optionally probe output shape.
+Validate `vibecheck.config.ts`: check eval functions, diffSchema, and optionally probe output shape.
 
 ## Exit codes
 
