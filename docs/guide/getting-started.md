@@ -1,79 +1,121 @@
-# Getting Started
+---
+title: Getting Started
+pageClass: vc-page-guide
+outline: [2, 3]
+guideProgress: { step: 2, total: 5 }
+---
 
-`vibecheck` (`vibecheck`) is a CLI for running evals on structured LLM outputs and comparing them against blessed reference data ("goldens").
+<div class="vc-hero-display">
+  <span class="word">Getting</span>
+  <span class="word accent small">started.</span>
+</div>
 
-## Install
+<div class="vc-hero-lede">
+  <div class="head">Five steps from an empty project to a working evaluation loop. By the end you'll have a golden reference, a passing baseline, and a diff that catches drift the moment it happens.</div>
+</div>
 
-### Option 1: Standalone binary (recommended)
+<div class="vc-prereq">
+  <div class="tag">Pre-req</div>
+  <div class="copy">
+    <strong>Bun installed (≥ 1.1.0). No Node, no tsx.</strong>
+    <span>vibecheck loads <code>vibecheck.config.ts</code> via Bun's native TypeScript runtime. If you don't have Bun yet, run <code>curl -fsSL https://bun.sh/install | bash</code>.</span>
+  </div>
+</div>
 
-Download the binary for your platform from [GitHub Releases](https://github.com/zcaceres/vibecheck/releases) and put it on your `PATH`:
+<div class="vc-spine">
+  <div class="vc-spine-step">
+    <div class="badge">
+      <div class="num">01</div>
+      <div class="min">~1 min</div>
+    </div>
+    <div class="body">
+      <div class="title">Install</div>
+      <div class="lede">Add vibecheck as a dev dependency. It exposes a single binary (<code>vibecheck</code>) you'll call from package.json scripts or directly via <code>bunx</code>.</div>
+<div class="vc-terminal">
+<span class="label">Shell</span>
+<pre><span class="prompt">$</span> bun add -d vibecheck
+<span class="comment"># or run without installing</span>
+<span class="prompt">$</span> bunx vibecheck --help</pre>
+</div>
+    </div>
+  </div>
 
-```bash
-curl -L -o /usr/local/bin/vibecheck \
-  https://github.com/zcaceres/vibecheck/releases/latest/download/vc-darwin-arm64
-chmod +x /usr/local/bin/vibecheck
-```
+  <div class="vc-spine-step">
+    <div class="badge">
+      <div class="num">02</div>
+      <div class="min">~30 sec</div>
+    </div>
+    <div class="body">
+      <div class="title">Initialize</div>
+      <div class="lede"><code>vibecheck init</code> scaffolds a typed config and a project-local <code>.vibecheck/</code> store. Everything stays in your repo — no global cache, no daemon.</div>
+<div class="vc-terminal">
+<span class="label">Shell</span>
+<pre><span class="prompt">$</span> bunx vibecheck init
+<span class="comment"># creates vibecheck.config.ts + .vibecheck/</span>
+<span class="prompt">$</span> ls .vibecheck/</pre>
+</div>
+    </div>
+  </div>
 
-No Bun, Node, or `node_modules` required — the binary is self-contained.
+  <div class="vc-spine-step">
+    <div class="badge">
+      <div class="num">03</div>
+      <div class="min">~3 min</div>
+    </div>
+    <div class="body">
+      <div class="title">Write your eval</div>
+      <div class="lede">Open <code>vibecheck.config.ts</code> and point <code>eval()</code> at your generator. The framework manages outputs only — you supply inputs and the function that produces the result.</div>
+<div class="vc-terminal">
+<span class="label">TypeScript</span>
+<pre>export default defineConfig({
+  evals: { reviews: { eval: async (ctx) => generate(ctx) } }
+});</pre>
+</div>
+    </div>
+  </div>
 
-### Option 2: From source
+  <div class="vc-spine-step">
+    <div class="badge">
+      <div class="num">04</div>
+      <div class="min">~1 min</div>
+    </div>
+    <div class="body">
+      <div class="title">Bless a golden</div>
+      <div class="lede">Run your eval once and promote the output as the reference. Commit <code>.vibecheck/{worker}/{datasetId}/golden.json</code> to git like any snapshot.</div>
+<div class="vc-terminal">
+<span class="label">Shell</span>
+<pre><span class="prompt">$</span> vibecheck bless reviews
+<span class="ok">✓</span> blessed · 4 sections · saved
+  <span class="arrow">→</span> .vibecheck/default/reviews/golden.json</pre>
+</div>
+    </div>
+  </div>
 
-```bash
-git clone https://github.com/zcaceres/vibecheck
-cd vibecheck
-bun install
-bun link
-```
+  <div class="vc-spine-step">
+    <div class="badge">
+      <div class="num">05</div>
+      <div class="min">~30 sec</div>
+    </div>
+    <div class="body">
+      <div class="title">Compare</div>
+      <div class="lede">Re-run any time. vibecheck diffs the new output against golden section-by-section and exits non-zero if anything drifted. Wire it into CI and you're done.</div>
+<div class="vc-terminal">
+<span class="label">Shell</span>
+<pre><span class="prompt">$</span> vibecheck eval reviews
+<span class="comment"># PASS · 0 regressions · 1.84s · $0.0042</span>
+<span class="prompt">$</span> echo $? <span class="arrow">→</span> 0</pre>
+</div>
+    </div>
+  </div>
+</div>
 
-Requires [Bun](https://bun.sh).
-
-## Scaffold a project
-
-```bash
-vibecheck init
-```
-
-This creates:
-
-- `vibecheck.config.ts` — your config (eval functions, judges, schemas)
-- `.vibecheck/` — storage for goldens, runs, and reports
-
-## Write your eval function
-
-Open `vibecheck.config.ts` and replace the placeholder `eval` function with your pipeline:
-
-```ts
-import { defineConfig, vibecheck } from "vibecheck";
-
-export default defineConfig({
-  evals: {
-    default: {
-      eval: async (ctx) => {
-        const input = loadInput(ctx.datasetId);
-        return await myLLMPipeline(input);
-      },
-      judge: vibecheck(),
-    },
-  },
-});
-```
-
-## Run your first eval
-
-```bash
-vibecheck eval my-dataset
-```
-
-The first run has no golden to compare against. Promote the output:
-
-```bash
-vibecheck bless my-dataset
-```
-
-Now subsequent `vibecheck eval my-dataset` runs diff against the saved golden.
-
-## Next steps
-
-- [Core Concepts](/guide/concepts) — datasets, workers, goldens, variables
-- [Judges](/guide/judges) — vibecheck, exactMatch, fuzzyMatch, llmJudge
-- [CLI Reference](/cli) — every command and flag
+<div class="vc-pagenav">
+  <a href="/" class="prev">
+    <div class="step">← Previous</div>
+    <div class="title">Introduction</div>
+  </a>
+  <a href="/guide/concepts" class="next">
+    <div class="step">Next →</div>
+    <div class="title">Core concepts</div>
+  </a>
+</div>
