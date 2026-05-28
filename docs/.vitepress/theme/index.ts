@@ -3,7 +3,6 @@ import { h, watchEffect } from "vue";
 import { useData } from "vitepress";
 import Breadcrumbs from "./Breadcrumbs.vue";
 import AsideMeta from "./AsideMeta.vue";
-import ProvenanceStamp from "./ProvenanceStamp.vue";
 import "./custom.css";
 
 export default {
@@ -21,7 +20,6 @@ export default {
     return h(DefaultTheme.Layout, null, {
       "doc-before": () => h(Breadcrumbs),
       "aside-outline-after": () => h(AsideMeta),
-      "layout-bottom": () => h(ProvenanceStamp),
     });
   },
 };

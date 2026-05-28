@@ -1754,20 +1754,6 @@ body, .vp-doc p, .vp-doc li {
 /* Hide default VitePress prev/next pager — pages render their own .vc-pagenav */
 .VPDocFooter .pager { display: none !important; }
 
-/* Provenance stamp under bottom bar — rendered by the layout slot */
-.vc-stamp {
-  background-color: var(--vc-cream);
-  padding: 6px 48px 12px;
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  line-height: 12px;
-  text-transform: uppercase;
-  color: var(--vc-navy);
-  opacity: 0.5;
-}
-
 /* Tiny tweaks: hide some VitePress chrome that conflicts */
 .VPDocAside { padding-top: 0 !important; }
 .VPDocAside .aside-curtain { display: none !important; }
