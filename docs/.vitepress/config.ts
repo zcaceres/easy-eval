@@ -26,19 +26,28 @@ export default defineConfig({
     ],
     sidebar: [
       {
+        text: "Docs",
+        collapsed: false,
+        items: [
+          { text: "Introduction", link: "/" },
+          { text: "What you get", link: "/#what-you-get" },
+          { text: "Quick start", link: "/#quick-start" },
+          { text: "Pick your path", link: "/#pick-your-path" },
+        ],
+      },
+      {
         text: "Guide",
         collapsed: false,
         items: [
-          { text: "Getting Started", link: "/guide/getting-started" },
-          { text: "Core Concepts", link: "/guide/concepts" },
-          { text: "Regression Sweep", link: "/guide/sweep" },
+          { text: "Getting started", link: "/guide/getting-started" },
+          { text: "Core concepts", link: "/guide/concepts" },
+          { text: "Regression sweep", link: "/guide/sweep" },
         ],
       },
       {
         text: "Judges",
         collapsed: false,
         items: [
-          { text: "Overview", link: "/guide/judges" },
           { text: "vibecheck", link: "/guide/judges#vibecheck" },
           { text: "exactMatch", link: "/guide/judges#exactmatch" },
           { text: "fuzzyMatch", link: "/guide/judges#fuzzymatch" },
@@ -49,14 +58,18 @@ export default defineConfig({
       {
         text: "CLI",
         collapsed: false,
-        items: [{ text: "Commands", link: "/cli" }],
+        items: [
+          { text: "Commands", link: "/cli" },
+          { text: "Flags & variables", link: "/cli#global-flags" },
+          { text: "Exit codes", link: "/cli#exit-codes" },
+        ],
       },
       {
         text: "API",
         collapsed: false,
         items: [
           { text: "Overview", link: "/api/" },
-          { text: "All Exports", link: "/api/README" },
+          { text: "All exports", link: "/api/README" },
         ],
       },
     ],
