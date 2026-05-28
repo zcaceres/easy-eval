@@ -1,4 +1,4 @@
-import { defineConfig } from "easy-eval";
+import { defineConfig, vibecheck } from "easy-eval";
 
 export default defineConfig({
   evals: {
@@ -18,16 +18,19 @@ export default defineConfig({
         };
       },
 
-      // Optional: define a diffSchema for structured section-by-section diffs.
-      // If omitted, easy-eval will auto-diff by comparing JSON recursively.
+      // Judge determines pass/fail. vibecheck() diffs output against golden.
+      // Omit to use vibecheck() with auto-diff by default.
+      // Pass a schema for structured section-by-section diffs:
       //
-      // diffSchema: {
-      //   sections: [
-      //     { path: "title", label: "Title", kind: "scalar" },
-      //     { path: "score", label: "Score", kind: "scalar" },
-      //     { path: "items", label: "Items", kind: "set" },
-      //   ],
-      // },
+      // judge: vibecheck({
+      //   schema: {
+      //     sections: [
+      //       { path: "title", label: "Title", kind: "scalar" },
+      //       { path: "score", label: "Score", kind: "scalar" },
+      //       { path: "items", label: "Items", kind: "set" },
+      //     ],
+      //   },
+      // }),
     },
   },
 });

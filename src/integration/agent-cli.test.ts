@@ -178,13 +178,13 @@ describe("test isolation", () => {
 // ─── JSON Output Format Tests ────────────────────────────────────
 
 describe("ee eval -f json", () => {
-  test("returns structured JSON with run, diff, and golden", async () => {
+  test("returns structured JSON with run, verdict, and golden", async () => {
     const { stdout, exitCode } = await runCli("eval", "test-dataset", "-f", "json");
     expect(exitCode).toBe(0);
 
     const result = parseJson(stdout) as any;
     expect(result).toHaveProperty("run");
-    expect(result).toHaveProperty("diff");
+    expect(result).toHaveProperty("verdict");
     expect(result).toHaveProperty("golden");
 
     expect(result.run.datasetId).toBe("test-dataset");
@@ -196,9 +196,11 @@ describe("ee eval -f json", () => {
     expect(result.golden).not.toBeNull();
     expect(result.golden.blessedAt).toBe("2026-01-10T08:00:00.000Z");
 
-    expect(result.diff).not.toBeNull();
-    expect(result.diff).toHaveProperty("sections");
-    expect(result.diff).toHaveProperty("summary");
+    expect(result.verdict).not.toBeNull();
+    expect(result.verdict.diff).toHaveProperty("sections");
+    expect(result.verdict.diff).toHaveProperty("summary");
+    expect(result.verdict).toHaveProperty("pass");
+    expect(result.verdict).toHaveProperty("summary");
   });
 
   test("includes vars and inputs in the run object", async () => {
@@ -213,13 +215,13 @@ describe("ee eval -f json", () => {
     });
   });
 
-  test("returns null diff and golden with --no-diff", async () => {
+  test("returns null verdict and golden with --no-diff", async () => {
     const { stdout, exitCode } = await runCli("eval", "test-dataset", "--no-diff", "-f", "json");
     expect(exitCode).toBe(0);
 
     const result = parseJson(stdout) as any;
     expect(result.run.output).toEqual(EVAL_OUTPUT);
-    expect(result.diff).toBeNull();
+    expect(result.verdict).toBeNull();
     expect(result.golden).toBeNull();
   });
 

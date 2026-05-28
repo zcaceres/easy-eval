@@ -12,6 +12,7 @@ export interface StorageConfig {
 export interface EvalDef {
   eval: (ctx: EvalContext) => Promise<unknown>;
   inputs?: (datasetId: string, vars: Record<string, string>) => Promise<unknown>;
+  judge?: EvalMethod;
   diffSchema?: DiffSchema;
 }
 
@@ -37,6 +38,23 @@ export interface CostReport {
     }
   >;
 }
+
+// ─── Eval method (judge) ──────────────────────────────────────────
+
+export interface JudgeInput {
+  run: EvalRun;
+  golden: Golden | null;
+  evalDef: EvalDef;
+}
+
+export interface EvalVerdict {
+  diff: DiffResult | null;
+  pass: boolean;
+  summary: string;
+  metadata?: Record<string, unknown>;
+}
+
+export type EvalMethod = (input: JudgeInput) => Promise<EvalVerdict>;
 
 // ─── Diff schema types ─────────────────────────────────────────────
 

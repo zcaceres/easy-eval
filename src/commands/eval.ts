@@ -3,11 +3,11 @@ import { loadConfig, resolveEval } from "../config/loader";
 import { getStorageRoot } from "../storage/paths";
 import { saveRun, loadGolden, saveChange, discoverDatasets } from "../storage/index";
 import type { DatasetInfo } from "../storage/index";
-import { diff } from "../diff/index";
 import { renderDiffTable, renderDetailedDiff, renderOutputTable, renderSweepTable } from "../render/table";
 import { bold, dim, green, red, yellow } from "../render/colors";
 import { validateEvalDef, validateOutput } from "../validation";
-import type { EvalContext, EvalRun, CostReport, Change, DiffResult, EvalDef, SweepDatasetResult } from "../types";
+import { vibecheck } from "../judges/vibecheck";
+import type { EvalContext, EvalRun, CostReport, Change, EvalVerdict, EvalDef, SweepDatasetResult } from "../types";
 
 export async function cmdEval(
   datasetId: string,
@@ -98,7 +98,7 @@ export async function cmdEval(
 
   if (opts.diff === false) {
     if (isJson) {
-      console.log(JSON.stringify({ run, diff: null, golden: null }, null, 2));
+      console.log(JSON.stringify({ run, verdict: null, golden: null }, null, 2));
     } else {
       console.log(yellow("\nSkipping diff (--no-diff)."));
     }
@@ -106,9 +106,12 @@ export async function cmdEval(
   }
 
   const golden = await loadGolden(storageRoot, evalName, datasetId);
+  const judge = evalDef.judge ?? vibecheck();
+  const verdict = await judge({ run, golden, evalDef });
+
   if (!golden) {
     if (isJson) {
-      console.log(JSON.stringify({ run, diff: null, golden: null }, null, 2));
+      console.log(JSON.stringify({ run, verdict, golden: null }, null, 2));
     } else {
       console.log(yellow("\nNo golden to compare against."));
       console.log(dim("Run `ee bless " + datasetId + "` to promote this output to golden.\n"));
@@ -121,24 +124,28 @@ export async function cmdEval(
     return;
   }
 
-  const result = diff(golden.output, output, evalDef.diffSchema);
-
   if (isJson) {
     console.log(JSON.stringify({
       run,
-      diff: result,
+      verdict,
       golden: { blessedAt: golden.blessedAt },
     }, null, 2));
     return;
   }
 
   console.log(`\n${dim("Golden:")} blessed ${golden.blessedAt.slice(0, 10)}`);
-  console.log();
-  console.log(renderDiffTable(result));
-  console.log();
-  console.log(renderDetailedDiff(result));
 
-  await promptCodify(storageRoot, evalName, datasetId, run, inputs, vars, result, evalDef);
+  if (verdict.diff) {
+    console.log();
+    console.log(renderDiffTable(verdict.diff));
+    console.log();
+    console.log(renderDetailedDiff(verdict.diff));
+  } else {
+    console.log();
+    console.log(verdict.summary);
+  }
+
+  await promptCodify(storageRoot, evalName, datasetId, run, inputs, vars, verdict, evalDef);
 }
 
 async function promptCodify(
@@ -148,7 +155,7 @@ async function promptCodify(
   run: EvalRun,
   inputs: unknown,
   vars: Record<string, string>,
-  result: DiffResult,
+  verdict: EvalVerdict,
   evalDef: EvalDef,
 ): Promise<void> {
   const rl = createInterface({ input: process.stdin, output: process.stdout });
@@ -224,7 +231,7 @@ async function promptCodify(
       runTimestamp: run.timestamp,
       inputs,
       vars,
-      diff: result,
+      diff: verdict.diff ?? undefined,
       note: note || undefined,
       metadata: run.metadata,
     };
@@ -290,14 +297,14 @@ async function runRegressionSweep(
         continue;
       }
 
-      const diffResult = diff(golden.output, output, evalDef.diffSchema);
-      const hasRegression = diffResult.summary.changed > 0 || diffResult.summary.missing > 0;
-      const status = hasRegression ? "regression" : "clean";
+      const judge = evalDef.judge ?? vibecheck();
+      const verdict = await judge({ run, golden, evalDef });
+      const status = verdict.pass ? "clean" : "regression";
       console.log(
-        (hasRegression ? red(" regression") : green(" clean")) + dim(` (${(durationMs / 1000).toFixed(1)}s)`),
+        (verdict.pass ? green(" clean") : red(" regression")) + dim(` (${(durationMs / 1000).toFixed(1)}s)`),
       );
 
-      results.push({ datasetId: ds.datasetId, status, diff: diffResult, durationMs, cost });
+      results.push({ datasetId: ds.datasetId, status, diff: verdict.diff ?? undefined, durationMs, cost });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       console.log(yellow(` skipped (${message})`));

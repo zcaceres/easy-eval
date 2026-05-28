@@ -10,7 +10,7 @@ export async function cmdInit(cwd: string = process.cwd()): Promise<void> {
     console.error("ee.config.ts already exists in this directory.\n");
     console.error("To configure your eval, edit " + bold("ee.config.ts") + ":");
     console.error(dim("  - Define your eval() function to produce structured output"));
-    console.error(dim("  - Add a diffSchema for section-by-section diffs (optional)"));
+    console.error(dim("  - Add a judge (e.g. vibecheck()) to control how evals are scored"));
     console.error("");
     console.error("Then run:");
     console.error(dim("  ee eval <datasetId>    Run eval and compare against golden"));
@@ -68,9 +68,9 @@ export async function cmdInit(cwd: string = process.cwd()): Promise<void> {
   console.log("  1. Open " + bold("ee.config.ts") + " and define your " + bold("eval()") + " function");
   console.log("     This is the eval function that produces structured output for a given dataset.");
   console.log("");
-  console.log("  2. Optionally add a " + bold("diffSchema") + " to control how diffs are displayed");
-  console.log("     Without a diffSchema, easy-eval auto-diffs JSON recursively.");
-  console.log("     With a diffSchema, you get clean section-by-section diffs (scalar, keyed-array, set).");
+  console.log("  2. Optionally add a " + bold("judge") + " to control how evals are scored");
+  console.log("     Default is vibecheck() — diffs output against golden (auto-diff or with a schema).");
+  console.log("     Pass a schema to vibecheck() for clean section-by-section diffs.");
   console.log("");
   console.log("  3. Run your first eval:");
   console.log(dim("     ee eval <datasetId>    Run eval and compare against golden"));
@@ -129,7 +129,7 @@ ee bless <datasetId>                # promote if better
 <!-- ee:end -->
 `;
 
-const DEFAULT_TEMPLATE = `import { defineConfig } from "easy-eval";
+const DEFAULT_TEMPLATE = `import { defineConfig, vibecheck } from "easy-eval";
 
 export default defineConfig({
   evals: {
@@ -149,16 +149,19 @@ export default defineConfig({
         };
       },
 
-      // Optional: define a diffSchema for structured section-by-section diffs.
-      // If omitted, easy-eval will auto-diff by comparing JSON recursively.
+      // Judge determines pass/fail. vibecheck() diffs output against golden.
+      // Omit to use vibecheck() with auto-diff by default.
+      // Pass a schema for structured section-by-section diffs:
       //
-      // diffSchema: {
-      //   sections: [
-      //     { path: "title", label: "Title", kind: "scalar" },
-      //     { path: "score", label: "Score", kind: "scalar" },
-      //     { path: "items", label: "Items", kind: "set" },
-      //   ],
-      // },
+      // judge: vibecheck({
+      //   schema: {
+      //     sections: [
+      //       { path: "title", label: "Title", kind: "scalar" },
+      //       { path: "score", label: "Score", kind: "scalar" },
+      //       { path: "items", label: "Items", kind: "set" },
+      //     ],
+      //   },
+      // }),
     },
   },
 });
