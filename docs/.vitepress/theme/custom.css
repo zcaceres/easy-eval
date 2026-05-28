@@ -391,13 +391,14 @@ body, .vp-doc p, .vp-doc li {
 }
 .VPFooter .container {
   max-width: 1440px !important;
-  display: flex !important;
+  display: grid !important;
+  grid-template-columns: 1fr auto 1fr !important;
   align-items: center !important;
-  justify-content: space-between !important;
+  gap: 24px !important;
   padding: 0 !important;
 }
 .VPFooter .message, .VPFooter .copyright {
-  color: var(--vc-yellow) !important;
+  color: var(--vc-cream) !important;
   font-family: 'Space Mono', monospace !important;
   font-size: 11px !important;
   font-weight: 700 !important;
@@ -408,7 +409,27 @@ body, .vp-doc p, .vp-doc li {
   margin: 0 !important;
   background: none !important;
 }
-.VPFooter .copyright { color: var(--vc-cream) !important; }
+.VPFooter .copyright {
+  grid-column: 1;
+  justify-self: start;
+}
+.VPFooter .message {
+  grid-column: 2;
+  color: var(--vc-yellow) !important;
+  justify-self: center;
+}
+.VPFooter .container::after {
+  content: "v0.1.0";
+  grid-column: 3;
+  justify-self: end;
+  color: var(--vc-cream);
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  line-height: 14px;
+}
 .VPFooter a { color: var(--vc-yellow) !important; }
 
 /* ─────────────────────────────────────────────────────────
@@ -1736,11 +1757,12 @@ body, .vp-doc p, .vp-doc li {
 /* Provenance stamp under bottom bar — rendered by the layout slot */
 .vc-stamp {
   background-color: var(--vc-cream);
-  padding: 8px 48px 14px;
+  padding: 6px 48px 12px;
   font-family: 'Space Mono', monospace;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.15em;
+  line-height: 12px;
   text-transform: uppercase;
   color: var(--vc-navy);
   opacity: 0.5;

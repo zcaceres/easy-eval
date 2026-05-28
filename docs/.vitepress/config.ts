@@ -77,7 +77,7 @@ export default defineConfig({
     socialLinks: [{ icon: "github", link: "https://github.com/zcaceres/vibecheck" }],
     footer: {
       message: "MIT · BUILT WITH BUN + VITEPRESS · NOT AFFILIATED WITH BAYINDIR, BURDUR",
-      copyright: "github.com/zcaceres/vibecheck · v0.1.0",
+      copyright: "github.com/zcaceres/vibecheck",
     },
     search: {
       provider: "local",
