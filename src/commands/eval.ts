@@ -6,7 +6,7 @@ import type { DatasetInfo } from "../storage/index";
 import { renderDiffTable, renderDetailedDiff, renderOutputTable, renderSweepTable } from "../render/table";
 import { bold, dim, green, red, yellow } from "../render/colors";
 import { validateEvalDef, validateOutput, validateIdentifier } from "../validation";
-import { vibecheck } from "../judges/vibecheck";
+import { resolveJudge } from "../judges/vibecheck";
 import type { EvalContext, EvalRun, CostReport, Change, EvalVerdict, EvalDef, SweepDatasetResult } from "../types";
 
 export async function cmdEval(
@@ -127,7 +127,7 @@ export async function cmdEval(
     return;
   }
 
-  const judge = evalDef.judge ?? vibecheck();
+  const judge = resolveJudge(evalDef);
   const verdict = await judge({ run, golden, evalDef });
 
   if (isJson) {
@@ -303,7 +303,7 @@ async function runRegressionSweep(
         continue;
       }
 
-      const judge = evalDef.judge ?? vibecheck();
+      const judge = resolveJudge(evalDef);
       const verdict = await judge({ run, golden, evalDef });
       const status = verdict.pass ? "clean" : "regression";
       console.log(
