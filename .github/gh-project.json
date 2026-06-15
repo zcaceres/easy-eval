@@ -1,0 +1,19 @@
+{
+  "projectNumber": 2,
+  "projectId": "PVT_kwHOAJkXU84BYO95",
+  "projectOwner": "zcaceres",
+  "repoOwner": "zcaceres",
+  "repo": "easy-eval",
+  "title": "easy-eval",
+  "url": "https://github.com/users/zcaceres/projects/2",
+  "defaultMode": "issue",
+  "statusField": {
+    "id": "PVTSSF_lAHOAJkXU84BYO95zhTWPJI",
+    "options": {
+      "Todo": "f75ad846",
+      "In Progress": "47fc9ee4",
+      "Done": "98236657"
+    }
+  },
+  "version": 2
+}

@@ -1,7 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Bash(bun add *)"
+      "Bash(bun add *)",
+      "Bash(gh auth status:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh issue create:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh project view:*)",
+      "Bash(gh project item-list:*)",
+      "Bash(gh project field-list:*)",
+      "Bash(gh project item-add:*)",
+      "Bash(gh project item-edit:*)",
+      "Bash(.github/scripts/gh-project-board.sh:*)"
     ]
   }
 }
