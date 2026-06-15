@@ -1,4 +1,4 @@
-import type { EvalMethod, DiffSchema } from "../types";
+import type { EvalMethod, DiffSchema, EvalDef } from "../types";
 import { diff } from "../diff/index";
 
 export interface VibecheckOptions {
@@ -29,4 +29,14 @@ export function vibecheck(options?: VibecheckOptions): EvalMethod {
       summary: parts.join(", "),
     };
   };
+}
+
+/**
+ * Resolve the judge for an eval. Uses the eval's explicit `judge` if set,
+ * otherwise falls back to the default `vibecheck()` judge — plumbing the
+ * eval's `diffSchema` through so schema-driven diffing works without the
+ * user having to wire `judge: vibecheck({ schema })` by hand.
+ */
+export function resolveJudge(evalDef: EvalDef): EvalMethod {
+  return evalDef.judge ?? vibecheck({ schema: evalDef.diffSchema });
 }
