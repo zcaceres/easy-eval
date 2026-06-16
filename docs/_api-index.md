@@ -29,7 +29,7 @@ outline: [2, 3]
     </div>
 <div class="preview">
 <div><span class="keyword">import</span> { defineConfig, vibecheck } <span class="keyword">from</span></div>
-<div>&nbsp;&nbsp;<span class="string">"vibecheck"</span>;</div>
+<div>&nbsp;&nbsp;<span class="string">"@zcaceres/vibecheck"</span>;</div>
 <div>&nbsp;</div>
 <div><span class="keyword">export default</span> defineConfig({</div>
 <div>&nbsp;&nbsp;evals: {</div>
@@ -57,7 +57,7 @@ outline: [2, 3]
       <div class="chip">Stable · since 0.1.0</div>
     </div>
 <div class="preview">
-<div><span class="keyword">import</span> { fromZod } <span class="keyword">from</span> <span class="string">"vibecheck"</span>;</div>
+<div><span class="keyword">import</span> { fromZod } <span class="keyword">from</span> <span class="string">"@zcaceres/vibecheck"</span>;</div>
 <div>&nbsp;</div>
 <div>&nbsp;&nbsp;reviews: {</div>
 <div>&nbsp;&nbsp;&nbsp;&nbsp;eval: <span class="keyword">async</span> (ctx) =&gt; generate(ctx),</div>

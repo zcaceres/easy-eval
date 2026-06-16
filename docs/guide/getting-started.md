@@ -35,9 +35,9 @@ guideProgress: { step: 2, total: 5 }
       <div class="lede">Add vibecheck as a dev dependency. It exposes a single binary (<code>vibecheck</code>) you'll call from package.json scripts or directly via <code>bunx</code>.</div>
 <div class="vc-terminal">
 <span class="label">Shell</span>
-<pre><span class="prompt">$</span> bun add -d vibecheck
+<pre><span class="prompt">$</span> bun add -d @zcaceres/vibecheck
 <span class="comment"># or run without installing</span>
-<span class="prompt">$</span> bunx vibecheck --help</pre>
+<span class="prompt">$</span> bunx @zcaceres/vibecheck --help</pre>
 </div>
     </div>
   </div>
@@ -52,7 +52,7 @@ guideProgress: { step: 2, total: 5 }
       <div class="lede"><code>vibecheck init</code> scaffolds a typed config and a project-local <code>.vibecheck/</code> store. Everything stays in your repo — no global cache, no daemon.</div>
 <div class="vc-terminal">
 <span class="label">Shell</span>
-<pre><span class="prompt">$</span> bunx vibecheck init
+<pre><span class="prompt">$</span> bunx @zcaceres/vibecheck init
 <span class="comment"># creates vibecheck.config.ts + .vibecheck/</span>
 <span class="prompt">$</span> ls .vibecheck/</pre>
 </div>

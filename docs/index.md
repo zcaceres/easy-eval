@@ -17,7 +17,7 @@ outline: [2, 3]
 <div class="vc-cta-row">
   <a class="vc-cta vc-cta-primary" href="/guide/getting-started">Get started <span>→</span></a>
   <a class="vc-cta vc-cta-secondary" href="https://github.com/zcaceres/vibecheck">★ GitHub</a>
-  <span class="vc-cta vc-cta-install"><span class="prompt">$</span>bun add -d vibecheck<span class="copy">⎘</span></span>
+  <span class="vc-cta vc-cta-install"><span class="prompt">$</span>bun add -d @zcaceres/vibecheck<span class="copy">⎘</span></span>
 </div>
 
 <div class="vc-section-h2">
@@ -56,7 +56,7 @@ outline: [2, 3]
 <div class="vc-install">
   <div class="vc-install-eyebrow">Install</div>
   <div class="vc-install-body">
-    <div class="vc-install-line"><span class="prompt">$</span>bun add -d vibecheck</div>
+    <div class="vc-install-line"><span class="prompt">$</span>bun add -d @zcaceres/vibecheck</div>
     <div class="vc-install-note">Bun ≥ 1.1.0 required. vibecheck is Bun-only — no Node, no tsx. <a href="/guide/getting-started#install">Full guide →</a></div>
   </div>
 </div>
@@ -74,7 +74,7 @@ outline: [2, 3]
     <div class="num">1.</div>
     <div class="body">
       <div class="title">Scaffold a config</div>
-      <div class="vc-term-line"><span class="prompt">$</span>bunx vibecheck init</div>
+      <div class="vc-term-line"><span class="prompt">$</span>bunx @zcaceres/vibecheck init</div>
       <div class="note">Drops a typed <code>vibecheck.config.ts</code> and a <code>.vibecheck/</code> folder into your project root.</div>
     </div>
   </div>

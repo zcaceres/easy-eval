@@ -1,12 +1,12 @@
 #!/usr/bin/env bun
 import * as easyEvalApi from "./index";
 
-// Lets user `vibecheck.config.ts` files resolve `import "vibecheck"` when running from
-// the compiled standalone binary, which has no access to their node_modules.
+// Lets user `vibecheck.config.ts` files resolve `import "@zcaceres/vibecheck"` when running
+// from the compiled standalone binary, which has no access to their node_modules.
 Bun.plugin({
   name: "vibecheck-self",
   setup(build) {
-    build.module("vibecheck", () => ({
+    build.module("@zcaceres/vibecheck", () => ({
       exports: easyEvalApi,
       loader: "object",
     }));

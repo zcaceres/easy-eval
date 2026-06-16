@@ -7,8 +7,10 @@ The core loop: **bless** a golden reference, **eval** by re-running your generat
 ## Install
 
 ```bash
-bun install
+bun add -d @zcaceres/vibecheck   # or run without installing: bunx @zcaceres/vibecheck --help
 ```
+
+Prebuilt standalone binaries (no Bun required at runtime) are also attached to each [GitHub release](https://github.com/zcaceres/easy-eval/releases).
 
 ## Quick start
 
@@ -77,7 +79,7 @@ A judge determines pass/fail for an eval run. Set `judge` on your eval definitio
 **`vibecheck()`** — the default judge. Diffs eval output against golden and passes when nothing changed, went missing, or was added. Without a schema it auto-diffs JSON recursively. Pass a schema for structured section-by-section diffs:
 
 ```ts
-import { defineConfig, vibecheck } from "vibecheck";
+import { defineConfig, vibecheck } from "@zcaceres/vibecheck";
 
 export default defineConfig({
   evals: {
@@ -101,7 +103,7 @@ Schema section kinds: `scalar`, `keyed-array`, `set`, `ordered-array`.
 **`exactMatch()`** — deterministic judge. Deep-equals the run output against golden. Passes only when values are identical. Use `fields` to restrict which top-level keys are checked:
 
 ```ts
-import { defineConfig, exactMatch } from "vibecheck";
+import { defineConfig, exactMatch } from "@zcaceres/vibecheck";
 
 export default defineConfig({
   evals: {
@@ -116,7 +118,7 @@ export default defineConfig({
 **`fuzzyMatch()`** — flexible judge with normalization. Compares fields with configurable tolerance for strings (case, whitespace, edit distance) and numbers:
 
 ```ts
-import { defineConfig, fuzzyMatch } from "vibecheck";
+import { defineConfig, fuzzyMatch } from "@zcaceres/vibecheck";
 
 export default defineConfig({
   evals: {
@@ -140,7 +142,7 @@ String matching: normalization (case, whitespace) is applied first, then exact c
 **`llmJudge()`** — uses an LLM to judge eval output. You provide a `call` function that takes a prompt and returns a string. The judge constructs a grading prompt from the run output, golden (if any), and an optional rubric, then parses the LLM's JSON response for pass/fail:
 
 ```ts
-import { defineConfig, llmJudge } from "vibecheck";
+import { defineConfig, llmJudge } from "@zcaceres/vibecheck";
 
 export default defineConfig({
   evals: {

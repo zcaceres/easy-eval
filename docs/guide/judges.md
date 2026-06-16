@@ -9,7 +9,7 @@ All built-in judges share the `EvalMethod` signature: `(JudgeInput) => Promise<E
 The default. Diffs eval output against golden and passes when nothing changed, went missing, or was added. Without a schema it auto-diffs JSON recursively. Pass a schema for structured section-by-section diffs:
 
 ```ts
-import { defineConfig, vibecheck } from "vibecheck";
+import { defineConfig, vibecheck } from "@zcaceres/vibecheck";
 
 export default defineConfig({
   evals: {
@@ -66,7 +66,7 @@ export default defineConfig({
 Deterministic. Deep-equals run output against golden. Passes only when values are identical. Use `fields` to restrict to specific top-level keys:
 
 ```ts
-import { exactMatch } from "vibecheck";
+import { exactMatch } from "@zcaceres/vibecheck";
 
 judge: exactMatch({ fields: ["name", "status"] });
 ```
@@ -76,7 +76,7 @@ judge: exactMatch({ fields: ["name", "status"] });
 Flexible comparison with normalization. Configurable tolerance for strings (case, whitespace, edit distance) and numbers:
 
 ```ts
-import { fuzzyMatch } from "vibecheck";
+import { fuzzyMatch } from "@zcaceres/vibecheck";
 
 judge: fuzzyMatch({
   ignoreCase: true,          // default: true
@@ -95,7 +95,7 @@ String matching: normalization first, then exact comparison. If still different 
 LLM-as-judge. You provide a `call` function that takes a prompt and returns a string. The judge constructs a grading prompt from the run output, golden, and an optional rubric, then parses the LLM's JSON response:
 
 ```ts
-import { llmJudge } from "vibecheck";
+import { llmJudge } from "@zcaceres/vibecheck";
 
 judge: llmJudge({
   call: async (prompt) => {
@@ -112,7 +112,7 @@ The LLM is prompted to return `{"pass": true/false, "summary": "..."}`. Raw resp
 A judge is just a function. Here's a minimal one that passes when the output's `score` exceeds a threshold:
 
 ```ts
-import type { EvalMethod } from "vibecheck";
+import type { EvalMethod } from "@zcaceres/vibecheck";
 
 const scoreThreshold = (min: number): EvalMethod => async ({ run }) => ({
   pass: (run.output as any).score >= min,
