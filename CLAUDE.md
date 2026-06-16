@@ -16,9 +16,9 @@ Generalized, open-source extraction of the eval framework from `~/storesdata/pip
 - **Framework-level diffSchema.** `EvalDef.diffSchema` controls how `vibecheck report`, `vibecheck merge`, and `vibecheck changes` render diffs. Separate from the judge — judges own their own comparison logic.
 - **Config is code, not YAML.** `vibecheck.config.ts` exports via `defineConfig()` for type safety.
 - **Storage is project-local.** `.vibecheck/{worker}/{datasetId}/` — not a global cache. Goldens can be committed to git; runs/reports are ephemeral.
-- **Workers are named eval targets.** Most projects have one (`default`). The `workers` map handles multi-eval projects.
+- **Workers are named eval targets.** Most projects have one (`default`). The `evals` map (keyed by worker name) handles multi-eval projects.
 - **The framework manages outputs only.** It does not manage input data. Users optionally provide an `inputs()` function that loads whatever their eval function needs.
-- **Cost tracking is user-reported.** The user calls `ctx.reportCost()` during their run function. The framework stores and displays it.
+- **Cost tracking is user-reported.** The user calls `ctx.reportCost()` during their eval function. The framework stores and displays it.
 
 ## CLI commands
 
@@ -31,9 +31,11 @@ vibecheck report <datasetId> [timestamp]    Show diff report from cached run
 vibecheck report <id> <ts> --against <ts2>  Compare two runs directly (run-vs-run)
 vibecheck sweep <datasetId>                 Non-interactive regression sweep
 vibecheck merge <datasetId> [timestamp]     Interactively merge eval into golden
+vibecheck validate                          Validate config; --probe checks output shapes
 vibecheck status                            Overview of all datasets and goldens
 vibecheck changes list [-d datasetId]       List codified changes (optionally filtered)
 vibecheck changes show <timestamp>          View a codified change in detail
+vibecheck changes add <id> [runTs]          Codify a change from an existing run
 vibecheck changes export [-d id] [-o path]  Export changes as markdown
 ```
 
@@ -46,12 +48,13 @@ Two paths: (1) built into `vibecheck eval`'s interactive codify flow, and (2) st
 ```
 src/
   cli.ts              Commander.js entry point (bin: "vibecheck")
-  index.ts            Public API: defineConfig + type re-exports
+  index.ts            Public API: defineConfig, judges, fromZod + type re-exports
   types.ts            All core types
   config/loader.ts    Find and import vibecheck.config.ts
   commands/           One file per CLI command
-  judges/             Eval methods (vibecheck, exactMatch, fuzzyMatch)
-  storage/            Filesystem ops for golden, runs, reports
+  judges/             Eval methods (vibecheck, exactMatch, fuzzyMatch, llmJudge)
+  schema/             fromZod: derive a diffSchema from a Zod schema
+  storage/            Filesystem ops for golden, runs, reports, changes
   diff/               Diff engines (auto-recursive + schema-driven)
   merge/              Interactive merge UI
   render/             Table + ANSI color renderers

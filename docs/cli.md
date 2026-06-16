@@ -26,7 +26,7 @@ exitLegend: true
 </div>
 
 <div class="vc-hero-lede">
-  <div class="head">Every vibecheck command. Each row lists the signature, what it does, and the exit codes you can rely on in CI. Agent-friendly: no interactive prompts unless you pass <code>--interactive</code>.</div>
+  <div class="head">Every vibecheck command. Each row lists the signature, what it does, and the exit codes you can rely on in CI. Agent-friendly: pass <code>-f json</code> for machine-readable output, or <code>--no-diff</code> on <code>eval</code> to skip the interactive codify prompt.</div>
 </div>
 
 <div class="vc-cmd-grouphead">
@@ -60,12 +60,12 @@ exitLegend: true
     </div>
     <div class="desc">
       <div class="head">Promote the latest run to golden.</div>
-      <div class="body">Reviews the new output side-by-side, then writes <code>.vibecheck/{worker}/{datasetId}/golden.json</code>. Pass <code>--yes</code> to skip the confirm in scripts.</div>
+      <div class="body">Reviews the new output side-by-side, then writes <code>.vibecheck/{worker}/{datasetId}/golden.json</code>. Pass <code>--from-run &lt;ts&gt;</code> to bless a specific past run instead of the latest.</div>
     </div>
     <div class="exits">
       <div class="label">Exits</div>
       <div class="exit ok">0 · ok</div>
-      <div class="exit warn">2 · abort</div>
+      <div class="exit bad">1 · err</div>
     </div>
   </div>
 
@@ -81,7 +81,7 @@ exitLegend: true
     <div class="exits">
       <div class="label">Exits</div>
       <div class="exit ok">0 · ok</div>
-      <div class="exit warn">2 · abort</div>
+      <div class="exit bad">1 · err</div>
     </div>
   </div>
 
@@ -90,7 +90,7 @@ exitLegend: true
 <div class="vc-cmd-grouphead">
   <h2 id="run-and-read" class="title">Run &amp; read</h2>
   <span class="blurb">Re-run evals, list history, surface diffs and decisions.</span>
-  <span class="count">6 commands</span>
+  <span class="count">7 commands</span>
 </div>
 
 <div class="vc-cmd-rows">
@@ -102,12 +102,12 @@ exitLegend: true
     </div>
     <div class="desc">
       <div class="head">Re-run the eval and diff against golden.</div>
-      <div class="body">The primary command. Runs your eval function, applies the configured judge, prints a section-by-section diff, and saves the run to <code>.vibecheck/</code>. Exits 1 if anything regressed.</div>
+      <div class="body">The primary command. Runs your eval function, applies the configured judge, prints a section-by-section diff, and saves the run to <code>.vibecheck/</code>. Exits 0 on a clean run <em>or</em> a diff — a regression doesn't fail the command. Exits 1 only on a config or output-schema error.</div>
     </div>
     <div class="exits">
       <div class="label">Exits</div>
-      <div class="exit ok">0 · pass</div>
-      <div class="exit bad">1 · diff</div>
+      <div class="exit ok">0 · ok</div>
+      <div class="exit bad">1 · err</div>
     </div>
   </div>
 
@@ -118,12 +118,11 @@ exitLegend: true
     </div>
     <div class="desc">
       <div class="head">Non-interactive regression sweep across all goldens.</div>
-      <div class="body">Re-runs the eval with the same <code>-v</code> variables across every other golden for this worker. Designed for agents and CI: prints a JSON-friendly summary of match / regression / skipped per dataset.</div>
+      <div class="body">Re-runs the eval with the same <code>-v</code> variables across every other golden for this worker, printing a summary of match / regression / skipped per dataset. Pass <code>-f json</code> for machine-readable output. Always exits 0 — read the summary to gate CI yourself.</div>
     </div>
     <div class="exits">
       <div class="label">Exits</div>
-      <div class="exit ok">0 · pass</div>
-      <div class="exit bad">1 · diff</div>
+      <div class="exit ok">0 · ok</div>
     </div>
   </div>
 
@@ -178,12 +177,28 @@ exitLegend: true
       <div class="sig"><span class="prompt">$</span>vibecheck changes &lt;sub&gt;</div>
     </div>
     <div class="desc">
-      <div class="head">List, show, or export codified changes.</div>
-      <div class="body">Sub-commands: <code>list</code>, <code>show &lt;ts&gt;</code>, <code>export</code>. Lets you replay the human decisions that shaped golden — useful for audit trails and onboarding.</div>
+      <div class="head">List, show, add, or export codified changes.</div>
+      <div class="body">Sub-commands: <code>list</code>, <code>show &lt;ts&gt;</code>, <code>add &lt;id&gt; [runTs]</code>, <code>export</code>. Lets you replay the human decisions that shaped golden — useful for audit trails and onboarding.</div>
     </div>
     <div class="exits">
       <div class="label">Exits</div>
       <div class="exit ok">0 · ok</div>
+    </div>
+  </div>
+
+  <div class="vc-cmd">
+    <div class="lhs">
+      <h3 id="validate" class="name">validate</h3>
+      <div class="sig"><span class="prompt">$</span>vibecheck validate</div>
+    </div>
+    <div class="desc">
+      <div class="head">Type-check the config before you run it.</div>
+      <div class="body">Loads <code>vibecheck.config.ts</code> and checks every eval function and <code>diffSchema</code>. Pass <code>--probe</code> to run each eval once and validate its output shape against the schema.</div>
+    </div>
+    <div class="exits">
+      <div class="label">Exits</div>
+      <div class="exit ok">0 · ok</div>
+      <div class="exit bad">1 · err</div>
     </div>
   </div>
 
@@ -192,7 +207,7 @@ exitLegend: true
 <div class="vc-flags-banner" id="global-flags">
   <div class="left">
     <div class="label">Global flags</div>
-    <div class="body">Every command accepts <code>-v key=value</code> to pass eval variables, <code>--worker &lt;name&gt;</code> to target a specific worker, and <code>--json</code> to switch output to a machine-readable stream.</div>
+    <div class="body"><code>eval</code> and <code>sweep</code> accept <code>-v key=value</code> to pass eval variables. Most commands accept <code>--worker &lt;name&gt;</code> to target a specific worker (all except <code>init</code>, <code>status</code>, and <code>changes export</code>) and <code>-f, --format &lt;json|md|table&gt;</code> to switch output to a machine-readable stream. A global <code>-c, --config &lt;path&gt;</code> points at a specific config file.</div>
   </div>
   <a href="#exit-codes">Flags &amp; vars →</a>
 </div>
@@ -201,9 +216,8 @@ exitLegend: true
 
 | Code | Meaning |
 |------|---------|
-| `0`  | Success (eval passed, or non-evaluating command succeeded) |
-| `1`  | Eval failed / regression / config error |
-| `2`  | User aborted an interactive prompt |
+| `0`  | Success — including an `eval`/`sweep` that found a diff (a regression does not fail the command) |
+| `1`  | Config-validation error, output-schema mismatch, or a missing config / run / golden / change |
 
 <div class="vc-pagenav">
   <a href="/guide/sweep" class="prev">

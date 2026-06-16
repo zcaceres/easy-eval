@@ -1,4 +1,4 @@
-import { defineConfig, vibecheck, exactMatch, fuzzyMatch, llmJudge } from "vibecheck";
+import { defineConfig, vibecheck, exactMatch, fuzzyMatch, llmJudge } from "@zcaceres/vibecheck";
 
 export default defineConfig({
   evals: {

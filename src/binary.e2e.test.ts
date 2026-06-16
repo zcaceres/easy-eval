@@ -69,7 +69,7 @@ describe("compiled vibecheck binary e2e", () => {
     expect(existsSync(join(tmp, ".vibecheck"))).toBe(true);
 
     const config = readFileSync(join(tmp, "vibecheck.config.ts"), "utf8");
-    expect(config).toContain('from "vibecheck"');
+    expect(config).toContain('from "@zcaceres/vibecheck"');
   });
 
   test("eval runs scaffolded config WITHOUT node_modules (virtual module shim)", async () => {

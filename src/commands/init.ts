@@ -129,7 +129,7 @@ vibecheck bless <datasetId>                # promote if better
 <!-- vibecheck:end -->
 `;
 
-const DEFAULT_TEMPLATE = `import { defineConfig, vibecheck, exactMatch, fuzzyMatch, llmJudge } from "vibecheck";
+const DEFAULT_TEMPLATE = `import { defineConfig, vibecheck, exactMatch, fuzzyMatch, llmJudge } from "@zcaceres/vibecheck";
 
 export default defineConfig({
   evals: {
