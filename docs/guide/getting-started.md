@@ -100,7 +100,7 @@ guideProgress: { step: 2, total: 5 }
     </div>
     <div class="body">
       <h2 id="compare" class="title">Compare</h2>
-      <div class="lede">Re-run any time. vibecheck diffs the new output against golden section-by-section and exits non-zero if anything drifted. Wire it into CI and you're done.</div>
+      <div class="lede">Re-run any time. vibecheck diffs the new output against golden section-by-section and prints exactly what drifted. Codify the change or re-bless when the new output is the one you want.</div>
 <div class="vc-terminal">
 <span class="label">Shell</span>
 <pre><span class="prompt">$</span> vibecheck eval reviews

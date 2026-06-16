@@ -65,6 +65,6 @@ eval: async (ctx) => {
 
 ## Codified changes
 
-After an eval shows a difference, you can **codify** the change — record it as a structured entry with a note explaining what improved. Codified changes accumulate in `.vibecheck/{worker}/changes/` and can be reviewed with `vibecheck changes`.
+After an eval shows a difference, you can **codify** the change — record it as a structured entry with a note explaining what improved. Codified changes accumulate in `.vibecheck/changes/` (a single worker-independent log) and can be reviewed with `vibecheck changes`.
 
 This makes it easy to track *why* a golden moved over time, not just *that* it moved.

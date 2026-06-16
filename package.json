@@ -7,6 +7,9 @@
   "bin": {
     "vibecheck": "src/cli.ts"
   },
+  "engines": {
+    "bun": ">=1.1.0"
+  },
   "scripts": {
     "vibecheck": "bun run src/cli.ts",
     "typecheck": "tsc --noEmit",

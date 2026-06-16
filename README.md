@@ -14,7 +14,7 @@ bun install
 
 ```bash
 vibecheck init              # Scaffold vibecheck.config.ts and .vibecheck/
-# Edit vibecheck.config.ts — define your run() function
+# Edit vibecheck.config.ts — define your eval() function
 vibecheck eval my-input     # Run eval, compare against golden
 vibecheck bless my-input    # Promote output to golden reference
 ```
@@ -27,13 +27,13 @@ Every `vibecheck` command takes a **datasetId** — a unique string that identif
 
 Examples: `"user-123"`, `"invoice-march"`, `"edge-case-empty-cart"`, `"joes-pizza"`
 
-Your `run()` function receives the datasetId via `ctx.datasetId`. Use it to load the right input data for that eval run — from a file, a database, a hardcoded map, whatever fits your project.
+Your `eval()` function receives the datasetId via `ctx.datasetId`. Use it to load the right input data for that eval run — from a file, a database, a hardcoded map, whatever fits your project.
 
 ```ts
 export default defineConfig({
-  workers: {
+  evals: {
     default: {
-      run: async (ctx) => {
+      eval: async (ctx) => {
         const input = loadMyData(ctx.datasetId); // you decide how to load inputs
         return await myLLMPipeline(input);        // returns structured output
       },
@@ -180,8 +180,12 @@ vibecheck eval <datasetId> [-v key=value]   Run eval function, compare against g
 vibecheck bless <datasetId>                 Promote output to golden
 vibecheck runs <datasetId>                  List past eval runs
 vibecheck report <datasetId> [timestamp]    Show diff report from cached run
+vibecheck report <id> <ts> --against <ts2>  Compare two runs directly (run-vs-run)
+vibecheck sweep <datasetId>                 Non-interactive regression sweep
 vibecheck merge <datasetId> [timestamp]     Interactively merge eval into golden
+vibecheck validate                          Validate vibecheck.config.ts
 vibecheck status                            Overview of all datasets and goldens
+vibecheck changes list|show|export          List, show, or export codified changes
 ```
 
 ## Development

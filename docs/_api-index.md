@@ -11,7 +11,7 @@ outline: [2, 3]
 </div>
 
 <div class="vc-hero-lede">
-  <div class="head">The entire public surface fits on this page. One config helper, four built-in judges, a dozen types. Everything else is internal — if it's not listed here, it isn't stable.</div>
+  <div class="head">The entire public surface fits on this page. Two helpers, four built-in judges, a dozen types. Everything else is internal — if it's not listed here, it isn't stable.</div>
 </div>
 
 <div class="vc-fn-card">
@@ -39,6 +39,30 @@ outline: [2, 3]
 <div>&nbsp;&nbsp;&nbsp;&nbsp;},</div>
 <div>&nbsp;&nbsp;},</div>
 <div>});</div>
+</div>
+  </div>
+</div>
+
+<div class="vc-fn-card">
+  <div class="chrome">
+    <span class="kind">Function</span>
+    <span class="name">fromZod</span>
+    <span class="sig">(schema, overrides?: ZodOverrides) → DiffSchema</span>
+    <span class="path">vibecheck/index.ts</span>
+  </div>
+  <div class="row">
+    <div class="copy">
+      <div class="head">Derive a diffSchema from a Zod schema.</div>
+      <div class="body">Converts a Zod object schema into a vibecheck <code>DiffSchema</code> so <code>report</code>, <code>merge</code>, and <code>changes</code> render structured section diffs without hand-writing section configs. Pass <code>overrides</code> to tune or drop individual fields. Zod is an optional peer dependency.</div>
+      <div class="chip">Stable · since 0.1.0</div>
+    </div>
+<div class="preview">
+<div><span class="keyword">import</span> { fromZod } <span class="keyword">from</span> <span class="string">"vibecheck"</span>;</div>
+<div>&nbsp;</div>
+<div>&nbsp;&nbsp;reviews: {</div>
+<div>&nbsp;&nbsp;&nbsp;&nbsp;eval: <span class="keyword">async</span> (ctx) =&gt; generate(ctx),</div>
+<div>&nbsp;&nbsp;&nbsp;&nbsp;diffSchema: fromZod(ReviewSchema),</div>
+<div>&nbsp;&nbsp;},</div>
 </div>
   </div>
 </div>
