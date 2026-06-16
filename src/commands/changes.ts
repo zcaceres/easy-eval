@@ -47,13 +47,19 @@ export async function cmdChanges(
 
   for (const c of changes) {
     const ts = c.timestamp.slice(0, 19);
-    const note = c.note ?? dim("—");
-    const vars = Object.keys(c.vars).length > 0
+    const hasNote = c.note != null;
+    const hasVars = Object.keys(c.vars).length > 0;
+    const note = hasNote ? c.note! : "—";
+    const vars = hasVars
       ? Object.entries(c.vars).map(([k, v]) => `${k}=${v}`).join(", ")
-      : dim("—");
+      : "—";
+    // Pad the plain string first, then color — applying color before padding
+    // inflates `.length` with ANSI bytes so padEnd would no-op (misaligning).
+    const noteCell = trunc(note, W_NOTE).padEnd(W_NOTE);
+    const varsCell = trunc(vars, W_VARS).padEnd(W_VARS);
 
     console.log(
-      `${ts.padEnd(W_TS)} ${c.datasetId.padEnd(W_DS)} ${trunc(note, W_NOTE).padEnd(W_NOTE)} ${trunc(vars, W_VARS).padEnd(W_VARS)}`,
+      `${ts.padEnd(W_TS)} ${c.datasetId.padEnd(W_DS)} ${hasNote ? noteCell : dim(noteCell)} ${hasVars ? varsCell : dim(varsCell)}`,
     );
   }
 

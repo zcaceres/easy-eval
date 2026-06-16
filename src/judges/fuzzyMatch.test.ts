@@ -266,4 +266,36 @@ describe("fuzzyMatch", () => {
     expect(verdict).toHaveProperty("pass");
     expect(verdict).toHaveProperty("summary");
   });
+
+  // ─── Regression: null output and fuzzy array comparison ───────
+
+  test("does not crash when an output is null", async () => {
+    const judge = fuzzyMatch();
+    const verdict = await judge({
+      run: makeRun(null),
+      golden: makeGolden({ a: 1 }),
+      evalDef: makeEvalDef(),
+    });
+    expect(verdict.pass).toBe(false);
+  });
+
+  test("array elements honor fuzzy options (case + whitespace, order-insensitive)", async () => {
+    const judge = fuzzyMatch({ ignoreCase: true, ignoreWhitespace: true });
+    const verdict = await judge({
+      run: makeRun({ tags: ["hello  world", "foo"] }),
+      golden: makeGolden({ tags: ["Foo", "Hello World"] }),
+      evalDef: makeEvalDef(),
+    });
+    expect(verdict.pass).toBe(true);
+  });
+
+  test("array with a genuinely different element still mismatches", async () => {
+    const judge = fuzzyMatch();
+    const verdict = await judge({
+      run: makeRun({ tags: ["aaa"] }),
+      golden: makeGolden({ tags: ["zzz"] }),
+      evalDef: makeEvalDef(),
+    });
+    expect(verdict.pass).toBe(false);
+  });
 });

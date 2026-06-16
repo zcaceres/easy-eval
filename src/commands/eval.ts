@@ -212,9 +212,13 @@ async function promptCodify(
         }
 
         const regressionCount = sweepResults.filter((r) => r.status === "regression").length;
-        if (regressionCount > 0) {
+        const errorCount = sweepResults.filter((r) => r.status === "error").length;
+        if (regressionCount > 0 || errorCount > 0) {
+          const parts: string[] = [];
+          if (regressionCount > 0) parts.push(`${regressionCount} regression${regressionCount !== 1 ? "s" : ""}`);
+          if (errorCount > 0) parts.push(`${errorCount} error${errorCount !== 1 ? "s" : ""}`);
           const proceed = await ask(
-            `\n${red(`${regressionCount} regression${regressionCount !== 1 ? "s" : ""} detected.`)} Still codify? [y/N] `,
+            `\n${red(`${parts.join(" and ")} detected.`)} Still codify? [y/N] `,
           );
           if (proceed !== "y" && proceed !== "yes") {
             console.log(yellow("Aborted. Change was not saved."));
@@ -313,8 +317,8 @@ async function runRegressionSweep(
       results.push({ datasetId: ds.datasetId, status, diff: verdict.diff ?? undefined, durationMs, cost });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      console.log(yellow(` skipped (${message})`));
-      results.push({ datasetId: ds.datasetId, status: "skipped", error: message });
+      console.log(yellow(` error (${message})`));
+      results.push({ datasetId: ds.datasetId, status: "error", error: message });
     }
   }
 
