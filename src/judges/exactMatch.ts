@@ -15,7 +15,7 @@ export function exactMatch(options?: ExactMatchOptions): EvalMethod {
     const goldenObj = golden.output as Record<string, unknown>;
     const runObj = run.output as Record<string, unknown>;
 
-    if (!fields && typeof goldenObj !== "object" || goldenObj === null) {
+    if (typeof goldenObj !== "object" || goldenObj === null || typeof runObj !== "object" || runObj === null) {
       const pass = JSON.stringify(golden.output) === JSON.stringify(run.output);
       return { diff: null, pass, summary: pass ? "exact match" : "mismatch" };
     }

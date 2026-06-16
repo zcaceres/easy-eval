@@ -146,4 +146,36 @@ describe("exactMatch", () => {
     expect(verdict).toHaveProperty("pass");
     expect(verdict).toHaveProperty("summary");
   });
+
+  // ─── Regression: scalar/null output handling ──────────────────
+
+  test("does not crash when run output is null", async () => {
+    const judge = exactMatch();
+    const verdict = await judge({
+      run: makeRun(null),
+      golden: makeGolden({ a: 1 }),
+      evalDef: makeEvalDef(),
+    });
+    expect(verdict.pass).toBe(false);
+  });
+
+  test("differing scalar outputs mismatch even when fields are set", async () => {
+    const judge = exactMatch({ fields: ["a"] });
+    const verdict = await judge({
+      run: makeRun("world"),
+      golden: makeGolden("hello"),
+      evalDef: makeEvalDef(),
+    });
+    expect(verdict.pass).toBe(false);
+  });
+
+  test("equal scalar outputs match even when fields are set", async () => {
+    const judge = exactMatch({ fields: ["a"] });
+    const verdict = await judge({
+      run: makeRun("hello"),
+      golden: makeGolden("hello"),
+      evalDef: makeEvalDef(),
+    });
+    expect(verdict.pass).toBe(true);
+  });
 });

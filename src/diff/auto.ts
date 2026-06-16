@@ -222,16 +222,22 @@ function guessKeyField(golden: Record<string, unknown>[], eval_: Record<string, 
   const sample = golden[0] ?? eval_[0];
   if (!sample) return null;
 
+  // A field is only usable as a key if it's a non-empty string on *every*
+  // item in both arrays — otherwise ragged items collide on `String(undefined)`
+  // and all but the last are silently dropped from the diff.
+  const isUsableKey = (field: string): boolean =>
+    [...golden, ...eval_].every((item) => typeof item[field] === "string" && item[field] !== "");
+
   const candidates = ["id", "name", "key", "type", "label", "title", "slug"];
   for (const field of candidates) {
-    if (field in sample && typeof sample[field] === "string") {
+    if (field in sample && isUsableKey(field)) {
       return field;
     }
   }
 
   for (const [field, val] of Object.entries(sample)) {
-    if (typeof val === "string" && field.toLowerCase().includes("name")) return field;
-    if (typeof val === "string" && field.toLowerCase().includes("id")) return field;
+    if (typeof val === "string" && field.toLowerCase().includes("name") && isUsableKey(field)) return field;
+    if (typeof val === "string" && field.toLowerCase().includes("id") && isUsableKey(field)) return field;
   }
 
   return null;

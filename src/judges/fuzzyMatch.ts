@@ -27,6 +27,17 @@ export function fuzzyMatch(options?: FuzzyMatchOptions): EvalMethod {
     const goldenObj = golden.output as Record<string, unknown>;
     const runObj = run.output as Record<string, unknown>;
 
+    if (typeof goldenObj !== "object" || goldenObj === null || typeof runObj !== "object" || runObj === null) {
+      const pass = fuzzyEqual(golden.output, run.output, {
+        ignoreCase,
+        ignoreWhitespace,
+        numericTolerance,
+        maxEditDistance,
+        minSimilarity,
+      });
+      return { diff: null, pass, summary: pass ? "fuzzy match" : "mismatch" };
+    }
+
     const keysToCheck = fields ?? allKeys(goldenObj, runObj);
     const mismatched: string[] = [];
 
@@ -123,11 +134,13 @@ function fuzzyEqual(golden: unknown, run: unknown, opts: CompareOpts): boolean {
 function fuzzyArrayEqual(golden: unknown[], run: unknown[], opts: CompareOpts): boolean {
   if (golden.length !== run.length) return false;
 
-  const goldenSorted = [...golden].map((v) => JSON.stringify(v)).sort();
-  const runSorted = [...run].map((v) => JSON.stringify(v)).sort();
-
-  for (let i = 0; i < goldenSorted.length; i++) {
-    if (goldenSorted[i] !== runSorted[i]) return false;
+  // Order-insensitive: greedily pair each golden element with an unused run
+  // element that fuzzy-matches it, honoring the fuzzy options.
+  const used = new Array(run.length).fill(false);
+  for (const g of golden) {
+    const idx = run.findIndex((r, i) => !used[i] && fuzzyEqual(g, r, opts));
+    if (idx === -1) return false;
+    used[idx] = true;
   }
   return true;
 }

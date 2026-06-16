@@ -3,7 +3,7 @@ import { existsSync } from "fs";
 import type { EvalConfig } from "../types";
 import { VibecheckInputError, validateEvalDef } from "../validation";
 
-const CONFIG_FILENAMES = ["vibecheck.config.ts", "vibecheck.config.js"];
+const CONFIG_FILENAMES = ["vibecheck.config.ts", "vibecheck.config.js", "vibecheck.config.mjs"];
 const CONFIG_BASENAME_RE = /^vibecheck\.config\.(ts|js|mjs)$/;
 
 export async function loadConfig(configPath?: string): Promise<EvalConfig> {

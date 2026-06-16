@@ -169,9 +169,9 @@ export function renderSweepTable(results: SweepDatasetResult[]): string {
   for (const r of results) {
     if (r.status === "skipped" || r.status === "error") {
       const statusStr = r.status === "skipped" ? yellow("~ skipped") : red("x error");
-      const dash = dim("—");
+      const dash = "—";
       lines.push(
-        `${trunc(r.datasetId, W_DS - 1).padEnd(W_DS)} ${dash.padStart(W_NUM)} ${dash.padStart(W_NUM)} ${dash.padStart(W_NUM)} ${dash.padStart(W_NUM)} ${dash.padStart(W_DUR)} ${dash.padStart(W_COST)} ${statusStr}`,
+        `${trunc(r.datasetId, W_DS - 1).padEnd(W_DS)} ${dim(dash.padStart(W_NUM))} ${dim(dash.padStart(W_NUM))} ${dim(dash.padStart(W_NUM))} ${dim(dash.padStart(W_NUM))} ${dim(dash.padStart(W_DUR))} ${dim(dash.padStart(W_COST))} ${statusStr}`,
       );
     } else {
       const s = r.diff!.summary;
